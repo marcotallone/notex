@@ -30,7 +30,7 @@
     <a href="./main.pdf"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="./main.pdf">View Demo</a>
+    <a href="./main.tex">View Demo</a>
     ·
     <a href="https://github.com/marcotallone/notex/issues">Report Bug</a>
     ·
