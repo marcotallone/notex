@@ -1,9 +1,9 @@
 %┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓%
-%┃                               ~  QUASAR ~                                  ┃%
+%┃                                ~  NOTEX ~                                  ┃%
 %┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛%
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{notex}[2024/05/17 A modern note taking LaTeX class.]
+\ProvidesClass{notex}[2024/05/17 A modern note-taking LaTeX class.]
 
 \LoadClass[a4paper, 10pt]{article}
 
