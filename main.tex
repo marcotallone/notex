@@ -1,0 +1,47 @@
+\documentclass{settings/notex}
+
+% PREAMBLE ─────────────────────────────────────────────────────────────────────
+
+% Images path
+\graphicspath{{images/}}
+
+% Additional packages here
+\usepackage{blindtext}
+% ...
+
+% Subfiles package (best loaded last in the preamble)
+\usepackage{subfiles}
+
+% TITLE, AUTHOR AND DATE ───────────────────────────────────────────────────────
+
+% Title, Author and Date
+\title{\bft{NoTeX Template}}
+\author{Marco Tallone}
+\date{2024}
+
+% Copy versions for headers (see NOTE on `Styles` in settings/notex.cls)
+% \newcommand{\pastetitle}{NoTeX Template}
+% \newcommand{\pasteauthor}{Marco Tallone}
+% \newcommand{\pastedate}{2024}
+
+% DOCUMENT ─────────────────────────────────────────────────────────────────────
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+% Sections
+\pagebreak
+\subfile{sections/introduction}
+\pagebreak
+\subfile{sections/section}
+
+% Bibliography
+% Remember to compile with the sequence:
+% lualatex -> bibtex -> lualatex -> lualatex
+\pagebreak
+\bibliographystyle{plainurl}
+\bibliography{bibliography}
+
+\end{document}

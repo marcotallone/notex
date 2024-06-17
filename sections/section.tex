@@ -1,0 +1,423 @@
+\documentclass[../main.tex]{subfiles}
+\graphicspath{{\subfix{../images/}}} % Images path
+
+\begin{document}
+
+\section{Usage Examples}
+
+This section presents simple examples on how to use the NoTeX template and its
+features. The template is designed to be easy to use and customize, so you can
+focus on the content of your document. But if you don't like something mind that
+it's always possible to customize every aspect by messing with the files in the
+\cc{settings/} folder.\\
+In the following subsections you will find examples of how to use the template's
+features.\\
+
+\subsection{Boxes}
+
+You can use different types of boxes to highlight important information. A
+simple box can be created with the \cc{cbox} environment, which stands for
+``\itt{colored box}''.\\
+
+\begin{cbox}
+	This is a simple, not really colorful, box.\\
+	You can use many types of environments inside it, such as lists, equations,
+	images, and more.\\
+	This has been made using the \cc{tcolorbox} package, therefore floats are not welcome inside these boxes and the next ones.
+\end{cbox}
+
+You can also change the color of the box by passing an optional argument to the
+\cc{cbox} environment and of course use already implemented \LaTeX\ enviromnets
+inside them such as equations, double columns, lists and more\dots For example, to create an orange box, you can use the following code:
+
+\begin{center}
+	\cc{\textbackslash\ begin\{cbox\}[color]}
+\end{center}
+
+\begin{cbox}[orange]
+	\textcolor{background}{
+		This is an orange box.
+		Maybe it's a little bit more colorful, so let's add a formula:
+		\begin{equation*}
+			i \hbar \frac{d}{dt} \psi(t) = \mcal{\hat{H}} \psi(t)
+		\end{equation*}
+}
+\end{cbox}
+
+Remember to always close all the environments you open with the corresponding
+end command.
+Notice that you might need to change the color inside the box to make the text
+more readable. You can either use the command \cc{\textbackslash\ textcolor} or pick one of the
+predefined colors commands such as:
+
+\begin{itemize}
+	\item \red{\textbackslash red}
+	\item  \orange{\textbackslash orange}
+	\item \yellow{\textbackslash yellow}
+	\item \green{\textbackslash green}
+	\item \azure{\textbackslash azure}
+	\item \blue{\textbackslash blue}
+	\item \purple{\textbackslash purple}
+\end{itemize}
+
+\pagebreak
+\subsection{Definitions}
+
+Colored boxes are fun but sometimes, especially in a scientific document, you
+need to add some definitions. To do so, the \cc{definition} environment provides
+a simple way to create numbered definitions. The general syntax wants to have a
+definitions block being started with:
+
+\begin{center}
+	\cc{\textbackslash begin\{definition\}[<title>][<label>]}
+\end{center}
+
+\begin{definition}[Triangle][triangle]
+    A triangle is a polygon with three edges and three vertices. Triangles are classified in:
+	\begin{itemize}
+		\item Equilateral: all sides are equal.
+		\item Isosceles: two sides are equal.
+		\item Scalene: no sides are equal.
+	\end{itemize}
+\end{definition}
+
+You can then reference the definition by referencing the label you gave to it,
+preceded by \cc{def:}. For example look in the source code how I defined the
+definition~\ref{def:triangle}.\\
+It's not mandatory to give a title, neither the label, but if you have to assign a label to a non-titled definition you still need to pass one set of empty brackets \cc{\textbackslash begin\{definition\}[][label]}.
+
+\pagebreak
+\subsection{Theorems, Propositions, Lemmas, and Corollaries}
+
+In a scientific document, you might also need to add theorems, propositions, lemmas, and corollaries. The template provides environments for each of these, which are defined as follows:
+
+\begin{center}
+	\cc{\textbackslash begin\{theorem\}[title][label]}
+\end{center}
+
+Notice that, in order to be referenced, all three of these environments share
+the counter prefix \cc{th:} and hence the numbering is shared among them.\\
+
+\begin{theorem}[Pythagorean Theorem][pythagorean]
+    In a right triangle, the square of the length of the hypotenuse is equal to the sum of the squares of the lengths of the other two sides.
+    \begin{equation*}
+        a^2 + b^2 = c^2
+    \end{equation*}
+\end{theorem}
+
+Then also:
+
+\begin{proposition}[Proposition Name][proposition]
+	This is a nice proposition, with practical implications.
+\end{proposition}
+
+\begin{lemma}[Lemma Name][lemma]
+	This is a lemma, because it missed something to be a theorem.
+\end{lemma}
+
+And finally:
+
+\begin{corollary}[Corollary Name][corollary]
+	This is a corollary, whose proof is left as an exercise to the reader.
+	\emoji{joy}
+\end{corollary}
+
+Of course you can always leave the title and label empty if you don't need them.
+
+\pagebreak
+\subsection{Warnings}
+
+In some cases you might want to highlight important warnings, i.e.\ something
+that you want to immediately see when reading a particular page. For this it's
+possible to use the \cc{warning} environment with:
+
+\begin{center}
+	\cc{\textbackslash begin\{warning\}[color]}
+\end{center}
+
+\begin{warning}
+	Be careful: in order to compile this document you need the \cc{LuaLaTeX} compiler.
+\end{warning}
+
+If you really need to alert the reader about something important, you might thing of changing the color of the warning box like this.
+
+\begin{warning}[darkred!40!background]
+	If you don't read this the world will end in 5 minutes. \emoji{scream}
+	\emoji{volcano}
+\end{warning}
+
+\vspace{2cm}
+
+\subsection{Informative Blocks}
+
+Observations, Notes and informations can be highlighted using the \cc{info} and
+\cc{blueinfo} environments:
+
+\begin{center}
+	\cc{\textbackslash begin\{info\}}
+\end{center}
+
+\begin{info}
+	\bft{Note}: The \cc{LuaLaTeX} compiler is a modern version of the \cc{LaTeX} compiler that allows you to use modern fonts and features.
+\end{info}
+
+Or the \bft{\blue{blue version}}:
+
+\begin{center}
+	\cc{\textbackslash begin\{blueinfo\}}
+\end{center}
+
+\begin{blueinfo}
+	\bft{Eyecatching Note}: hey, look what I can do with my hands:
+	\emoji{vulcan-salute} 
+\end{blueinfo}
+
+\pagebreak
+\subsection{Examples}
+
+Examples are what you sometimes need to make your reader understand better what
+you're talking about. The \cc{example} environment is designed to help you with
+this. The general syntax is:
+
+\begin{center}
+	\cc{\textbackslash begin\{example\}[title][label]}
+\end{center}
+
+where, again, you might omit eihter the title or the label if you don't need them.\\
+Let's see\dots an \bft{example} of this! \emoji{smile}
+
+\begin{example}[How to use the example environment][example]
+	Here is an example of how to use the example environment.\\
+	You can write whatever you want here, and it will be highlighted in a box.\\
+	The color it's alittle bit different from the main text so it's not confused
+	with definitions, theorems or infos which looks similar.\\
+	You can still use other blocks inside but you have to change the color
+	manually to \cc{\gray{\textbackslash gray}} as this won't be done automatically.
+	\begin{info}
+		\bft{Look:} an info block inside an example block.
+	\end{info}
+\end{example}
+
+
+\pagebreak
+\subsection{Code}
+
+We've finally arrived to the section dedicated to code, one of the most complex
+one, as you might want to write code in many different ways depending on the context.\\
+Before starting, however, a warning about this!
+
+\begin{warning}
+	\bft{Warning}: the code environments are based on the \cc{listings} package,
+	which is not perfect and might not always work as expected. In particular,
+	not all coding languages are included out of the box. I've added a few of
+	the ones I usually use in the \cc{settings/codestyles.sty} file, but you might need
+	to add more if you use different languages. There you also will be able to
+	add keywords or change any other option relative to the code language. If you want to change something about the code blocks, then I suggest looking at the \cc{settings/code.sty} file.
+\end{warning}
+
+\subsubsection{Inline Code}
+
+You can write \cc{inline code} as we've already seen using the
+\cc{\textbackslash cc\{\}} command.
+
+\subsubsection{Code Blocks}
+
+A simple code block can be created using the environment:
+
+\begin{center}
+	\cc{\textbackslash begin\{code\}\{<language>\}}
+\end{center}
+
+For example:
+
+\begin{code}{Python}
+def hello(name):
+    """Greets the user by name."""
+    print(f"Hello, {name}!")
+\end{code}
+
+You then might want to add a title and this can be done by passing the title as a \bft{keyword argument} to the \cc{code} environment before the mandatory programming language argument:
+
+\begin{code}
+	[title = My hello name function]
+	{Python}
+def hello(name):
+    """Greets the user by name."""
+    print(f"Hello, {name}!")
+\end{code}
+
+\begin{warning}
+	Just as a general warning, \byellow{make sure the first keyword argument is on the same line as the opening `\cc{[}' bracket, otherwise it won't work}.
+\end{warning}
+
+In a similar way you can also pass independently input and output arguments:
+
+\begin{code}
+	[title = My hello name function, 
+	input = A name, 
+	output = Hello <name>!]
+	{Python}
+def hello(name):
+    """Greets the user by name."""
+    print(f"Hello, {name}!")
+\end{code}
+
+\begin{blueinfo}
+	Just be careful that if you want to pass math symbols to the input or output arguments you have to ``protext'' them to avoid strange behaviors. This can be done with the \cc{\textbackslash protect} command.
+\end{blueinfo}
+
+The previous situation for instance usually happens when writing in Pseudocode which is an actual defined language in notex but you can modify it to your liking in the \cc{codestyles.sty}~file.\\
+
+
+\pagebreak
+\subsection{Tables}
+
+Tables are a common way to present data in a structured way. \LaTeX\ already
+provides many tabular environments, here I just give you a nicely formatted one
+for this template that you can copy and paste. You also find this template
+commented in the \cc{settings/notex.sty} file under the ``Tables'' section.\\
+For normal tables I usually use this style:
+
+\begin{table}[htb]
+  \renewcommand{\arraystretch}{1.5} % Row height
+  \centering
+  \begin{tabular}{|c|c|c|}
+
+    % Header (different color)
+    \hline
+    \rowcolor{boxcolor}
+    \textbf{Column1} &
+    \textbf{Column2} &
+    \textbf{Column3} \\ 
+
+    % Rows
+    \hline
+    Row1 & 
+    Row1 & 
+    Row1 \\
+    \hline
+
+  \end{tabular}
+  \caption{Normal table}
+  \label{tab:mytablelabel}
+  \renewcommand{\arraystretch}{1} % Reset row height to default
+\end{table}
+
+While for tables with a lot of text I usually use the \cc{tabularx} environment
+with the \cc{X} column type. This is useful when you have a lot of text in a
+column and you want it to wrap around. This table can also extend to the full textwidth Here is an example:
+
+\renewcommand{\arraystretch}{1.5} % Row height
+\begin{table}[htb]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|X|l|}
+
+    % Header (different color)
+    \hline
+    \rowcolor{boxcolor}
+	\textbf{Environment} &
+	\textbf{Command} &
+	\textbf{Description} \\ 
+
+    % Rows
+    \hline
+	Box &
+	\cc{\textbackslash begin\{cbox\}[color]} &
+	Creates a colored box. \\
+    \hline
+	Definition &
+	\cc{\textbackslash begin\{definition\}[title][label]} &
+	Defines something new. \\
+	\hline
+	Theorem &
+	\cc{\textbackslash begin\{theorem\}[title][label]} &
+	States a theorem. \\
+	\hline
+	Proposition &
+	\cc{\textbackslash begin\{proposition\}[title][label]} &
+	States a proposition. \\
+	\hline
+	Lemma &
+	\cc{\textbackslash begin\{lemma\}[title][label]} &
+	States a lemma. \\
+	\hline
+	Corollary &
+	\cc{\textbackslash begin\{corollary\}[title][label]} &
+	States a corollary. \\
+	\hline
+	Warning &
+	\cc{\textbackslash begin\{warning\}[color]} &
+	Highlights a warning. \\
+	\hline
+	Info &
+	\cc{\textbackslash begin\{info\}} &
+	Provides information. \\
+	\hline
+	Blue Info &
+	\cc{\textbackslash begin\{blueinfo\}} &
+	Provides informatione. \\
+	\hline
+	Example &
+	\cc{\textbackslash begin\{example\}[title][label]} &
+	Provides an example. \\
+	\hline
+	Code Block &
+	\cc{\textbackslash begin\{code\}[title=\dots,\dots]\{language\}} &
+	Formal code block. \\
+	\hline
+
+  \end{tabularx}
+	\caption{Summary of NoTeX envirnments}
+	\label{tab:summary-table}
+\end{table}
+\renewcommand{\arraystretch}{1} % Reset row height to default
+
+
+% \renewcommand{\arraystretch}{1.5} % Row height
+% \begin{table}[htb]
+
+% % Settings
+% \centering
+% \begin{tabularx}{\textwidth}{|l|X|l|} % <--- Adjust here as needed !
+% \hline
+% \rowcolor{boxcolor} % Header Color
+
+% % Header (also adjust above)
+% \textbf{Environment} &
+% \textbf{Command} &
+% \textbf{Description} \\ 
+
+% % Content
+% \hline
+% Box & \cc{\textbackslash begin\{cbox\}[color]} & Creates a colored box. \\
+% \hline
+% Definition & \cc{\textbackslash begin\{definition\}\{Title\}\{label\}} & Defines a new term. \\
+% \hline
+% Theorem & \cc{\textbackslash begin\{theorem\}\{Title\}\{label\}} & States a theorem. \\
+% \hline
+% Lemma & \cc{\textbackslash begin\{lemma\}\{Title\}\{label\}} & States a lemma. \\
+% \hline
+% Corollary & \cc{\textbackslash begin\{corollary\}\{Title\}\{label\}} & States a corollary. \\
+% \hline
+% Warning & \cc{\textbackslash begin\{warning\}} & Highlights a warning. \\
+% \hline
+% Info & \cc{\textbackslash begin\{info\}} & Provides information. \\
+% \hline
+% Blue Info & \cc{\textbackslash begin\{blueinfo\}} & Provides information in blue. \\
+% \hline
+% Example & \cc{\textbackslash begin\{example\}\{Title\}\{label\}} & Provides an example. \\
+% \hline
+% Code Block & \cc{\textbackslash begin\{codeblock\}} & Formal code block. \\
+% \hline
+% Code Box & \cc{\textbackslash begin\{codebox\}\{language\}} & Informal code box. \\
+% \hline
+
+% \end{tabularx}
+% \caption{Summary of NoTeX envirnments}
+% \label{tab:summary-table}
+% \end{table}
+
+
+
+
+\end{document}
