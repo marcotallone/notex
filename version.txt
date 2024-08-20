@@ -1,0 +1,1 @@
+This branch contains the version 1.0 of the notex project.
