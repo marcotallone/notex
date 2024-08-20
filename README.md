@@ -43,6 +43,9 @@
   <summary>📑 Table of Contents</summary>
   <ol>
     <li>
+        <a href="#news-and-updates">News and Updates 🚀</a>
+    </li>
+    <li>
       <a href="#about-the-project">About The Project</a>
       <ul>
         <li><a href="#built-with">Built With</a></li>
@@ -58,6 +61,24 @@
     <li><a href="#usage">Usage</a></li>
   </ol>
 </details>
+
+<!-- NEWS -->
+## News and Updates 🚀
+
+Big News! Update version `2.0` is out! I've updated the documentation with all
+the added features. This version remains retro-compatible with the previous
+set-up at some level but you need to install [`pygments`](https://pygments.org/)
+to take advantage of the new features. This can be done through the pip package
+manager:
+
+```
+pip install pygments
+```
+
+The old version is still available in the `notex-1.0` side branch in case
+something doesn't work. Enjoy!
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
@@ -83,6 +104,7 @@ Preamble setting also follows this philosophy: different settings are placed in 
 └── 📂 utils              # Utilities
     └── ...
 ```
+
 You will find then implemented NoTeX `cls` class and attached `sty` files in the `settings/` folder.\
 This repository also provides a few uselful utility scripts in the `utils/` folder that will be updated with time. These might be helpful for stuff like cleaning up or collecting data from the tex files... Notice however that they are still a work in progress so check them out before blindly run them!
 
@@ -124,8 +146,6 @@ If you want  to use this template without following these prerequisites, you mig
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
 <!-- USAGE EXAMPLES -->
 ## Usage
 
@@ -153,6 +173,12 @@ Otherwise using the dark option will set the default dark theme.
 
 ```latex
 \documentclass[dark]{settings/notex}
+```
+
+With the update `2.0` a new theme has been added: `tokyo`. You can use it as the others:
+
+```latex
+\documentclass[tokyo]{settings/notex}
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -198,11 +224,8 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/marcotallone/notex.svg?style=for-the-badge
-[contributors-url]: https://github.com/marcotallone/notex/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/marcotallone/notex.svg?style=for-the-badge
 [forks-url]: https://github.com/marcotallone/notex/network/members
 [stars-shield]: https://img.shields.io/github/stars/marcotallone/notex.svg?style=for-the-badge
@@ -219,3 +242,4 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 [gmail-url]: mailto:marcotallone85@gmail.com -->
 [gmail-shield]: https://img.shields.io/badge/-Gmail-red?style=for-the-badge&logo=gmail&logoColor=white&colorB=red
 [gmail-url]: mailto:marcotallone85@gmail.com
+
