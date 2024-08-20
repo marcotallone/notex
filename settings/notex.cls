@@ -3,7 +3,7 @@
 %┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛%
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{notex}[2024/05/17 A modern note-taking LaTeX class.]
+\ProvidesClass{notex}[2024/08/20 A modern note-taking LaTeX class. Version 2.0]
 
 \LoadClass[a4paper, 10pt]{article}
 
@@ -45,13 +45,13 @@
 % \RequirePackage{pdfpages}
 
 % Emoji support for LaTeX
-% \RequirePackage{emoji}
-% \setemojifont{Noto Color Emoji}
+\RequirePackage{emoji}
+\setemojifont{Noto Color Emoji}
 
 % Fontawesome5 package for icons
-% \RequirePackage{fontawesome5}
+\RequirePackage{fontawesome5}
 
-% tcolorbox for colored boxes
+% tcolorbox for colored boxes (imported in code.sty)
 % [breakable] option allows the box to be split across pages
 % \RequirePackage[breakable]{tcolorbox}
 
@@ -139,27 +139,30 @@
 
 \RequirePackage[table]{xcolor}
 \RequirePackage{pagecolor}
+\newcommand{\selectedtheme}{}
 
 % Theme
 
 % Light Theme
 \DeclareOption{light}{
+	\renewcommand{\selectedtheme}{light}
 
-  % Background and boxes
-  \definecolor{background}{HTML}{FFFFFF}
-  \definecolor{boxcolor}{HTML}{EFF1F3}
-  \definecolor{darkred}{HTML}{D72323}
-  \definecolor{darkblue}{HTML}{0A84FF}
-  \definecolor{darkgreen}{HTML}{00C853}
-  \definecolor{darkyellow}{HTML}{FFCB30}
+  % Background and boxes											% --HEX--
+  \definecolor{background}{HTML}{FFFFFF}			% #FFFFFF
+  \definecolor{boxcolor}{HTML}{EFF1F3}				% #EFF1F3
+	\definecolor{commentscolor}{HTML}{89929B}		% #89929B
+  \definecolor{darkred}{HTML}{D72323}					% #D72323
+  \definecolor{darkblue}{HTML}{0A84FF}				% #0A84FF
+  \definecolor{darkgreen}{HTML}{00C853}				% #00C853
+  \definecolor{darkyellow}{HTML}{FFCB30}			% #FFCB30
 
-  % Text color / shades
-  \definecolor{black}{HTML}{000000}
-  \definecolor{darkgray}{HTML}{161B22}
-  \definecolor{gray}{HTML}{89929B}
-  \definecolor{lightgray}{HTML}{C6CDD5}
-  \definecolor{white}{HTML}{FFFFFF}
-  \definecolor{textcolor}{HTML}{000000}       %(black)
+  % Text color / shades												% --HEX--	
+  \definecolor{black}{HTML}{000000}						% #000000
+  \definecolor{darkgray}{HTML}{161B22}				% #161B22
+  \definecolor{gray}{HTML}{89929B}						% #89929B
+  \definecolor{lightgray}{HTML}{C6CDD5}				% #C6CDD5
+  \definecolor{white}{HTML}{FFFFFF}						% #FFFFFF
+  \definecolor{textcolor}{HTML}{000000}       % #000000
 
   % Colors                                    % --HEX--
   \definecolor{red}{HTML}{BD2C00}             % #BD2C00
@@ -173,30 +176,33 @@
   % Background and text color
   \pagecolor{background}                      % Page Background
   \color{textcolor}                           % Main text color
-  \definecolor{captionscolor}{HTML}{89929B}   % Caption colors
-  \definecolor{iconscolor}{HTML}{89929B}      % Icons color
-  \definecolor{linescolor}{HTML}{89929B}      % Lines color
+	\colorlet{captionscolor}{gray}							% Caption Colors
+	\colorlet{iconscolor}{gray}									% Icons color
+	\colorlet{linescolor}{gray}									% Lines color
+	\colorlet{numerscolor}{commentscolor}				% Line Numbers color
 
 }
 
 % Dark Theme
 \DeclareOption{dark}{
+	\renewcommand{\selectedtheme}{dark}
 
-  % Background and boxes
-  \definecolor{background}{HTML}{0D1117}
-  \definecolor{boxcolor}{HTML}{21262D}
-  \definecolor{darkred}{HTML}{D72323}
-  \definecolor{darkblue}{HTML}{0A84FF}
-  \definecolor{darkgreen}{HTML}{00C853}
-  \definecolor{darkyellow}{HTML}{FFCB30}
+	% Background and boxes											% --HEX--
+  \definecolor{background}{HTML}{0D1117}			% #0D1117
+  \definecolor{boxcolor}{HTML}{21262D}				% #21262D
+	\definecolor{commentscolor}{HTML}{C6CDD5}		% #C6CDD5
+  \definecolor{darkred}{HTML}{D72323}					% #D72323
+  \definecolor{darkblue}{HTML}{0A84FF}				% #0A84FF
+  \definecolor{darkgreen}{HTML}{00C853}				% #00C853
+  \definecolor{darkyellow}{HTML}{FFCB30}			% #FFCB30
 
-  % Text shades
-  \definecolor{black}{HTML}{000000}
-  \definecolor{darkgray}{HTML}{161B22}
-  \definecolor{gray}{HTML}{89929B}
-  \definecolor{lightgray}{HTML}{C6CDD5}
-  \definecolor{white}{HTML}{FFFFFF}
-  \definecolor{textcolor}{HTML}{FFFFFF}       % (white)      
+  % Text shades																% --HEX--
+  \definecolor{black}{HTML}{000000}						% #000000
+  \definecolor{darkgray}{HTML}{161B22}				% #161B22
+  \definecolor{gray}{HTML}{89929B}						% #89929B
+  \definecolor{lightgray}{HTML}{C6CDD5}				% #C6CDD5
+  \definecolor{white}{HTML}{FFFFFF}						% #FFFFFF
+  \definecolor{textcolor}{HTML}{FFFFFF}       % #FFFFFF      
 
   % Colors                                    % --HEX--
   \definecolor{red}{HTML}{FA7970}             % #FA7970 
@@ -210,10 +216,49 @@
   % Background and text color
   \pagecolor{background}                      % Page Background
   \color{textcolor}                           % Main text color
-  \definecolor{captionscolor}{HTML}{C6CDD5}   % Caption Colors
-  \definecolor{iconscolor}{HTML}{FFFFFF}      % Icons color
-  \definecolor{linescolor}{HTML}{C6CDD5}      % Lines color
+	\colorlet{captionscolor}{lightgray}					% Caption Colors
+	\colorlet{iconscolor}{white}								% Icons color
+	\colorlet{linescolor}{lightgray}						% Lines color
+	\colorlet{numerscolor}{commentscolor}				% Line Numbers color
+}
 
+% Tokyonight Theme
+\DeclareOption{tokyo}{
+	\renewcommand{\selectedtheme}{tokyo}
+
+  % Background and boxes											% --HEX--
+  \definecolor{background}{HTML}{1A1B26}			% #1A1B26
+  \definecolor{boxcolor}{HTML}{24283B}				% #24283B
+	\definecolor{commentscolor}{HTML}{565F89}		% #565F89
+  \definecolor{darkred}{HTML}{D72323}					% #D72323
+  \definecolor{darkblue}{HTML}{0A84FF}				% #0A84FF
+  \definecolor{darkgreen}{HTML}{00C853}				% #00C853
+  \definecolor{darkyellow}{HTML}{FFCB30}			% #FFCB30
+
+  % Text shades																% --HEX--				
+  \definecolor{black}{HTML}{000000}						% #000000
+  \definecolor{darkgray}{HTML}{161B22}				% #161B22
+  \definecolor{gray}{HTML}{89929B}						% #89929B
+  \definecolor{lightgray}{HTML}{C6CDD5}				% #C6CDD5
+  \definecolor{white}{HTML}{FFFFFF}						% #FFFFFF
+  \definecolor{textcolor}{HTML}{FFFFFF}       % #FFFFFF
+
+  % Colors                                    % --HEX--
+  \definecolor{red}{HTML}{F7768E}             % #F7768E
+  \definecolor{orange}{HTML}{FF9E64}          % #FF9E64
+  \definecolor{yellow}{HTML}{FFCB30}          % #FFCB30
+  \definecolor{green}{HTML}{9ECE6A}           % #9ECE6A
+  \definecolor{azure}{HTML}{2AC3DE}           % #2AC3DE
+  \definecolor{blue}{HTML}{7AA2F7}            % #7AA2F7
+  \definecolor{purple}{HTML}{BB9AF7}          % #BB9AF7
+
+  % Background and text color
+  \pagecolor{background}                      % Page Background
+  \color{textcolor}                           % Main text color
+	\colorlet{captionscolor}{gray}							% Caption Colors
+	\colorlet{iconscolor}{white}								% Icons color
+	\colorlet{linescolor}{gray}									% Lines color
+	\colorlet{numerscolor}{commentscolor}				% Line Numbers color
 }
 
 % Set the default option
@@ -251,7 +296,7 @@
 \RequirePackage{tabularx}
 
 % Table templates (TT)
-% ------------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
 % Normal Table with tabular
 
 % \begin{table}[htb]
@@ -279,7 +324,7 @@
 %   \renewcommand{\arraystretch}{1} % Reset row height to default
 % \end{table}
 
-% ------------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
 % Table with tabularx
 
 % \begin{table}[htb]
@@ -307,9 +352,9 @@
 %   \renewcommand{\arraystretch}{1} % Reset row height to default
 % \end{table}
 
-% ------------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
 % // TODO: maybe build environment/macros to deal with these tables...
-% ------------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
 
 %┌────────────────────────────────────────────────────────────────────────────┐%
 %│                                   TikZ                                     │%

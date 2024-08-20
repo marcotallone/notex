@@ -1,0 +1,71 @@
+\documentclass[../main.tex]{subfiles}
+\graphicspath{{\subfix{../images/}}} % Images path
+
+\begin{document}
+
+\section{Update: Version 2.0! \emoji{rocket}}
+
+Hi, version 2.0 is here! This is a major update that adds the \cc{minted}
+package for new coding features. In particular now text highlighting in coding
+blocks is done through the 
+\href{https://pygments.org/}{\cc{pygments} library \faIcon{link}}
+. This means that you need to
+install it in your system to use the new features. An easy way to do so is
+through \cc{pip}:
+
+\begin{cbox}
+	\inline[bash]{pip install pygments}
+\end{cbox}
+
+This version is retro-compatible with the previous one, so you can still use the
+previous coding environments as before (indeed the previous sections are just as
+they were).\\
+Additionally I've added a new theme to celebrate this new version, it's called
+\inline{Tokyo}. I hope you
+like it!\\
+Here I will show how the new coding environments look like. These will be easier
+to use as you just need to include the language between a \cc{begin} and
+\cc{end} command. Check that your required language is included in the
+\cc{settings/code.sty} file and you're ready to go.
+
+\begin{python}
+def main():
+		print("Hello, World!")
+		print("This is a Python code block.")
+		print("I hope you like it!")
+		print("Goodbye!")
+\end{python}
+
+The also support the usual input/output commands. Here's an example:
+
+\begin{python}[title=Python code block,
+	input={input.txt},
+	output=The file extension
+]
+def read_extension(filename):
+		return filename.split('.')[-1]
+\end{python}
+
+Pygments supports a lot of languages, like YAML:
+
+\begin{yaml}
+name: "Pippo"
+surname: "Pallo"
+age: 24
+list:
+	- item1
+	- item2
+	- item3
+
+# This is a comment
+nested:
+	key1: value1
+	key2: value2
+	key3: value3
+\end{yaml}
+
+Additionally I added an \cc{\textbackslash inline\{\}} command to have inline code snippets with
+correct syntax highlighting. For example, \inline[python]{print("Hello,
+World!")}.
+
+\end{document}
