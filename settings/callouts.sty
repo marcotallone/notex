@@ -42,6 +42,30 @@
 }
 
 %┌────────────────────────────────────────────────────────────────────────────┐%
+%│                                Empty Boxes                                 │%
+%└────────────────────────────────────────────────────────────────────────────┘%
+% Empty box you can choose the border color of
+% Usage: 
+% ───────────────────────────────────────
+% \begin{ebox}[color] (default: iconscolor)
+%     ...content...
+% \end{ebox}
+% ───────────────────────────────────────
+
+\newtcolorbox{ebox}[1][iconscolor]{
+  breakable,              % allow the box to be split across pages
+  enhanced jigsaw,        % better frame drawing
+  colback   = background, % background color
+  colframe  = #1,         % frame color
+  coltext   = textcolor,  % text color
+  boxrule   = 0mm,        % frame thickness
+  left      = 7mm,        % left margin
+  right     = 7mm,        % right margin
+  top       = 3mm,        % top margin
+  bottom    = 3mm,        % bottom margin
+}
+
+%┌────────────────────────────────────────────────────────────────────────────┐%
 %│                                 Warnings                                   │%
 %└────────────────────────────────────────────────────────────────────────────┘%
 % Warning block
