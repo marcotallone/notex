@@ -91,20 +91,44 @@
 %│                                   Fonts                                    │%
 %└────────────────────────────────────────────────────────────────────────────┘%
 
-% Use Helvetica font
-% \RequirePackage[scaled]{helvet}
+% NOTE: For default LaTeX font, comment all the following lines
+% NOTE: Sources for fonts:
+%				- https://www.overleaf.com/learn/latex/Font_typefaces
+%				- https://tex.stackexchange.com/questions/59702/suggest-a-nice-font-family-for-my-basic-latex-template-text-and-math
+%				- https://www.draketo.de/anderes/latex-fonts.html
 
-% Use the Tex Gyre Heros font
+% Simple Sans Serif
+% \renewcommand*\familydefault{\sfdefault}
+
+% Helvetica
+% \RequirePackage[scaled]{helvet}
+% \renewcommand*\familydefault{\sfdefault}
+
+% Tex Gyre Heros
 % \RequirePackage{tgheros}
 
-% Use the Computer Modern Sans Serif font
+% Computer Modern Sans Serif
 % \RequirePackage{cmbright}
 
-% Use the Latin Modern Sans Serif font (default)
-% \RequirePackage{lmodern}
+% Palatino with AMS Euler (eulervm) for math
+% \RequirePackage[sc, osf]{mathpazo} % Palatino
+\RequirePackage{eulervm} % Euler math
 
-% Set the default font to sans-serif
-\renewcommand*\familydefault{\sfdefault}
+% Avant
+% \usepackage{avant} % PSNFSS Font, in every TeX distribution 
+% \renewcommand{\familydefault}{\sfdefault}
+
+% Berasans
+% \usepackage[scaled=0.80]{berasans}% package has a handy scaling option
+% \renewcommand{\familydefault}{\sfdefault}
+
+% Libris
+% \usepackage{libris}    % a nice, almost handwritten calligraphic look
+% \renewcommand{\familydefault}{\sfdefault}
+
+% Iwona
+\usepackage{iwona}
+
 
 %┌────────────────────────────────────────────────────────────────────────────┐%
 %│                                   Math                                     │%

@@ -5,7 +5,7 @@
 
 \begin{document}
 
-\section{grid}
+\section{Test Section}
 
 % \begin{tcbraster}[raster columns=2, raster equal height,
 % size=small,colframe=red!50!black,colback=red!10!white,colbacktitle=red!50!white,
@@ -17,13 +17,24 @@
 % \begin{tcolorbox}A box again\end{tcolorbox}
 % \end{tcbraster}
 
-\begin{cbox}
-	First box
-\end{cbox} 
+% \begin{cbox}
+% 	First box
+% \end{cbox} 
 
 
-\begin{ebox}
-			Hey
-		\end{ebox}
+% \begin{ebox}
+% 			Hey
+% 		\end{ebox}
+
+\begin{theorem}[Residual theorem]
+	Let $f$ be \bft{holomorphic} in a domain $D$ except for isolated singularities at
+	$a_1, a_2, \ldots, a_m$. Let $\gamma$ be a closed rectifiable curve in $D$
+	which does not pass through any of the points $a_k$. Then
+	\begin{equation*}
+		\oint_\gamma f(z) \, dz = 2 \pi i \sum_{k=1}^m
+		\text{I}(\gamma, a_k) \text{Res}(f, a_k).
+	\end{equation*}
+
+\end{theorem}
 
 \end{document}
