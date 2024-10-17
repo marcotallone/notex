@@ -1,0 +1,40 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage{lipsum} % For dummy text
+
+% Define the gradient colors
+\usetikzlibrary{shadings}
+\tikzset{%
+  header gradient/.style={%
+    left color=blue!20, right color=blue!80},
+  footer gradient/.style={%
+    left color=red!20, right color=red!80}
+}
+
+% Define the header and footer
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+
+% Header
+\fancyhead[L]{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \shade[header gradient] (-\paperwidth,0) rectangle (\paperwidth,10cm);
+  \end{tikzpicture}
+  \hspace{1cm}Header Text
+}
+
+% Footer
+\fancyfoot[C]{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \shade[footer gradient] (0,0) rectangle (\paperwidth,1cm);
+  \end{tikzpicture}
+  \hspace{1cm}Footer Text
+}
+
+\begin{document}
+
+\lipsum[1-20] % Dummy text
+
+\end{document}
+

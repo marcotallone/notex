@@ -2,39 +2,480 @@
 \graphicspath{{\subfix{../images/}}} % Images path
 
 \tcbuselibrary{raster}
+\usetikzlibrary{shadings}
+
+\newtcolorbox{testbox}[1][boxcolor]{
+  breakable,              % allow the box to be split across pages
+  enhanced jigsaw,        % better frame drawing
+  colback   = #1,         % background color
+  colframe  = #1,         % frame color
+  coltext   = textcolor,  % text color
+  boxrule   = 0mm,        % frame thickness
+  left      = 3mm,        % left margin
+  right     = 3mm,        % right margin
+  top       = 3mm,        % top margin
+  bottom    = 3mm,        % bottom margin
+}
+
+\newtcolorbox{testbox2}[1][boxcolor]{
+  breakable,              % allow the box to be split across pages
+  enhanced jigsaw,        % better frame drawing
+  colback   = #1,         % background color
+  colframe  = #1,         % frame color
+  coltext   = textcolor,  % text color
+  boxrule   = 0mm,        % frame thickness
+  left      = 3mm,        % left margin
+  right     = 3mm,        % right margin
+  top       = 3mm,        % top margin
+  bottom    = 3mm,        % bottom margin,
+	fonttitle = \bfseries,
+	title=My title,
+	frame style={
+		left color=myorange,
+		right color=mypurple,
+	},
+	width = 0.95\textwidth,
+	center,
+	shadow={-1mm}{0mm}{0mm}{fill=myorange, opacity=0.95},
+	shadow={-2mm}{0mm}{0mm}{fill=myorange, opacity=0.75},
+	shadow={-3mm}{0mm}{0mm}{fill=myorange, opacity=0.55},
+	shadow={-4mm}{0mm}{0mm}{fill=myorange, opacity=0.35},
+	shadow={1mm}{0mm}{0mm}{fill=mypurple, opacity=0.95},
+	shadow={2mm}{0mm}{0mm}{fill=mypurple, opacity=0.75},
+	shadow={3mm}{0mm}{0mm}{fill=mypurple, opacity=0.55},
+	shadow={4mm}{0mm}{0mm}{fill=mypurple, opacity=0.35},
+	overlay unbroken and first={
+		\fill[myorange] 
+			([xshift=-0.1mm,yshift=0.1mm]title.south west) 
+			rectangle 
+			([xshift=1mm]title.north west);
+		\fill[mypurple] 
+			([xshift=-1mm,yshift=0.1mm]title.south east)
+			rectangle 
+			([xshift=+0.1mm]title.north east);
+	},
+	% leftrule = 1mm,
+	% rightrule = 1mm,
+  % underlay={
+  %   \fill[green] 
+		% ([xshift=0mm]frame.south west) 
+		% rectangle 
+		% ([xshift=0mm]frame.north east);
+  %   % \fill[blue] (frame.south east) rectangle ([xshift=-3mm]frame.north east);
+  %   % \fill[green] ([xshift=-3mm]frame.south east) rectangle ([xshift=-6mm]frame.north east);
+  % }
+}
+
+% \newtcolorbox{testbox3}[1][boxcolor]{
+%   breakable,              % allow the box to be split across pages
+%   enhanced jigsaw,        % better frame drawing
+%   colback   = #1,         % background color
+%   colframe  = #1,         % frame color
+%   coltext   = textcolor,  % text color
+%   boxrule   = 0mm,        % frame thickness
+%   left      = 3mm,        % left margin
+%   right     = 3mm,        % right margin
+%   top       = 3mm,        % top margin
+%   bottom    = 3mm,        % bottom margin
+%   overlay={
+%     \draw[#1!75!background, line width=1mm] (frame.south west) rectangle (frame.north east);
+%     \draw[#1!50!background, line width=1mm] ([xshift=-1mm, yshift=-1mm]frame.south west) rectangle ([xshift=1mm, yshift=1mm]frame.north east);
+%   }
+% }
+
+\newtcolorbox{testbox3}[1][boxcolor]{
+  breakable,              % allow the box to be split across pages
+  enhanced jigsaw,        % better frame drawing
+  colback   = #1,         % background color
+  colframe  = #1,         % frame color
+  coltext   = textcolor,  % text color
+  boxrule   = 0mm,        % frame thickness
+  left      = 6mm,        % left margin
+  right     = 6mm,        % right margin
+  top       = 6mm,        % top margin
+  bottom    = 6mm,        % bottom margin
+  overlay={
+		% Outer
+    \draw[#1!25!background,	
+					line width=1.4mm, 
+					rounded corners=0.5mm
+				] ([xshift=0.7mm, yshift=0.7mm]frame.south west) 
+				rectangle 
+				([xshift=-0.7mm, yshift=-0.7mm]frame.north east);
+		% Middle
+    \draw[#1!50!background,
+					line width=1.4mm, 
+					rounded corners=0.5mm
+				] ([xshift=1.7mm, yshift=1.7mm]frame.south west) 
+				rectangle 
+				([xshift=-1.7mm, yshift=-1.7mm]frame.north east);
+		% Inner
+		\draw[#1!75!background,
+					line width=1.2mm, 
+					rounded corners=0.5mm
+				] ([xshift=2.6mm, yshift=2.6mm]frame.south west) 
+				rectangle 
+				([xshift=-2.6mm, yshift=-2.6mm]frame.north east);
+  }
+}
+
+
+\newtcolorbox{testbox4}[1][boxcolor]{
+  breakable,              % allow the box to be split across pages
+  enhanced jigsaw,        % better frame drawing
+  colback   = #1,         % background color
+  colframe  = #1,         % frame color
+  coltext   = textcolor,  % text color
+  boxrule   = 0.5mm,        % frame thickness
+  left      = 3mm,        % left margin
+  right     = 3mm,        % right margin
+  top       = 3mm,        % top margin
+  bottom    = 3mm,        % bottom margin,
+	arc				= 0mm,			% round corners
+	sharp corners,
+	fonttitle = \bfseries,
+	bottomtitle = 0.3mm,
+	toptitle = 0.5mm,
+	title=My title,
+	frame style={
+		left color=myorange,
+		right color=mypurple,
+	},
+	width = 0.95\textwidth,
+	center,
+	% leftrule = 1mm,
+	% rightrule = 1mm,
+	overlay={
+		\fill[myorange, opacity=0.8]
+		([xshift=-1mm]frame.south west) 
+		rectangle 
+		([xshift=0mm]frame.north west);
+		\fill[myorange, opacity=0.5]
+		([xshift=-2mm]frame.south west) 
+		rectangle 
+		([xshift=-1mm]frame.north west);
+		\fill[myorange, opacity=0.3]
+		([xshift=-3mm]frame.south west) 
+		rectangle 
+		([xshift=-2mm]frame.north west);
+		\fill[mypurple, opacity=0.8]
+		([xshift=0mm]frame.south east)
+		rectangle 
+		([xshift=1mm]frame.north east);
+		\fill[mypurple, opacity=0.5]
+		([xshift=1mm]frame.south east)
+		rectangle 
+		([xshift=2mm]frame.north east);
+		\fill[mypurple, opacity=0.3]
+		([xshift=2mm]frame.south east)
+		rectangle 
+		([xshift=3mm]frame.north east);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\definecolor{myorange}{HTML}{E95420}
+\definecolor{mypurple}{HTML}{772953}
+\definecolor{warmgray}{HTML}{AEA79F}
+\definecolor{warmgray}{HTML}{AEA79F}
+
+% ------------------------------------------------------------------------------
+\newtcolorbox{testwarning}[1][boxcolor]{
+  breakable,              % allow the box to be split across pages
+  enhanced jigsaw,        % better frame drawing
+  colback   = #1,         % background color
+  colframe  = yellow,     % frame color
+  coltext   = textcolor,  % text color
+	colbacktitle = yellow, % title background color
+	opacitybacktitle = 0.5, % title background opacity
+	coltitle = textcolor,  % title text color
+	fonttitle = \bfseries, % title font
+	title = \yellow{\faExclamationTriangle},
+	% title = \yellow{\emoji{warning}},
+	detach title,before upper={\tcbtitle\;\, },
+  boxrule   = 0.3mm,      % frame thickness
+  left      = 2mm,        % left margin
+  right     = 2mm,        % right margin
+  top       = 2mm,        % top margin
+  bottom    = 2mm,        % bottom margin
+	titlerule = 0mm,
+	arc				= 0mm,			% round corners
+	sharp corners,
+	width = 0.95\textwidth,
+	center,
+	overlay={
+		\fill[yellow, opacity=0.8]
+		([xshift=-1mm]frame.south west) 
+		rectangle 
+		([xshift=0mm]frame.north west);
+		\fill[yellow, opacity=0.5]
+		([xshift=-2mm]frame.south west) 
+		rectangle 
+		([xshift=-1mm]frame.north west);
+		\fill[yellow, opacity=0.3]
+		([xshift=-3mm]frame.south west) 
+		rectangle 
+		([xshift=-2mm]frame.north west);
+		\fill[yellow, opacity=0.8]
+		([xshift=0mm]frame.south east)
+		rectangle 
+		([xshift=1mm]frame.north east);
+		\fill[yellow, opacity=0.5]
+		([xshift=1mm]frame.south east)
+		rectangle 
+		([xshift=2mm]frame.north east);
+		\fill[yellow, opacity=0.3]
+		([xshift=2mm]frame.south east)
+		rectangle 
+		([xshift=3mm]frame.north east);
+  }
+  % overlay   = {           % overlay warning emoji
+    % \node[anchor=north west,
+    %       yshift=-1mm,
+    %       xshift=1mm] 
+					% at (frame.north west) {\yellow{\faExclamationTriangle}};
+    % % at (frame.north west) {\emoji{warning}};
+  % },
+}
+
+% ------------------------------------------------------------------------------
 
 \begin{document}
 
 \section{Test Section}
 
-% \begin{tcbraster}[raster columns=2, raster equal height,
-% size=small,colframe=red!50!black,colback=red!10!white,colbacktitle=red!50!white,
-% title={Box \# \thetcbrasternum}]
-% \begin{tcolorbox}First box\end{tcolorbox}
-% \begin{tcolorbox}Second box\end{tcolorbox}
-% \begin{tcolorbox}This is a box\\with a second line\end{tcolorbox}
-% \begin{tcolorbox}Another box\end{tcolorbox}
-% \begin{tcolorbox}A box again\end{tcolorbox}
-% \end{tcbraster}
+\blindtext
 
-% \begin{cbox}
-% 	First box
-% \end{cbox} 
+\begin{testwarning}
+	Hey be careful!
+	There is a warning here. You need to pay attention for the following reasons:
+	\begin{itemize}
+		\item This is the first reason.
+		\item This is the second reason.
+		\item This is the third reason.
+	\end{itemize}
+\end{testwarning}
+
+\blindtext
+
+\begin{testbox2}
+	\blindtext
+\end{testbox2}
+
+\blindtext
+
+\begin{testbox4}
+	\blindtext
+\end{testbox4}
 
 
-% \begin{ebox}
-% 			Hey
-% 		\end{ebox}
 
-\begin{theorem}[Residual theorem]
-	Let $f$ be \bft{holomorphic} in a domain $D$ except for isolated singularities at
-	$a_1, a_2, \ldots, a_m$. Let $\gamma$ be a closed rectifiable curve in $D$
-	which does not pass through any of the points $a_k$. Then
-	\begin{equation*}
-		\oint_\gamma f(z) \, dz = 2 \pi i \sum_{k=1}^m
-		\text{I}(\gamma, a_k) \text{Res}(f, a_k).
-	\end{equation*}
 
-\end{theorem}
+
+
+
+
+
+% Simple tests... -------------------------------------------------------------
+
+
+% % \begin{tcbraster}[raster columns=2, raster equal height,
+% % size=small,colframe=red!50!black,colback=red!10!white,colbacktitle=red!50!white,
+% % title={Box \# \thetcbrasternum}]
+% % \begin{tcolorbox}First box\end{tcolorbox}
+% % \begin{tcolorbox}Second box\end{tcolorbox}
+% % \begin{tcolorbox}This is a box\\with a second line\end{tcolorbox}
+% % \begin{tcolorbox}Another box\end{tcolorbox}
+% % \begin{tcolorbox}A box again\end{tcolorbox}
+% % \end{tcbraster}
+
+% % \begin{cbox}
+% % 	First box
+% % \end{cbox} 
+
+
+% % \begin{ebox}
+% % 			Hey
+% % 		\end{ebox}
+
+% \begin{theorem}[Residual theorem]
+% 	Let $f$ be \bft{holomorphic} in a domain $D$ except for isolated singularities at
+% 	$a_1, a_2, \ldots, a_m$. Let $\gamma$ be a closed rectifiable curve in $D$
+% 	which does not pass through any of the points $a_k$. Then
+% 	\begin{equation*}
+% 		\oint_\gamma f(z) \, dz = 2 \pi i \sum_{k=1}^m
+% 		\text{I}(\gamma, a_k) \text{Res}(f, a_k).
+% 	\end{equation*}
+% 	\tcblower
+% 	Here, $\text{I}(\gamma, a_k)$ denotes the winding number of $\gamma$ around
+% 	$a_k$.
+% \end{theorem}
+
+% \tcbset{colback=warmgray!30!white,fonttitle=\bfseries}
+
+% \begin{tcolorbox}[
+% 	enhanced,
+% 	title=My title,
+% 	frame style={
+% 		left color=myorange,
+% 		right color=mypurple,
+% 	},
+% 	fuzzy shadow={0mm}{0mm}{-2mm}{2mm}{black},
+%   boxrule   = 0mm,      % frame thickness
+% ]
+% This is a \textbf{tcolorbox}.
+% \tcblower
+% This is the lower part.
+% \end{tcolorbox}
+
+% \blindtext
+
+% % preamble
+% \tcbset{skin=enhanced,
+% 	fonttitle=\bfseries,
+% 	frame style={
+% 		upper left=blue,
+% 		upper right=red,
+% 		lower left=yellow,
+% 		lower right=green
+% 	},
+% 	interior style={white,opacity=0.5},
+% 	segmentation style={black,dashed,opacity=0.2,line width=1pt}
+% }
+% \begin{tcolorbox}[title=Nice box in rainbow colors]
+% With the \enquote{enhanced} skin, it is quite easy to produce fancy looking effects.
+% \tcblower
+% Note that this is still a \texttt{tcolorbox}.
+% \end{tcolorbox}
+
+% \blindtext
+
+% % preamble
+% \tcbset{skin=enhanced,
+% 	fonttitle=\bfseries,
+% 	frame style={
+% 		upper left=mypurple,
+% 		upper right=myorange,
+% 		lower left=mypurple,
+% 		lower right=myorange
+% 	},
+% 	interior style={boxcolor,opacity=0.7},
+% 	boxrule=0mm,
+% 	segmentation style={black,dashed,opacity=0.3,line width=0.1mm}
+% }
+% \begin{tcolorbox}[title=Nice box in rainbow colors]
+% With the \enquote{enhanced} skin, it is quite easy to produce fancy looking effects.
+% \tcblower
+% Note that this is still a \texttt{tcolorbox}.
+% \end{tcolorbox}
+
+% \emoji{smile} \emoji{rocket}
+
+% % ------------------------------------------------------------------------------
+% \pagebreak
+
+% \blindtext
+
+% \tcbset{colback=warmgray!30!white,fonttitle=\bfseries}
+
+% \begin{tcolorbox}[
+% 	enhanced,
+% 	title=My title,
+% 	frame style={
+% 		left color=myorange,
+% 		right color=mypurple,
+% 	},
+% 	boxrule=0mm,      % frame thickness
+% ]
+
+% \blindtext
+
+% \end{tcolorbox}
+
+% \begin{tcolorbox}[
+% 	enhanced,
+% 	title=My title,
+% 	frame style={
+% 		left color=myorange,
+% 		right color=mypurple,
+% 	},
+% 	% fuzzy shadow={0mm}{0mm}{-2mm}{2mm}{black},
+%   boxrule   = 0mm,      % frame thickness
+% ]
+% This is a \textbf{tcolorbox}.
+% \tcblower
+% This is the lower part.
+% \end{tcolorbox}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \end{document}
