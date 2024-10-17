@@ -1,0 +1,58 @@
+%┌────────────────────────────────────────────────────────────────────────────┐%
+%│                                  Colors                                    │%
+%└────────────────────────────────────────────────────────────────────────────┘%
+% Colors and themes settings
+
+\RequirePackage[table]{xcolor}
+\RequirePackage{pagecolor}
+\newcommand{\selectedtheme}{}
+
+% Theme selection
+% NOTE: Available themes:
+%				- light
+%				- dark
+%				- tokyo
+%				- one
+%				- bw (black and white)
+%				- ubuntu
+
+% Light Theme
+\DeclareOption{light}{
+	\renewcommand{\selectedtheme}{light}
+	\input{settings/themes/light}
+}
+
+% Dark Theme
+\DeclareOption{dark}{
+	\renewcommand{\selectedtheme}{dark}
+	\input{settings/themes/dark}
+}
+
+% Tokyonight Theme / Tokyo Theme
+\DeclareOption{tokyo}{
+	\renewcommand{\selectedtheme}{tokyo}
+	\input{settings/themes/tokyo}
+}
+
+% One Theme
+\DeclareOption{one}{
+	\renewcommand{\selectedtheme}{light}
+	\input{settings/themes/one}
+}
+
+% Black and White Theme
+\DeclareOption{bw}{
+	\renewcommand{\selectedtheme}{bw}
+	\input{settings/themes/bw}
+}
+
+% Ubuntu Theme
+\DeclareOption{ubuntu}{
+	\renewcommand{\selectedtheme}{ubuntu}
+	\input{settings/themes/ubuntu}
+}
+
+% Set the default theme option
+\ExecuteOptions{light}
+\ProcessOptions\relax
+

@@ -1,0 +1,22 @@
+%┌────────────────────────────────────────────────────────────────────────────┐%
+%│                                  Figures                                   │%
+%└────────────────────────────────────────────────────────────────────────────┘%
+% Figures options
+% NOTE: For figures counter reset at each section look at settings/math.tex
+
+% General figures packages
+\RequirePackage{graphicx}
+\RequirePackage{wrapfig}
+
+% Either one or the other commented!
+% \RequirePackage{subfig}
+\RequirePackage{subcaption}
+
+\RequirePackage{adjustbox} % Scale figures
+\RequirePackage[section]{placeins} % Figures inside sections
+
+% Captions
+\RequirePackage[labelfont={color=captionscolor, bf},
+            textfont={color=captionscolor},
+            margin=1cm]{caption}
+\captionsetup{format=hang}

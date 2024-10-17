@@ -1,0 +1,52 @@
+%┌────────────────────────────────────────────────────────────────────────────┐%
+%│                             Macros / Commands                              │%
+%└────────────────────────────────────────────────────────────────────────────┘%
+% Personal commands to make life easier
+
+% Quick \textbf{} bold font
+\newcommand{\bft}[1]{\textbf{#1}}
+
+% Quick \textit{} italic font
+\newcommand{\itt}[1]{\textit{#1}}
+
+% Quick \texttt{} monospace font
+\newcommand{\ttt}[1]{\texttt{#1}}
+
+% Quick \mathbf{} bold math font
+\newcommand{\mbf}[1]{\mathbf{#1}}
+
+% Quick \mathbb{} blackboard bold math font
+\newcommand{\mbb}[1]{\mathbb{#1}}
+
+% Quick \mathcal{} calligraphic math font
+\newcommand{\mcal}[1]{\mathcal{#1}}
+
+% Identity matrix
+\newcommand{\id}{\mathbbm{1}}
+
+% Quick colors
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\orange}[1]{\textcolor{orange}{#1}}
+\newcommand{\yellow}[1]{\textcolor{yellow}{#1}}
+\newcommand{\green}[1]{\textcolor{green}{#1}}
+\newcommand{\azure}[1]{\textcolor{azure}{#1}}
+\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+\newcommand{\purple}[1]{\textcolor{purple}{#1}}
+\newcommand{\gray}[1]{\textcolor{gray}{#1}}
+\newcommand{\comm}[1]{\textcolor{commentscolor}{#1}}
+
+% Quick bold font colors
+\newcommand{\bred}[1]{\textcolor{red}{\bft{#1}}}
+\newcommand{\borange}[1]{\textcolor{orange}{\bft{#1}}}
+\newcommand{\byellow}[1]{\textcolor{yellow}{\bft{#1}}}
+\newcommand{\bgreen}[1]{\textcolor{green}{\bft{#1}}}
+\newcommand{\bazure}[1]{\textcolor{azure}{\bft{#1}}}
+\newcommand{\bblue}[1]{\textcolor{blue}{\bft{#1}}}
+\newcommand{\bpurple}[1]{\textcolor{purple}{\bft{#1}}}
+\newcommand{\bgray}[1]{\textcolor{gray}{\bft{#1}}}
+\newcommand{\bcomm}[1]{\textcolor{commentscolor}{\bft{#1}}}
+
+% Command to print an horizontal line given the width in input (optional,
+% default is \textwidth)
+\newcommand{\oline}[1][\textwidth]{\noindent\rule{#1}{0.1pt}}
+
