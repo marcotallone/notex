@@ -10,6 +10,7 @@
 \setemojifont{Noto Color Emoji}
 \RequirePackage{fontawesome5}
 \RequirePackage[breakable]{tcolorbox}
+\tcbuselibrary{skins}
 \RequirePackage{etoolbox}
 \RequirePackage{pgfkeys}
 \RequirePackage{xparse}
@@ -35,10 +36,17 @@
   colframe  = #1,         % frame color
   coltext   = textcolor,  % text color
   boxrule   = 0mm,        % frame thickness
-  left      = 7mm,        % left margin
-  right     = 7mm,        % right margin
+  left      = 3mm,        % left margin
+  right     = 3mm,        % right margin
   top       = 3mm,        % top margin
   bottom    = 3mm,        % bottom margin
+	arc				= 1mm,        % arc corners radius
+	segmentation style={		% separation line for `\tcblower`
+		#1!30!black,
+		dashed,
+		opacity=0.5,
+		line width=0.1mm
+	},
 }
 
 %┌────────────────────────────────────────────────────────────────────────────┐%
@@ -47,24 +55,29 @@
 % Empty box you can choose the border color of
 % Usage: 
 % ───────────────────────────────────────
-% \begin{ebox}[color] (default: textcolor)
+% \begin{ebox}[color] (default: iconscolor)
 %     ...content...
 % \end{ebox}
 % ───────────────────────────────────────
 
-\newtcolorbox{ebox}[1][textcolor]{
+\newtcolorbox{ebox}[1][iconscolor]{
   breakable,              % allow the box to be split across pages
   enhanced jigsaw,        % better frame drawing
   colback   = background, % background color
-	opacityback = 0,        % background opacity
   colframe  = #1,         % frame color
-	opacityframe = 1,       % frame opacity
   coltext   = textcolor,  % text color
   boxrule   = 0.3mm,        % frame thickness
-  left      = 7mm,        % left margin
-  right     = 7mm,        % right margin
+  left      = 3mm,        % left margin
+  right     = 3mm,        % right margin
   top       = 3mm,        % top margin
   bottom    = 3mm,        % bottom margin
+	arc				= 1mm,        % arc corners radius
+	segmentation style={		% separation line for `\tcblower`
+		#1,
+		dashed,
+		opacity=0.75,
+		line width=0.1mm
+	},
 }
 
 %┌────────────────────────────────────────────────────────────────────────────┐%
@@ -85,16 +98,19 @@
   colframe  = yellow,     % frame color
   coltext   = textcolor,  % text color
   boxrule   = 0.3mm,      % frame thickness
-  left      = 7mm,        % left margin
-  right     = 7mm,        % right margin
+  left      = 3mm,        % left margin
+  right     = 3mm,        % right margin
   top       = 3mm,        % top margin
   bottom    = 3mm,        % bottom margin
-  overlay   = {           % overlay warning emoji
-    \node[anchor=north west,
-          yshift=-2mm,
-          xshift=1mm] 
-    at (frame.north west) {\emoji{warning}};
-  },
+	title			= \textcolor{iconscolor}{\emoji{warning}}\;, % title
+	detach title,						% detach title from the box
+	before upper={\tcbtitle\;\,},	% print title
+  % overlay   = {           % overlay warning emoji
+  %   \node[anchor=north west,
+  %         yshift=-2mm,
+  %         xshift=1mm] 
+  %   at (frame.north west) {\emoji{warning}};
+  % },
 }
 
 %┌────────────────────────────────────────────────────────────────────────────┐%
@@ -115,38 +131,44 @@
   colframe  = boxcolor,   % frame color
   coltext   = textcolor,  % text color
   boxrule   = 0mm,        % frame thickness
-  left      = 7mm,        % left margin
-  right     = 7mm,        % right margin
+  left      = 3mm,        % left margin
+  right     = 3mm,        % right margin
   top       = 3mm,        % top margin
   bottom    = 3mm,        % bottom margin
-  overlay   = {           % overlay drawing
-    \node[anchor=north west,
-          yshift=-2.5mm,
-          xshift=1mm] at (frame.north west)
-    {\textcolor{iconscolor}{\faIcon{info-circle}}};
-  },
+	title			= \textcolor{iconscolor}{\faIcon{info-circle}}\;, % title
+	detach title,						% detach title from the box
+	before upper={\tcbtitle\;\,},	% print title
+  % overlay   = {           % overlay drawing
+  %   \node[anchor=north west,
+  %         yshift=-2.5mm,
+  %         xshift=1mm] at (frame.north west)
+  %   {\textcolor{iconscolor}{\faIcon{info-circle}}};
+  % },
 }
 
 % Blue info block (equivalent)
 \newtcolorbox{blueinfo}{
   breakable,                  % allow the box to be split across pages
   enhanced jigsaw,            % better frame drawing
-  colback       = darkblue,   % background color
-  colframe      = darkblue,   % frame color
-  opacityback   = 0.3,        % background opacity
-  opacityframe  = 0.3,        % frame opacity
+  colback       = blue,   % background color
+  colframe      = blue,   % frame color
+  opacityback   = 0.4,        % background opacity
+  opacityframe  = 0.4,        % frame opacity
   coltext       = textcolor,  % text color
   boxrule       = 0mm,        % frame thickness
-  left          = 7mm,        % left margin
-  right         = 7mm,        % right margin
+  left          = 3mm,        % left margin
+  right         = 3mm,        % right margin
   top           = 3mm,        % top margin
   bottom        = 3mm,        % bottom margin
-  overlay       = {           % overlay drawing
-    \node[anchor=north west,
-          yshift=-2.5mm,
-          xshift=1mm] at (frame.north west)
-    {\textcolor{iconscolor}{\faIcon{info-circle}}};
-  },
+	title			= \textcolor{blue!75!background}{\faIcon{info-circle}}\;, % title
+	detach title,               % detach title from the box
+	before upper={\tcbtitle\;\,}, % print title
+  % overlay       = {           % overlay drawing
+  %   \node[anchor=north west,
+  %         yshift=-2.5mm,
+  %         xshift=1mm] at (frame.north west)
+  %   {\textcolor{iconscolor}{\faIcon{info-circle}}};
+  % },
 }
 
 %┌────────────────────────────────────────────────────────────────────────────┐%
@@ -171,7 +193,8 @@
 }}
 
 \newcommand{\exampleSquare}{
-  \tcbox[exampleStyle]{EXAMPLE \theexample}
+  % \tcbox[exampleStyle]{EXAMPLE \theexample}
+	\tcbox[exampleStyle]{\fontfamily{lmss}\selectfont EXAMPLE \theexample}
 }
 
 % Example counter
@@ -204,8 +227,8 @@
     bottom    =3mm,           % bottom margin
     overlay   = {             % overlay drawing
       \node[anchor=north west, 
-            yshift=-2.5mm, 
-            xshift=1mm] at (frame.north west)
+            yshift=-2.9mm, 
+            xshift=1.4mm] at (frame.north west)
       {\textcolor{gray}{\faIcon{edit}}};
     },
     before upper  = {         % print number here
@@ -238,7 +261,11 @@
 }}
 
 \newcommand{\defSquare}{
-  \tcbox[definitionStyle]{\textit{def} \thedefinition}
+  % \tcbox[definitionStyle]{\textit{def} \thedefinition}
+	\tcbox[definitionStyle]{
+		{\fontfamily{ptm}\selectfont \textit{def}}
+		{\fontfamily{lmss}\selectfont \thedefinition}
+	}
 }
 
 % Definition counter
@@ -265,18 +292,18 @@
     colframe  = boxcolor,     % frame color
     coltext   = textcolor,    % text color
     boxrule   = 0mm,          % frame thickness
-    left      = 7mm,          % left margin
-    right     = 7mm,          % right margin
+    left      = 3mm,          % left margin
+    right     = 3mm,          % right margin
     top       = 3mm,          % top margin
     bottom    = 3mm,          % bottom margin
     overlay   = {             % overlay drawing
       \node[anchor=north west, 
             yshift=-2.9mm, 
-            xshift=1mm] at (frame.north west)
+            xshift=1.5mm] at (frame.north west)
       {\textcolor{iconscolor}{\faIcon{book-open}}};
     },
     before upper = {          % print number here
-      \defSquare\ \textbf{#1} \par \vspace*{2mm}
+      \hspace{3mm} \defSquare\ \textbf{#1} \par \vspace*{2mm}
     },
   ]
 }{
@@ -291,22 +318,34 @@
 
 % Theorem Icon
 \newcommand{\theoremSquare}{
-  \tcbox[definitionStyle]{\textbf{THEOREM} \thetheorem}
+  % \tcbox[definitionStyle]{\textbf{THEOREM} \thetheorem}
+	\tcbox[definitionStyle]{
+		\fontfamily{lmss}\selectfont \textbf{THEOREM} \thetheorem\
+	}	
 }
 
 % Corollary Icon
 \newcommand{\corollarySquare}{
-  \tcbox[definitionStyle]{\textbf{COROLLARY} \thetheorem}
+  % \tcbox[definitionStyle]{\textbf{COROLLARY} \thetheorem}
+	\tcbox[definitionStyle]{
+		\fontfamily{lmss}\selectfont \textbf{COROLLARY} \thetheorem\
+	}
 }
 
 % Proposition Icon
 \newcommand{\propSquare}{
-  \tcbox[definitionStyle]{\textbf{PROPOSITION} \thetheorem}
+  % \tcbox[definitionStyle]{\textbf{PROPOSITION} \thetheorem}
+	\tcbox[definitionStyle]{
+		\fontfamily{lmss}\selectfont \textbf{PROPOSITION} \thetheorem\
+	}
 }
 
 % Lemma Icon
 \newcommand{\lemmaSquare}{
-  \tcbox[definitionStyle]{\textbf{LEMMA} \thetheorem}
+  % \tcbox[definitionStyle]{\textbf{LEMMA} \thetheorem}
+	\tcbox[definitionStyle]{
+		\fontfamily{lmss}\selectfont \textbf{LEMMA} \thetheorem\
+	}
 }
 
 % Theorem, Corollary, Proposition, Lemma counter
@@ -333,18 +372,18 @@
     colframe  = boxcolor,     % frame color
     coltext   = textcolor,    % text color
     boxrule   = 0mm,          % frame thickness
-    left      = 7mm,          % left margin
-    right     = 7mm,          % right margin
+    left      = 3mm,          % left margin
+    right     = 3mm,          % right margin
     top       = 3mm,          % top margin
     bottom    = 3mm,          % bottom margin
     overlay   = {             % overlay drawing
       \node[anchor=north west, 
             yshift=-2.9mm, 
-            xshift=1mm] at (frame.north west)
+            xshift=1.5mm] at (frame.north west)
       {\textcolor{iconscolor}{\faIcon{book}}};
     },
     before upper = {          % print number here
-      \theoremSquare\ \textbf{#1} \par \vspace*{2mm}
+      \hspace{2mm} \theoremSquare\ \textbf{#1} \par \vspace*{2mm}
     },
   ]
 }{
@@ -363,18 +402,18 @@
     colframe  = boxcolor,     % frame color
     coltext   = textcolor,    % text color
     boxrule   = 0mm,          % frame thickness
-    left      = 7mm,          % left margin
-    right     = 7mm,          % right margin
+    left      = 3mm,          % left margin
+    right     = 3mm,          % right margin
     top       = 3mm,          % top margin
     bottom    = 3mm,          % bottom margin
     overlay   = {             % overlay drawing
       \node[anchor=north west, 
             yshift=-2.9mm, 
-            xshift=1mm] at (frame.north west)
+            xshift=1.5mm] at (frame.north west)
       {\textcolor{iconscolor}{\faIcon{book}}};
     },
     before upper = {          % print number here
-      \corollarySquare\ \textbf{#1} \par \vspace*{2mm}
+      \hspace{2mm} \corollarySquare\ \textbf{#1} \par \vspace*{2mm}
     },
   ]
 }{
@@ -393,18 +432,18 @@
     colframe  = boxcolor,     % frame color
     coltext   = textcolor,    % text color
     boxrule   = 0mm,          % frame thickness
-    left      = 7mm,          % left margin
-    right     = 7mm,          % right margin
+    left      = 3mm,          % left margin
+    right     = 3mm,          % right margin
     top       = 3mm,          % top margin
     bottom    = 3mm,          % bottom margin
     overlay   = {             % overlay drawing
       \node[anchor=north west, 
             yshift=-2.9mm, 
-            xshift=1mm] at (frame.north west)
+            xshift=1.5mm] at (frame.north west)
       {\textcolor{iconscolor}{\faIcon{book}}};
     },
     before upper = {          % print number here
-      \propSquare\ \textbf{#1} \par \vspace*{2mm}
+      \hspace{2mm} \propSquare\ \textbf{#1} \par \vspace*{2mm}
     },
   ]
 }{
@@ -423,18 +462,18 @@
     colframe  = boxcolor,     % frame color
     coltext   = textcolor,    % text color
     boxrule   = 0mm,          % frame thickness
-    left      = 7mm,          % left margin
-    right     = 7mm,          % right margin
+    left      = 3mm,          % left margin
+    right     = 3mm,          % right margin
     top       = 3mm,          % top margin
     bottom    = 3mm,          % bottom margin
     overlay   = {             % overlay drawing
       \node[anchor=north west, 
             yshift=-2.9mm, 
-            xshift=1mm] at (frame.north west)
+            xshift=1.5mm] at (frame.north west)
       {\textcolor{iconscolor}{\faIcon{book}}};
     },
     before upper = {          % print number here
-      \lemmaSquare\ \textbf{#1} \par \vspace*{2mm}
+      \hspace{2mm} \lemmaSquare\ \textbf{#1} \par \vspace*{2mm}
     },
   ]
 }{

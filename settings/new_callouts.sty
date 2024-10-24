@@ -1,0 +1,722 @@
+%┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓%
+%┃                                 CALLOUTS                                   ┃%
+%┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛%
+% NOTE: If you use this package independently, you need to define the colors!
+% NOTE: This package requires the LuaLaTeX compiler.
+
+\ProvidesPackage{callouts}[2024/08/20 Package providing colorful boxes]
+
+\RequirePackage{emoji}
+\setemojifont{Noto Color Emoji}
+\RequirePackage{fontawesome5}
+\RequirePackage[breakable]{tcolorbox}
+\RequirePackage{etoolbox}
+\RequirePackage{pgfkeys}
+\RequirePackage{xparse}
+\usetikzlibrary{shadings}
+
+% Save the original \fboxsep
+\newlength{\originalfboxsep}
+
+%┌────────────────────────────────────────────────────────────────────────────┐%
+%│                                Color Boxes                                 │%
+%└────────────────────────────────────────────────────────────────────────────┘%
+% Simple box you can choose the color of
+% Usage: 
+% ───────────────────────────────────────
+% \begin{cbox}[color] (default: boxcolor)
+%     ...content...
+% \end{cbox}
+% ───────────────────────────────────────
+
+\newtcolorbox{cbox}[1][boxcolor]{
+  breakable,              % allow the box to be split across pages
+  enhanced jigsaw,        % better frame drawing
+  colback   = #1,         % background color
+  colframe  = #1,         % frame color
+  coltext   = textcolor,  % text color
+  boxrule   = 0mm,        % frame thickness
+  left      = 3mm,        % left margin
+  right     = 3mm,        % right margin
+  top       = 3mm,        % top margin
+  bottom    = 3mm,        % bottom margin
+	arc				= 1mm,        % arc corners radius
+	segmentation style={		% separation line for `\tcblower`
+		#1!30!black,
+		dashed,
+		opacity=0.5,
+		line width=0.1mm
+	},
+	width			= \textwidth,	% box width
+	center,									% center the box
+}
+
+%┌────────────────────────────────────────────────────────────────────────────┐%
+%│                                Empty Boxes                                 │%
+%└────────────────────────────────────────────────────────────────────────────┘%
+% Empty box you can choose the border color of
+% Usage: 
+% ───────────────────────────────────────
+% \begin{ebox}[color] (default: textcolor)
+%     ...content...
+% \end{ebox}
+% ───────────────────────────────────────
+
+\newtcolorbox{ebox}[1][textcolor]{
+  breakable,              % allow the box to be split across pages
+  enhanced jigsaw,        % better frame drawing
+  colback   = background, % background color
+	opacityback = 0,        % background opacity
+  colframe  = #1,         % frame color
+	opacityframe = 1,       % frame opacity
+  coltext   = textcolor,  % text color
+  boxrule   = 0.3mm,      % frame thickness
+  left      = 3mm,        % left margin
+  right     = 3mm,        % right margin
+  top       = 3mm,        % top margin
+  bottom    = 3mm,        % bottom margin
+	arc				= 1mm,        % arc corners radius
+	segmentation style={		% separation line for `\tcblower`
+		#1,
+		dashed,
+		opacity=0.75,
+		line width=0.1mm
+	},
+	width			= \textwidth,	% box width
+	center,									% center the box
+}
+
+%┌────────────────────────────────────────────────────────────────────────────┐%
+%│                                 Warnings                                   │%
+%└────────────────────────────────────────────────────────────────────────────┘%
+% Warning block
+% Usage:
+% ──────────────────────────────────────────
+% \begin{warning}[color] (default: boxcolor)
+%     ...content...
+% \end{warning}
+% ──────────────────────────────────────────
+
+\newtcolorbox{warning}[1][boxcolor]{
+  breakable,              % allow the box to be split across pages
+  enhanced jigsaw,        % better frame drawing
+  colback   = #1,         % background color
+  colframe  = yellow,     % frame color
+  coltext   = textcolor,  % text color
+	colbacktitle = yellow,	% title background color
+	opacitybacktitle = 0.5, % title background opacity
+	coltitle = yellow,		% title text color
+	fonttitle = \bfseries,	% title font
+	title = \faExclamationTriangle, % title content (warning icon)
+	detach title,before upper={\tcbtitle\;\,}, % title position
+  boxrule   = 0.3mm,      % frame thickness
+  left      = 2mm,        % left margin
+  right     = 2mm,        % right margin
+  top       = 2mm,        % top margin
+  bottom    = 2mm,        % bottom margin
+	titlerule = 0mm,				% line below the title
+	arc				= 1mm,				% arc corners radius
+}
+
+%┌────────────────────────────────────────────────────────────────────────────┐%
+%│                                   Info                                     │%
+%└────────────────────────────────────────────────────────────────────────────┘%
+% Info block
+% Usage:
+% ───────────────────────────────────────
+% \begin{info}[color] (default: boxcolor)
+%     ...content...
+% \end{info}
+% ───────────────────────────────────────
+
+\newtcolorbox{info}[1][boxcolor]{
+  breakable,              % allow the box to be split across pages
+  enhanced jigsaw,        % better frame drawing
+  colback   = #1,         % background color
+  colframe  = boxcolor,   % frame color
+  coltext   = textcolor,  % text color
+	coltitle	= iconscolor,		% title text color
+	fonttitle = \bfseries,	% title font
+	title			= \faInfoCircle, % title content (warning icon)
+	detach title,
+	before upper = {\tcbtitle\;\,}, % title position
+  boxrule   = 0mm,        % frame thickness
+  left      = 2mm,        % left margin
+  right     = 2mm,        % right margin
+  top       = 2mm,        % top margin
+  bottom    = 2mm,        % bottom margin
+}
+
+% Blue info block (equivalent)
+\newtcolorbox{blueinfo}{
+  breakable,              % allow the box to be split across pages
+  enhanced jigsaw,        % better frame drawing
+  colback   = darkblue,         % background color
+  colframe  = darkblue,   % frame color
+  opacityback   = 0.3,        % background opacity
+  opacityframe  = 0.3,        % frame opacity
+  coltext   = textcolor,  % text color
+	coltitle	= iconscolor,		% title text color
+	fonttitle = \bfseries,	% title font
+	title			= \faInfoCircle, % title content (warning icon)
+	detach title,
+	before upper = {\tcbtitle\;\,}, % title position
+  boxrule   = 0mm,        % frame thickness
+  left      = 2mm,        % left margin
+  right     = 2mm,        % right margin
+  top       = 2mm,        % top margin
+  bottom    = 2mm,        % bottom margin
+}
+
+%┌────────────────────────────────────────────────────────────────────────────┐%
+%│                                 Examples                                   │%
+%└────────────────────────────────────────────────────────────────────────────┘%
+
+% % Example icon
+% \tcbset{exampleStyle/.style={
+%   on line,                      % the box will be inline
+%   nobeforeafter,                % no space before and after
+%   arc       = 1mm,              % arc radius
+%   boxsep    = 2pt,              % padding
+%   colback   = gray,             % background color
+%   colframe  = gray,             % frame color
+%   coltext   = boxcolor,         % text color
+%   fontupper = \small\bfseries,  % font style
+%   boxrule   = 0pt,              % frame thickness
+%   top       = 0mm,              % top margin
+%   bottom    = 0mm,              % bottom margin
+%   left      = 0.25mm,           % left margin
+%   right     = 0.25mm,           % right margin
+% }}
+
+% \newcommand{\exampleSquare}{
+%   \tcbox[exampleStyle]{EXAMPLE \theexample}
+% }
+
+% Example counter
+\newcounter{example}
+\makeatletter
+\@addtoreset{example}{section}
+\makeatother
+\renewcommand{\theexample}{\thesection.\arabic{example}}
+
+% Example block
+% Usage:
+% ────────────────────────────────────────
+% \begin{example}[title][label] (optional)
+%     ...content...
+% \end{example}
+% ────────────────────────────────────────
+
+\NewDocumentEnvironment{example}{O{} O{}}{
+  \refstepcounter{example}\label{ex:#2} % increment counter and label
+  \begin{tcolorbox}[
+    breakable,                % allow the box to be split across pages
+    enhanced jigsaw,          % better frame drawing
+    colback   =background,    % background color
+    colframe  =gray,          % frame color
+    coltext   =gray,          % text color
+    boxrule   =0.3mm,         % frame thickness
+    left      =2mm,           % left margin
+    right     =2mm,           % right margin
+    top       =2mm,           % top margin
+    bottom    =2mm,           % bottom margin
+		arc				= 1mm,					% arc corners radius
+		titlerule = 0mm,					% line below the title
+    title     = \IfStrEq{#1}{}{
+			\exampleSquare\ \textbf{Example}
+		}{
+			\faEdit\;\textbf{#1} \hfill 
+			\scalebox{0.7}{\raisebox{0.4mm}{EXAMPLE}} \theexample\ }, % title content
+		fonttitle = \bfseries,	% title font
+		coltitle = gray!90!textcolor,		% title text color
+		colbacktitle = gray,
+		bottomtitle = 0.2mm,
+		toptitle = 0.7mm,
+		opacitybacktitle = 0.25, % title background opacity
+		opacityframe = 0.5,
+		bottomtitle = 0.5mm,
+		toptitle = 0.5mm,
+  ]
+}{
+  \end{tcolorbox}
+}
+
+%┌────────────────────────────────────────────────────────────────────────────┐%
+%│                                Definition                                  │%
+%└────────────────────────────────────────────────────────────────────────────┘%
+
+% % Definition Icon
+% \tcbset{definitionStyle/.style={
+%   on line,                      % the box will be inline
+%   nobeforeafter,                % no space before and after
+%   arc       = 1mm,              % arc radius
+%   boxsep    = 2pt,              % padding
+%   colback   = iconscolor,       % background color
+%   colframe  = iconscolor,       % frame color
+%   coltext   = boxcolor,         % text color
+%   fontupper = \small\bfseries,  % font style
+%   boxrule   = 0pt,              % frame thickness
+%   top       = 0mm,              % top margin
+%   bottom    = 0mm,              % bottom margin
+%   left      = 0.25mm,           % left margin
+%   right     = 0.25mm,           % right margin
+% }}
+
+% \newcommand{\defSquare}{
+%   \tcbox[definitionStyle]{\textit{def} \thedefinition}
+% }
+
+% Definition counter
+\newcounter{definition}
+\makeatletter
+\@addtoreset{definition}{section}
+\makeatother
+\renewcommand{\thedefinition}{\thesection.\arabic{definition}}
+
+% Definition block
+% Usage:
+% ───────────────────────────────────────────
+% \begin{definition}[title][label] (optional)
+%     ...content...
+% \end{definition}
+% ───────────────────────────────────────────
+
+\NewDocumentEnvironment{definition}{O{} O{}}{
+  \refstepcounter{definition}\label{def:#2} % increment counter and label
+  \begin{tcolorbox}[
+    breakable,                % allow the box to be split across pages
+    enhanced jigsaw,          % better frame drawing
+    colback   = boxcolor,     % background color
+    coltext   = textcolor,    % text color
+    boxrule   = 0mm,          % frame thickness
+    left      = 6mm,          % left margin
+    right     = 2mm,          % right margin
+    top       = 2mm,          % top margin
+    bottom    = 2mm,          % bottom margin
+		arc = 1mm,								% arc  corners radius
+		titlerule = 0mm,					% line below the title
+    title     = \IfStrEq{#1}{}{\textbf{Definition}}{\textbf{#1}}, % title content
+		fonttitle = \bfseries,		% title font
+		coltitle = iconscolor,		% title text color
+		bottomtitle = 0.2mm,
+		toptitle = 0.7mm,
+		opacityframe = 1,				% frame opacity
+		skin = enhanced,        % better frame drawing
+		frame style={
+			upper left=primary!80!boxcolor,
+			upper right=secondary!80!boxcolor,
+			lower left=boxcolor,
+			lower right=boxcolor,
+		},
+		% opacitybacktitle = 0.25, % title background opacity
+    overlay   = {             % overlay drawing
+      \begin{scope}
+        \fill[primary, opacity=0.25] 
+          ([xshift=1mm]frame.north west)
+					arc[start angle=90, end angle=180, radius=1mm] -- 
+          ([xshift=0mm, yshift=1mm]frame.south west)
+					arc[start angle=-180, end angle=-90, radius=1mm] --
+          ([xshift=6.5mm, yshift=0mm]frame.south west)
+					arc[start angle=-90, end angle=-180, radius=1mm] -- 
+          ([xshift=5.5mm, yshift=-1mm]frame.north west)
+					arc[start angle=180, end angle=90, radius=1mm] -- 
+          cycle;
+      \end{scope},
+      \node[anchor=north west, 
+            yshift=-0.5mm, 
+            xshift=-0.3mm] at (frame.north west)
+						{\fontsize{9}{9}\selectfont\textcolor{iconscolor}{\faIcon{book-open}}};
+			\node[anchor=north east, 
+						yshift=-0.5mm, 
+						xshift=-0.7mm] at (frame.north east)
+            {\textcolor{iconscolor}{\textbf{\scalebox{0.7}{\raisebox{0.4mm}{DEF}}
+						\thedefinition}}};
+    },
+  ]
+}{
+  \end{tcolorbox}
+}
+
+%┌────────────────────────────────────────────────────────────────────────────┐%
+%│                 Theorem, Proposition, Corollary, Lemma                     │%
+%└────────────────────────────────────────────────────────────────────────────┘%
+% NOTE: The following blocks share the same counter `th:`
+% NOTE: The style of the icons is the same of the definition (above)
+
+% Theorem Icon
+\newcommand{\theoremSquare}{
+  \tcbox[definitionStyle]{\textbf{THEOREM} \thetheorem}
+}
+
+% Corollary Icon
+\newcommand{\corollarySquare}{
+  \tcbox[definitionStyle]{\textbf{COROLLARY} \thetheorem}
+}
+
+% Proposition Icon
+\newcommand{\propSquare}{
+  \tcbox[definitionStyle]{\textbf{PROPOSITION} \thetheorem}
+}
+
+% Lemma Icon
+\newcommand{\lemmaSquare}{
+  \tcbox[definitionStyle]{\textbf{LEMMA} \thetheorem}
+}
+
+% Theorem, Corollary, Proposition, Lemma counter
+\newcounter{theorem}
+\makeatletter
+\@addtoreset{theorem}{section}
+\makeatother
+\renewcommand{\thetheorem}{\thesection.\arabic{theorem}}
+
+% Theorem block
+% Usage:
+% ────────────────────────────────────────
+% \begin{theorem}[title][label] (optional)
+%     ...content...
+% \end{theorem}
+% ────────────────────────────────────────
+
+% Old:
+% \NewDocumentEnvironment{theorem}{O{} O{}}{
+%   \refstepcounter{theorem}\label{th:#2} % increment counter and label
+%   \begin{tcolorbox}[
+%     breakable,                % allow the box to be split across pages
+%     enhanced jigsaw,          % better frame drawing
+%     colback   = boxcolor,     % background color
+%     colframe  = boxcolor,     % frame color
+%     coltext   = textcolor,    % text color
+%     boxrule   = 0mm,          % frame thickness
+%     left      = 7mm,          % left margin
+%     right     = 7mm,          % right margin
+%     top       = 3mm,          % top margin
+%     bottom    = 3mm,          % bottom margin
+%     overlay   = {             % overlay drawing
+%       \node[anchor=north west, 
+%             yshift=-2.9mm, 
+%             xshift=1mm] at (frame.north west)
+%       {\textcolor{iconscolor}{\faIcon{book}}};
+%     },
+%     before upper = {          % print number here
+%       \theoremSquare\ \textbf{#1} \par \vspace*{2mm}
+%     },
+%   ]
+% }{
+%   \end{tcolorbox}
+% }
+
+% New:
+\NewDocumentEnvironment{theorem}{O{} O{}}{
+  \refstepcounter{theorem}\label{th:#2} % increment counter and label
+  \begin{tcolorbox}[
+    breakable,                % allow the box to be split across pages
+    enhanced jigsaw,          % better frame drawing
+    colback   = boxcolor,     % background color
+    coltext   = textcolor,    % text color
+    boxrule   = 0mm,          % frame thickness
+    left      = 6mm,          % left margin
+    right     = 2mm,          % right margin
+    top       = 2mm,          % top margin
+    bottom    = 2mm,          % bottom margin
+		arc = 1mm,
+		titlerule = 0mm,				% line below the title
+		title = \IfStrEq{#1}{}{\textbf{Theorem}}{\textbf{#1}}, % title content
+		fonttitle = \bfseries,	% title font
+		coltitle = iconscolor,		% title text color
+		bottomtitle = 0.2mm,
+		toptitle = 0.7mm,
+		opacityframe = 1,     % frame opacity
+		skin = enhanced,        % better frame drawing
+		frame style={
+			upper left=primary!80!boxcolor,
+			upper right=secondary!80!boxcolor,
+			lower left=boxcolor,
+			lower right=boxcolor,
+		},
+    overlay   = {             % overlay drawing
+			\begin{scope}
+				\fill[primary, opacity=0.25] 
+					([xshift=1mm]frame.north west)
+					arc[start angle=90, end angle=180, radius=1mm] --
+					([xshift=0mm, yshift=1mm]frame.south west)
+					arc[start angle=-180, end angle=-90, radius=1mm] --
+					([xshift=6.5mm, yshift=0mm]frame.south west)
+					arc[start angle=-90, end angle=-180, radius=1mm] --
+					([xshift=5.5mm, yshift=-1mm]frame.north west)
+					arc[start angle=180, end angle=90, radius=1mm] --
+					cycle;
+				\end{scope},
+				\node[anchor=north west, 
+							yshift=-0.3mm, 
+							xshift=0mm] at (frame.north west)
+							{\fontsize{9}{9}\selectfont\textcolor{iconscolor}{\faIcon{book}}};
+			\node[anchor=north east,
+						yshift=-0.5mm,
+						xshift=-0.7mm] at (frame.north east)
+						{\textcolor{iconscolor}{\textbf{\scalebox{0.7}{\raisebox{0.4mm}{THEOREM}} \thetheorem}}};
+    },
+  ]
+}{
+  \end{tcolorbox}
+}
+
+% Corollary block
+% Usage: same as the theorem block (above)
+
+% Old:
+% \NewDocumentEnvironment{corollary}{O{} O{}}{
+%   \refstepcounter{theorem}\label{th:#2} % increment counter and label
+%   \begin{tcolorbox}[
+%     breakable,                % allow the box to be split across pages
+%     enhanced jigsaw,          % better frame drawing
+%     colback   = boxcolor,     % background color
+%     colframe  = boxcolor,     % frame color
+%     coltext   = textcolor,    % text color
+%     boxrule   = 0mm,          % frame thickness
+%     left      = 7mm,          % left margin
+%     right     = 7mm,          % right margin
+%     top       = 3mm,          % top margin
+%     bottom    = 3mm,          % bottom margin
+%     overlay   = {             % overlay drawing
+%       \node[anchor=north west, 
+%             yshift=-2.9mm, 
+%             xshift=1mm] at (frame.north west)
+%       {\textcolor{iconscolor}{\faIcon{book}}};
+%     },
+%     before upper = {          % print number here
+%       \corollarySquare\ \textbf{#1} \par \vspace*{2mm}
+%     },
+%   ]
+% }{
+%   \end{tcolorbox}
+% }
+
+% New:
+\NewDocumentEnvironment{corollary}{O{} O{}}{
+  \refstepcounter{theorem}\label{th:#2} % increment counter and label
+  \begin{tcolorbox}[
+    breakable,                % allow the box to be split across pages
+    enhanced jigsaw,          % better frame drawing
+    colback   = boxcolor,     % background color
+    coltext   = textcolor,    % text color
+    boxrule   = 0mm,          % frame thickness
+    left      = 7mm,          % left margin
+    right     = 7mm,          % right margin
+    top       = 3mm,          % top margin
+    bottom    = 3mm,          % bottom margin
+    arc = 1mm,
+    titlerule = 0mm,          % line below the title
+    title = \IfStrEq{#1}{}{\textbf{Corollary}}{\textbf{#1}}, % title content
+    fonttitle = \bfseries,    % title font
+    coltitle = iconscolor,     % title text color
+    bottomtitle = 0.2mm,
+    toptitle = 0.7mm,
+    opacityframe = 1,         % frame opacity
+    skin = enhanced,          % better frame drawing
+    frame style={
+      upper left=primary!80!boxcolor,
+      upper right=secondary!80!boxcolor,
+      lower left=boxcolor,
+      lower right=boxcolor,
+    },
+    overlay   = {             % overlay drawing
+      \begin{scope}
+        \fill[primary, opacity=0.25] 
+          ([xshift=1mm]frame.north west)
+          arc[start angle=90, end angle=180, radius=1mm] --
+          ([xshift=0mm, yshift=1mm]frame.south west)
+          arc[start angle=-180, end angle=-90, radius=1mm] --
+          ([xshift=6.5mm, yshift=0mm]frame.south west)
+          arc[start angle=-90, end angle=-180, radius=1mm] --
+          ([xshift=5.5mm, yshift=-1mm]frame.north west)
+          arc[start angle=180, end angle=90, radius=1mm] --
+          cycle;
+      \end{scope},
+      \node[anchor=north west, 
+            yshift=-0.3mm, 
+            xshift=0mm] at (frame.north west)
+            {\fontsize{9}{9}\selectfont\textcolor{iconscolor}{\faIcon{book}}};
+      \node[anchor=north east,
+            yshift=-0.5mm,
+            xshift=-0.7mm] at (frame.north east)
+            {\textcolor{iconscolor}{\textbf{\scalebox{0.7}{\raisebox{0.4mm}{COROLLARY}} \thetheorem}}};
+    },
+  ]
+}{
+  \end{tcolorbox}
+}
+
+% Proposition block
+% Usage: same as the theorem block (above)
+
+% Old:
+% \NewDocumentEnvironment{proposition}{O{} O{}}{
+%   \refstepcounter{theorem}\label{th:#2} % increment counter and label
+%   \begin{tcolorbox}[
+%     breakable,                % allow the box to be split across pages
+%     enhanced jigsaw,          % better frame drawing
+%     colback   = boxcolor,     % background color
+%     colframe  = boxcolor,     % frame color
+%     coltext   = textcolor,    % text color
+%     boxrule   = 0mm,          % frame thickness
+%     left      = 7mm,          % left margin
+%     right     = 7mm,          % right margin
+%     top       = 3mm,          % top margin
+%     bottom    = 3mm,          % bottom margin
+%     overlay   = {             % overlay drawing
+%       \node[anchor=north west, 
+%             yshift=-2.9mm, 
+%             xshift=1mm] at (frame.north west)
+%       {\textcolor{iconscolor}{\faIcon{book}}};
+%     },
+%     before upper = {          % print number here
+%       \propSquare\ \textbf{#1} \par \vspace*{2mm}
+%     },
+%   ]
+% }{
+%   \end{tcolorbox}
+% }
+
+% New:
+\NewDocumentEnvironment{proposition}{O{} O{}}{
+  \refstepcounter{theorem}\label{th:#2} % increment counter and label
+  \begin{tcolorbox}[
+    breakable,                % allow the box to be split across pages
+    enhanced jigsaw,          % better frame drawing
+    colback   = boxcolor,     % background color
+    coltext   = textcolor,    % text color
+    boxrule   = 0mm,          % frame thickness
+    left      = 7mm,          % left margin
+    right     = 7mm,          % right margin
+    top       = 3mm,          % top margin
+    bottom    = 3mm,          % bottom margin
+    arc = 1mm,
+    titlerule = 0mm,          % line below the title
+    title = \IfStrEq{#1}{}{\textbf{Proposition}}{\textbf{#1}}, % title content
+    fonttitle = \bfseries,    % title font
+    coltitle = iconscolor,     % title text color
+    bottomtitle = 0.2mm,
+    toptitle = 0.7mm,
+    opacityframe = 1,         % frame opacity
+    skin = enhanced,          % better frame drawing
+    frame style={
+      upper left=primary!80!boxcolor,
+      upper right=secondary!80!boxcolor,
+      lower left=boxcolor,
+      lower right=boxcolor,
+    },
+    overlay   = {             % overlay drawing
+      \begin{scope}
+        \fill[primary, opacity=0.25] 
+          ([xshift=1mm]frame.north west)
+          arc[start angle=90, end angle=180, radius=1mm] --
+          ([xshift=0mm, yshift=1mm]frame.south west)
+          arc[start angle=-180, end angle=-90, radius=1mm] --
+          ([xshift=6.5mm, yshift=0mm]frame.south west)
+          arc[start angle=-90, end angle=-180, radius=1mm] --
+          ([xshift=5.5mm, yshift=-1mm]frame.north west)
+          arc[start angle=180, end angle=90, radius=1mm] --
+          cycle;
+      \end{scope},
+      \node[anchor=north west, 
+            yshift=-0.3mm, 
+            xshift=0mm] at (frame.north west)
+            {\fontsize{9}{9}\selectfont\textcolor{iconscolor}{\faIcon{book}}};
+      \node[anchor=north east,
+            yshift=-0.5mm,
+            xshift=-0.7mm] at (frame.north east)
+            {\textcolor{iconscolor}{\textbf{\scalebox{0.7}{\raisebox{0.4mm}{PROPOSITION}} \thetheorem}}};
+    },
+  ]
+}{
+  \end{tcolorbox}
+}
+
+% Lemma block
+% Usage: same as theorem (above)
+
+% Old:
+% \NewDocumentEnvironment{lemma}{O{} O{}}{
+%   \refstepcounter{theorem}\label{th:#2} % increment counter and label
+%   \begin{tcolorbox}[
+%     breakable,                % allow the box to be split across pages
+%     enhanced jigsaw,          % better frame drawing
+%     colback   = boxcolor,     % background color
+%     colframe  = boxcolor,     % frame color
+%     coltext   = textcolor,    % text color
+%     boxrule   = 0mm,          % frame thickness
+%     left      = 7mm,          % left margin
+%     right     = 7mm,          % right margin
+%     top       = 3mm,          % top margin
+%     bottom    = 3mm,          % bottom margin
+%     overlay   = {             % overlay drawing
+%       \node[anchor=north west, 
+%             yshift=-2.9mm, 
+%             xshift=1mm] at (frame.north west)
+%       {\textcolor{iconscolor}{\faIcon{book}}};
+%     },
+%     before upper = {          % print number here
+%       \lemmaSquare\ \textbf{#1} \par \vspace*{2mm}
+%     },
+%   ]
+% }{
+%   \end{tcolorbox}
+% }
+
+% New:
+\NewDocumentEnvironment{lemma}{O{} O{}}{
+  \refstepcounter{theorem}\label{th:#2} % increment counter and label
+  \begin{tcolorbox}[
+    breakable,                % allow the box to be split across pages
+    enhanced jigsaw,          % better frame drawing
+    colback   = boxcolor,     % background color
+    coltext   = textcolor,    % text color
+    boxrule   = 0mm,          % frame thickness
+    left      = 7mm,          % left margin
+    right     = 7mm,          % right margin
+    top       = 3mm,          % top margin
+    bottom    = 3mm,          % bottom margin
+    arc = 1mm,
+    titlerule = 0mm,          % line below the title
+    title = \IfStrEq{#1}{}{\textbf{Lemma}}{\textbf{#1}}, % title content
+    fonttitle = \bfseries,    % title font
+    coltitle = iconscolor,     % title text color
+    bottomtitle = 0.8mm,
+    toptitle = 0.7mm,
+    opacityframe = 1,         % frame opacity
+    skin = enhanced,          % better frame drawing
+    frame style={
+      upper left=primary!80!boxcolor,
+      upper right=secondary!80!boxcolor,
+      lower left=boxcolor,
+      lower right=boxcolor,
+    },
+    overlay   = {             % overlay drawing
+      \begin{scope}
+        \fill[primary, opacity=0.25] 
+          ([xshift=1mm]frame.north west)
+          arc[start angle=90, end angle=180, radius=1mm] --
+          ([xshift=0mm, yshift=1mm]frame.south west)
+          arc[start angle=-180, end angle=-90, radius=1mm] --
+          ([xshift=6.5mm, yshift=0mm]frame.south west)
+          arc[start angle=-90, end angle=-180, radius=1mm] --
+          ([xshift=5.5mm, yshift=-1mm]frame.north west)
+          arc[start angle=180, end angle=90, radius=1mm] --
+          cycle;
+      \end{scope},
+      \node[anchor=north west, 
+            yshift=-0.3mm, 
+            xshift=0mm] at (frame.north west)
+            {\fontsize{9}{9}\selectfont\textcolor{iconscolor}{\faIcon{book}}};
+      \node[anchor=north east,
+            yshift=-0.5mm,
+            xshift=-0.7mm] at (frame.north east)
+            {\textcolor{iconscolor}{\textbf{\scalebox{0.7}{\raisebox{0.4mm}{LEMMA}} \thetheorem}}};
+    },
+  ]
+}{
+  \end{tcolorbox}
+}
+

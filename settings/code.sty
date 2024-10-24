@@ -99,9 +99,9 @@
     minted options = {
       breaklines,																% break long lines
       autogobble,																% remove leading spaces				
-      linenos,																	% enable line numbers
+      % linenos,																	% enable line numbers
       fontsize						=	\small,							% font size
-      numbersep						=	4mm,								% line number separation
+      % numbersep						=	4mm,								% line number separation
       obeytabs						=	true,								% obey tabs in code
       tabsize							=	4,									% tab size
       mathescape					=	true,								% enable math mode inside '$'
@@ -113,23 +113,24 @@
 		colframe              = \frameColor,				% frame color
     boxrule								=	0pt,								% frame thickness
     arc										=	2mm,								% corner radius
-    left									=	7mm,								% left margin
+    left									=	3mm,								% left margin
     top										=	1mm,								% top margin
     bottom								=	1mm,								% bottom margin		
 		% Title (only if passed as optional argument) -----------------------------
 		coltitle              =   textcolor,              % title color
 		fonttitle             =   \bfseries,              % title font
-		colbacktitle          =   boxcolor!40!background, % title background color
+		% colbacktitle          =   boxcolor!40!background, % title background color
+		colbacktitle          =   boxcolor!70!gray,
 		before title          =   {\faIcon{code}\quad},   % title icon
 		attach boxed title to top*,                       % title position
 		boxed title style={                               % title spacing/style
 			enhanced, 
 			top=1.5mm, 
-			bottom=1.5mm
+			bottom=2mm
 		}, 
 		% Input and Output --------------------------------------------------------
 		subtitle style = {													% INPUT and OUTPUT style
-			colback							=	boxcolor!40!background,
+			colback							=	boxcolor!90!gray,
 			before							=	{\vspace*{-3.2mm}},
 			top									=	1mm,
 			bottom							=	1mm,
@@ -154,41 +155,41 @@
 			}
 		},
 		% Numbers overlay box -----------------------------------------------------
-    overlay	= {
-			\begin{tcbclipinterior}\fill[boxcolor!40!background]
-        (frame.south west) rectangle ([xshift=5mm]frame.north west);
-      \end{tcbclipinterior}
-    }
+    % overlay	= {
+			% \begin{tcbclipinterior}\fill[boxcolor!40!background]
+    %     (frame.south west) rectangle ([xshift=5mm]frame.north west);
+    %   \end{tcbclipinterior}
+    % }
 		% -------------------------------------------------------------------------
   }
 }
 
-% Common minted style dependent on the theme
-\ifthenelse{\equal{\selectedtheme}{tokyo}}{
-	% Tokyonight theme
-	\setminted{style=dracula}
-}{
-	\ifthenelse{\equal{\selectedtheme}{dark}}{
-		% Dark theme
-		\setminted{style=github-dark}
-	}{
-		% Light theme
-		\setminted{style=default}
-	}
-}
+% % Common minted style dependent on the theme
+% \ifthenelse{\equal{\selectedtheme}{tokyo}}{
+% 	% Tokyonight theme
+% 	\setminted{style=dracula}
+% }{
+% 	\ifthenelse{\equal{\selectedtheme}{dark}}{
+% 		% Dark theme
+% 		\setminted{style=github-dark}
+% 	}{
+% 		% Light theme
+% 		\setminted{style=default}
+% 	}
+% }
 
 % XXX: try instead of previous nested if-else:
-% % Define keys for each theme
-% \pgfkeys{
-%   /themes/.cd,
-%   tokyo/.code = \setminted{style=dracula},
-%   dark/.code = \setminted{style=github-dark},
-%   light/.code = \setminted{style=default},
-%   % Add more themes here
-% }
-%
-% % Set the theme based on the selected theme
-% \pgfkeys{/themes/\selectedtheme}
+ % Define keys for each theme
+ \pgfkeys{
+   /themes/.cd,
+   tokyo/.code = \setminted{style=dracula},
+   dark/.code = \setminted{style=github-dark},
+   light/.code = \setminted{style=default},
+   % Add more themes here
+ }
+
+ % Set the theme based on the selected theme
+ \pgfkeys{/themes/\selectedtheme}
 
 
 %┌────────────────────────────────────────────────────────────────────────────┐%
@@ -272,6 +273,18 @@
 	minted language				=	yaml,							% YAML
 	enhanced,																	% enhanced mode							
 	listing only,															% only listing
+	minted options = { % !)Just to have tab size 2 for YAML
+		breaklines,																% break long lines
+		autogobble,																% remove leading spaces				
+		% linenos,																	% enable line numbers
+		fontsize						=	\small,							% font size
+		% numbersep						=	4mm,								% line number separation
+		obeytabs						=	true,								% obey tabs in code
+		tabsize							=	2,									% tab size
+		mathescape					=	true,								% enable math mode inside '$'
+		%	 WARNING: math escape works only in code comments!
+		escapeinside				=	§§,									% normal text inside '§'
+	},
 }
 
 % XXX: Add more languages here, for available languages check at:

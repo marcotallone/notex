@@ -17,14 +17,27 @@ features.\\
 
 You can use different types of boxes to highlight important information. A
 simple box can be created with the \cc{cbox} environment, which stands for
-``\itt{colored box}''.\\
+``\itt{colored box}''.
 
 \begin{cbox}
 	This is a simple, not really colorful, box.\\
 	You can use many types of environments inside it, such as lists, equations,
 	images, and more.\\
 	This has been made using the \cc{tcolorbox} package, therefore floats are not welcome inside these boxes and the next ones.
+	\tcblower
+	You can also add a lower part to the box, which is useful to separate the
+	content from the footer.
 \end{cbox}
+
+\begin{ebox}[blue]
+	This is a simple, not really colorful, box.\\
+	You can use many types of environments inside it, such as lists, equations,
+	images, and more.\\
+	This has been made using the \cc{tcolorbox} package, therefore floats are not welcome inside these boxes and the next ones.
+	\tcblower
+	You can also add a lower part to the box, which is useful to separate the
+	content from the footer.
+\end{ebox}
 
 You can also change the color of the box by passing an optional argument to the
 \cc{cbox} environment and of course use already implemented \LaTeX\ enviromnets

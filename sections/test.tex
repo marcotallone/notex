@@ -259,7 +259,65 @@
   % },
 }
 
-% ------------------------------------------------------------------------------
+% Define the new tcolorbox environment with xparse
+\NewTColorBox{testwarning2}{O{} O{boxcolor}}{
+  breakable,              % allow the box to be split across pages
+  enhanced jigsaw,        % better frame drawing
+  colback   = #2,         % background color
+  colframe  = yellow,     % frame color
+  coltext   = textcolor,  % text color
+  colbacktitle = yellow,  % title background color
+  opacitybacktitle = 0.5, % title background opacity
+  coltitle = textcolor,   % title text color
+  fonttitle = \bfseries,  % title font
+  boxrule   = 0.3mm,      % frame thickness
+  left      = 2mm,        % left margin
+  right     = 2mm,        % right margin
+  top       = 2mm,        % top margin
+  bottom    = 2mm,        % bottom margin
+  titlerule = 0mm,        % line below the title
+  arc       = 0mm,        % arc corners radius
+  sharp corners,          % sharp corners (comment to have arc corners)
+  width = 0.95\textwidth, % box width
+  center,                 % center the box
+  title = \IfValueTF{#1}{
+    \yellow{\faExclamationTriangle\, #1} % title content if title is given
+  }{
+    \yellow{\faExclamationTriangle}, % title content if no title is given
+	before upper={\tcbtitle\;\, },
+	detach title,
+  },
+%   \IfValueTF{#1}{}{
+% 	detach title,
+% 	before upper={\tcbtitle\;\, },
+%   },
+  overlay={               % side lines
+    \fill[yellow, opacity=0.8]
+    ([xshift=-1mm]frame.south west) 
+    rectangle 
+    ([xshift=0mm]frame.north west);
+    \fill[yellow, opacity=0.5]
+    ([xshift=-2mm]frame.south west) 
+    rectangle 
+    ([xshift=-1mm]frame.north west);
+    \fill[yellow, opacity=0.3]
+    ([xshift=-3mm]frame.south west) 
+    rectangle 
+    ([xshift=-2mm]frame.north west);
+    \fill[yellow, opacity=0.8]
+    ([xshift=0mm]frame.south east)
+    rectangle 
+    ([xshift=1mm]frame.north east);
+    \fill[yellow, opacity=0.5]
+    ([xshift=1mm]frame.south east)
+    rectangle 
+    ([xshift=2mm]frame.north east);
+    \fill[yellow, opacity=0.3]
+    ([xshift=2mm]frame.south east)
+    rectangle 
+    ([xshift=3mm]frame.north east);
+  }
+}
 
 \begin{document}
 
@@ -267,15 +325,35 @@
 
 \blindtext
 
-\begin{testwarning}
-	Hey be careful!
-	There is a warning here. You need to pay attention for the following reasons:
-	\begin{itemize}
-		\item This is the first reason.
-		\item This is the second reason.
-		\item This is the third reason.
-	\end{itemize}
-\end{testwarning}
+\begin{testwarning2}
+Hey be careful!
+There is a warning here. You need to pay attention for the following reasons:
+\begin{itemize}
+  \item This is the first reason.
+  \item This is the second reason.
+  \item This is the third reason.
+\end{itemize}
+\end{testwarning2}
+
+\begin{testwarning2}[Warning Title]
+Hey be careful!
+There is a warning here. You need to pay attention for the following reasons:
+\begin{itemize}
+  \item This is the first reason.
+  \item This is the second reason.
+  \item This is the third reason.
+\end{itemize}
+\end{testwarning2}
+
+\begin{testwarning2}[Warning Title][red]
+Hey be careful!
+There is a warning here. You need to pay attention for the following reasons:
+\begin{itemize}
+  \item This is the first reason.
+  \item This is the second reason.
+  \item This is the third reason.
+\end{itemize}
+\end{testwarning2}
 
 \blindtext
 
