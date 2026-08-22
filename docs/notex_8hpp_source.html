@@ -1,0 +1,344 @@
+<!-- Custom Doxygen HTML_HEADER for NoTeX. Rationale for every choice
+     here: docs/plan/CHANGELOG.md, entries 26-29. Keep every comment in
+     this file to 1-3 lines; longer ones have repeatedly broken rendering. -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.17.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>NoTeX: notex/include/notex/notex.hpp Source File</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="codefolding.js"></script>
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="doxygen-awesome-interactive-toc.js"></script>
+<script type="text/javascript" src="doxygen-awesome-tabs.js"></script>
+<script type="text/javascript" src="mermaid.min.js"></script>
+<script type="text/javascript">
+    // Guarded so one extension failing degrades to a console message
+    // instead of aborting this whole block (CHANGELOG entry 34).
+    function notexInit(name, extension) {
+        try {
+            if (extension && typeof extension.init === 'function') {
+                extension.init();
+            } else {
+                console.error('NoTeX: ' + name + '.init() unavailable, skipped');
+            }
+        } catch (error) {
+            console.error('NoTeX: ' + name + '.init() threw', error);
+        }
+    }
+    notexInit('DoxygenAwesomeFragmentCopyButton', typeof DoxygenAwesomeFragmentCopyButton !== 'undefined' ? DoxygenAwesomeFragmentCopyButton : null);
+    notexInit('DoxygenAwesomeDarkModeToggle', typeof DoxygenAwesomeDarkModeToggle !== 'undefined' ? DoxygenAwesomeDarkModeToggle : null);
+    notexInit('DoxygenAwesomeParagraphLink', typeof DoxygenAwesomeParagraphLink !== 'undefined' ? DoxygenAwesomeParagraphLink : null);
+    notexInit('DoxygenAwesomeInteractiveToc', typeof DoxygenAwesomeInteractiveToc !== 'undefined' ? DoxygenAwesomeInteractiveToc : null);
+    notexInit('DoxygenAwesomeTabs', typeof DoxygenAwesomeTabs !== 'undefined' ? DoxygenAwesomeTabs : null);
+</script>
+<script type="text/javascript">
+    // Deliberately its own <script>: a throw in another block cannot
+    // abort this one, which is what silently killed mermaid before.
+    (function() {
+        if (typeof mermaid === 'undefined') { return; }
+        var toggle = typeof DoxygenAwesomeDarkModeToggle !== 'undefined' ? DoxygenAwesomeDarkModeToggle : null;
+        var counter = 0;
+        // Must run here, before DOMContentLoaded: mermaid's own autorun
+        // would otherwise overwrite each diagram's source with its SVG.
+        mermaid.initialize({ startOnLoad: false });
+        // darkMode is a separate themeVariable; theme 'dark' alone leaves
+        // most computed colors on their light-mode branch.
+        function config(dark) {
+            return dark
+                ? { startOnLoad: false, theme: 'dark', themeVariables: { darkMode: true } }
+                : { startOnLoad: false, theme: 'neutral' };
+        }
+        // Source captured once, up front, so every re-render redraws from
+        // it rather than from a previous render's own output.
+        function saveSource() {
+            document.querySelectorAll('.mermaid').forEach(function(el) {
+                if (!el.hasAttribute('data-notex-source')) {
+                    el.setAttribute('data-notex-source', el.textContent);
+                }
+            });
+        }
+        // The third argument matters: without it mermaid measures label
+        // text against <body>'s font, so nodes size wrong and text crops.
+        function render(dark) {
+            mermaid.initialize(config(dark));
+            document.querySelectorAll('.mermaid').forEach(function(el) {
+                var source = el.getAttribute('data-notex-source');
+                if (!source) { return; }
+                mermaid.render('notex-mermaid-' + (counter++), source, el).then(function(result) {
+                    el.innerHTML = result.svg;
+                }).catch(function(error) {
+                    // mermaid empties the element first, so restore the
+                    // source rather than leave the diagram blank.
+                    el.textContent = source;
+                    console.error('NoTeX: mermaid render failed', error);
+                });
+            });
+        }
+        // userPreference is a getter over localStorage and the system
+        // setting, so it reads correctly even if init() never ran.
+        function darkNow() {
+            return toggle ? toggle.userPreference : false;
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            saveSource();
+            render(darkNow());
+        });
+        // Every mode-change path dispatches through this one property,
+        // so replacing it re-renders on toggle, system change and restore.
+        if (toggle) {
+            var originalEnableDarkMode = toggle.enableDarkMode;
+            toggle.enableDarkMode = function(enable) {
+                originalEnableDarkMode(enable);
+                render(enable);
+            };
+        }
+    })();
+</script>
+<script type="text/javascript">
+    // Moves the toggle button before the search box; MutationObserver
+    // since the extension re-appends it after on every resize.
+    document.addEventListener('DOMContentLoaded', function() {
+        function moveToggleBeforeSearch() {
+            var searchBox = document.getElementById("MSearchBox");
+            var toggle = document.querySelector("doxygen-awesome-dark-mode-toggle");
+            if (searchBox && toggle && searchBox.previousElementSibling !== toggle) {
+                searchBox.parentNode.insertBefore(toggle, searchBox);
+            }
+        }
+        new MutationObserver(moveToggleBeforeSearch).observe(document.body, {childList: true, subtree: true});
+        moveToggleBeforeSearch();
+    });
+</script>
+<script type="text/javascript">
+    // Publishes the sticky bar's measured height, which CSS cannot read
+    // on its own, so anchor targets can offset by it.
+    document.addEventListener('DOMContentLoaded', function() {
+        var topBar = document.getElementById('top');
+        if (!topBar) { return; }
+        function publishHeight() {
+            document.documentElement.style.setProperty('--notex-topbar-height', topBar.offsetHeight + 'px');
+        }
+        publishHeight();
+        if (typeof ResizeObserver !== 'undefined') {
+            new ResizeObserver(publishHeight).observe(topBar);
+        }
+    });
+</script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<style>
+/* Sticky, blurred top bar. Colours mirror the theme's own light/dark
+   custom-property pattern so the toggle keeps driving them. */
+:root {
+    --notex-topbar-background: rgba(255, 255, 255, 0.50);
+    --notex-topbar-height: 0px;
+}
+@media (prefers-color-scheme: dark) {
+    html:not(.light-mode) {
+        --notex-topbar-background: rgba(28, 29, 31, 0.50);
+    }
+}
+html.dark-mode {
+    --notex-topbar-background: rgba(28, 29, 31, 0.50);
+}
+#top {
+    position: sticky;
+    top: 0;
+    background: var(--notex-topbar-background);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    backdrop-filter: saturate(180%) blur(12px);
+}
+/* Without blur support the bar must stay opaque to stay readable. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    #top {
+        background: var(--header-background);
+    }
+}
+/* Anchor targets would otherwise land underneath the sticky bar. */
+a.anchor {
+    scroll-margin-top: calc(var(--notex-topbar-height) + var(--spacing-large));
+}
+/* Space before the search box, now that the toggle sits there. */
+doxygen-awesome-dark-mode-toggle {
+    margin-right: 0.5em;
+}
+/* Circular GitHub icon, replacing the theme's corner ribbon. */
+#notex-github-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    color: var(--page-secondary-foreground-color, #52606d);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+#notex-github-icon:hover {
+    background-color: var(--separator-color, rgba(0, 0, 0, 0.08));
+    color: var(--page-foreground-color, #14181d);
+}
+</style>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectalign">
+   <div id="projectname">NoTeX<span id="projectnumber">&#160;1.0.0</span>
+   </div>
+   <div id="projectbrief">A modern noteworthy LaTeX template</div>
+  </td>
+  <td style="padding-left: 0.5em; vertical-align: middle;">
+   <a id="notex-github-icon" href="https://github.com/marcotallone/notex" title="View source on GitHub" target="_blank" rel="noopener noreferrer">
+    <svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+   </a>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.17.0 -->
+<script type="text/javascript">
+let searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', codefold.init);
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', () => {
+  initMenu('',false);
+  init_search();
+});
+</script>
+<div id="main-nav-mobile">
+<div class="sm sm-dox"><input id="main-menu-state" type="checkbox"/>
+<label class="main-menu-btn" for="main-menu-state">
+<span class="main-menu-btn-icon"></span> Toggle main menu visibility</label>
+<span id="searchBoxPos1" style="position:absolute;right:8px;top:8px;height:36px;"></span>
+</div>
+</div><!-- main-nav-mobile -->
+<div id="main-nav">
+  <ul class="sm sm-dox" id="main-menu">
+    <li id="searchBoxPos2" style="float:right">
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+    </li>
+  </ul>
+</div><!-- main-nav -->
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><b>notex</b></li><li class="navelem"><b>include</b></li><li class="navelem"><b>notex</b></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="headertitle"><div class="title">notex.hpp</div></div>
+</div><!--header-->
+<div class="contents">
+<a href="notex_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment">// clang-format off</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment">// ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment">// ┃                                                                            ┃</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment">// ┃                         ░███                 ░███                          ┃</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment">// ┃                        ░██     ░███    ░██     ░██                         ┃</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment">// ┃                        ░██     ░████   ░██     ░██                         ┃</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment">// ┃                        ░██     ░██░██  ░██     ░██                         ┃</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment">// ┃                      ░███      ░██ ░██ ░██      ░██                        ┃</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="comment">// ┃                        ░██     ░██  ░██░██     ░██                         ┃</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment">// ┃                        ░██     ░██   ░████     ░██                         ┃</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment">// ┃                        ░██     ░██    ░███     ░██                         ┃</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="comment">// ┃                         ░███                 ░███                          ┃</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="comment">// ┃                                                                            ┃</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="comment">// ┃                               ~ N O T E X ~                                ┃</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="comment">// ┃                      Copyright (c) 2026 Marco Tallone                      ┃</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="comment">// ┃                                MIT License                                 ┃</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="comment">// ┃                                                                            ┃</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="comment">// ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="comment">// clang-format on</span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="comment">// TODO: THis is here just to be documented here...</span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacenotex.html">notex</a> {}</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="preprocessor">#include &quot;<a class="code" href="assets_8hpp.html">notex/assets.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="preprocessor">#include &quot;<a class="code" href="constants_8hpp.html">notex/constants.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="preprocessor">#include &quot;<a class="code" href="document_8hpp.html">notex/document.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="preprocessor">#include &quot;<a class="code" href="environment_8hpp.html">notex/environment.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="preprocessor">#include &quot;<a class="code" href="errors_8hpp.html">notex/errors.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="preprocessor">#include &quot;<a class="code" href="installer_8hpp.html">notex/installer.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="preprocessor">#include &quot;<a class="code" href="logging_8hpp.html">notex/logging.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="preprocessor">#include &quot;<a class="code" href="manager_8hpp.html">notex/manager.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="preprocessor">#include &quot;<a class="code" href="output_8hpp.html">notex/output.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="preprocessor">#include &quot;<a class="code" href="reference_8hpp.html">notex/reference.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="preprocessor">#include &quot;<a class="code" href="system_8hpp.html">notex/system.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="preprocessor">#include &quot;<a class="code" href="templates_8hpp.html">notex/templates.hpp</a>&quot;</span></div>
+<div class="ttc" id="aassets_8hpp_html"><div class="ttname"><a href="assets_8hpp.html">assets.hpp</a></div><div class="ttdoc">Accessor over the LaTeX template and font files embedded into the binary.</div></div>
+<div class="ttc" id="aconstants_8hpp_html"><div class="ttname"><a href="constants_8hpp.html">constants.hpp</a></div><div class="ttdoc">Compile-time constants.</div></div>
+<div class="ttc" id="adocument_8hpp_html"><div class="ttname"><a href="document_8hpp.html">document.hpp</a></div><div class="ttdoc">Document: a small, safe line-oriented editor for a single .tex file.</div></div>
+<div class="ttc" id="aenvironment_8hpp_html"><div class="ttname"><a href="environment_8hpp.html">environment.hpp</a></div><div class="ttdoc">Environment: discovers where TeX lives and whether NoTeX is installed.</div></div>
+<div class="ttc" id="aerrors_8hpp_html"><div class="ttname"><a href="errors_8hpp.html">errors.hpp</a></div><div class="ttdoc">Exception hierarchy and process exit codes used throughout NoTeX.</div></div>
+<div class="ttc" id="ainstaller_8hpp_html"><div class="ttname"><a href="installer_8hpp.html">installer.hpp</a></div><div class="ttdoc">Installer: deploys the NoTeX LaTeX template, globally into the TeX tree or locally into a project.</div></div>
+<div class="ttc" id="alogging_8hpp_html"><div class="ttname"><a href="logging_8hpp.html">logging.hpp</a></div><div class="ttdoc">Logging utility with plog initialization.</div></div>
+<div class="ttc" id="amanager_8hpp_html"><div class="ttname"><a href="manager_8hpp.html">manager.hpp</a></div><div class="ttdoc">Manager: represents and operates on a single NoTeX project.</div></div>
+<div class="ttc" id="anamespacenotex_html"><div class="ttname"><a href="namespacenotex.html">notex</a></div><div class="ttdef"><b>Definition</b> <a href="assets_8hpp_source.html#l00020">assets.hpp:20</a></div></div>
+<div class="ttc" id="aoutput_8hpp_html"><div class="ttname"><a href="output_8hpp.html">output.hpp</a></div><div class="ttdoc">Styled terminal output and interactive confirmation prompts.</div></div>
+<div class="ttc" id="areference_8hpp_html"><div class="ttname"><a href="reference_8hpp.html">reference.hpp</a></div><div class="ttdoc">reference: the table of ready-to-paste snippets served by notex get.</div></div>
+<div class="ttc" id="asystem_8hpp_html"><div class="ttname"><a href="system_8hpp.html">system.hpp</a></div><div class="ttdoc">Process execution and environment-variable access.</div></div>
+<div class="ttc" id="atemplates_8hpp_html"><div class="ttname"><a href="templates_8hpp.html">templates.hpp</a></div><div class="ttdoc">templates: encoded skeletons used to scaffold new NoTeX projects.</div></div>
+</div><!-- fragment --></div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.17.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

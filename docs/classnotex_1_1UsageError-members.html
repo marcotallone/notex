@@ -1,0 +1,298 @@
+<!-- Custom Doxygen HTML_HEADER for NoTeX. Rationale for every choice
+     here: docs/plan/CHANGELOG.md, entries 26-29. Keep every comment in
+     this file to 1-3 lines; longer ones have repeatedly broken rendering. -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.17.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>NoTeX: Member List</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="codefolding.js"></script>
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="doxygen-awesome-interactive-toc.js"></script>
+<script type="text/javascript" src="doxygen-awesome-tabs.js"></script>
+<script type="text/javascript" src="mermaid.min.js"></script>
+<script type="text/javascript">
+    // Guarded so one extension failing degrades to a console message
+    // instead of aborting this whole block (CHANGELOG entry 34).
+    function notexInit(name, extension) {
+        try {
+            if (extension && typeof extension.init === 'function') {
+                extension.init();
+            } else {
+                console.error('NoTeX: ' + name + '.init() unavailable, skipped');
+            }
+        } catch (error) {
+            console.error('NoTeX: ' + name + '.init() threw', error);
+        }
+    }
+    notexInit('DoxygenAwesomeFragmentCopyButton', typeof DoxygenAwesomeFragmentCopyButton !== 'undefined' ? DoxygenAwesomeFragmentCopyButton : null);
+    notexInit('DoxygenAwesomeDarkModeToggle', typeof DoxygenAwesomeDarkModeToggle !== 'undefined' ? DoxygenAwesomeDarkModeToggle : null);
+    notexInit('DoxygenAwesomeParagraphLink', typeof DoxygenAwesomeParagraphLink !== 'undefined' ? DoxygenAwesomeParagraphLink : null);
+    notexInit('DoxygenAwesomeInteractiveToc', typeof DoxygenAwesomeInteractiveToc !== 'undefined' ? DoxygenAwesomeInteractiveToc : null);
+    notexInit('DoxygenAwesomeTabs', typeof DoxygenAwesomeTabs !== 'undefined' ? DoxygenAwesomeTabs : null);
+</script>
+<script type="text/javascript">
+    // Deliberately its own <script>: a throw in another block cannot
+    // abort this one, which is what silently killed mermaid before.
+    (function() {
+        if (typeof mermaid === 'undefined') { return; }
+        var toggle = typeof DoxygenAwesomeDarkModeToggle !== 'undefined' ? DoxygenAwesomeDarkModeToggle : null;
+        var counter = 0;
+        // Must run here, before DOMContentLoaded: mermaid's own autorun
+        // would otherwise overwrite each diagram's source with its SVG.
+        mermaid.initialize({ startOnLoad: false });
+        // darkMode is a separate themeVariable; theme 'dark' alone leaves
+        // most computed colors on their light-mode branch.
+        function config(dark) {
+            return dark
+                ? { startOnLoad: false, theme: 'dark', themeVariables: { darkMode: true } }
+                : { startOnLoad: false, theme: 'neutral' };
+        }
+        // Source captured once, up front, so every re-render redraws from
+        // it rather than from a previous render's own output.
+        function saveSource() {
+            document.querySelectorAll('.mermaid').forEach(function(el) {
+                if (!el.hasAttribute('data-notex-source')) {
+                    el.setAttribute('data-notex-source', el.textContent);
+                }
+            });
+        }
+        // The third argument matters: without it mermaid measures label
+        // text against <body>'s font, so nodes size wrong and text crops.
+        function render(dark) {
+            mermaid.initialize(config(dark));
+            document.querySelectorAll('.mermaid').forEach(function(el) {
+                var source = el.getAttribute('data-notex-source');
+                if (!source) { return; }
+                mermaid.render('notex-mermaid-' + (counter++), source, el).then(function(result) {
+                    el.innerHTML = result.svg;
+                }).catch(function(error) {
+                    // mermaid empties the element first, so restore the
+                    // source rather than leave the diagram blank.
+                    el.textContent = source;
+                    console.error('NoTeX: mermaid render failed', error);
+                });
+            });
+        }
+        // userPreference is a getter over localStorage and the system
+        // setting, so it reads correctly even if init() never ran.
+        function darkNow() {
+            return toggle ? toggle.userPreference : false;
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            saveSource();
+            render(darkNow());
+        });
+        // Every mode-change path dispatches through this one property,
+        // so replacing it re-renders on toggle, system change and restore.
+        if (toggle) {
+            var originalEnableDarkMode = toggle.enableDarkMode;
+            toggle.enableDarkMode = function(enable) {
+                originalEnableDarkMode(enable);
+                render(enable);
+            };
+        }
+    })();
+</script>
+<script type="text/javascript">
+    // Moves the toggle button before the search box; MutationObserver
+    // since the extension re-appends it after on every resize.
+    document.addEventListener('DOMContentLoaded', function() {
+        function moveToggleBeforeSearch() {
+            var searchBox = document.getElementById("MSearchBox");
+            var toggle = document.querySelector("doxygen-awesome-dark-mode-toggle");
+            if (searchBox && toggle && searchBox.previousElementSibling !== toggle) {
+                searchBox.parentNode.insertBefore(toggle, searchBox);
+            }
+        }
+        new MutationObserver(moveToggleBeforeSearch).observe(document.body, {childList: true, subtree: true});
+        moveToggleBeforeSearch();
+    });
+</script>
+<script type="text/javascript">
+    // Publishes the sticky bar's measured height, which CSS cannot read
+    // on its own, so anchor targets can offset by it.
+    document.addEventListener('DOMContentLoaded', function() {
+        var topBar = document.getElementById('top');
+        if (!topBar) { return; }
+        function publishHeight() {
+            document.documentElement.style.setProperty('--notex-topbar-height', topBar.offsetHeight + 'px');
+        }
+        publishHeight();
+        if (typeof ResizeObserver !== 'undefined') {
+            new ResizeObserver(publishHeight).observe(topBar);
+        }
+    });
+</script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<style>
+/* Sticky, blurred top bar. Colours mirror the theme's own light/dark
+   custom-property pattern so the toggle keeps driving them. */
+:root {
+    --notex-topbar-background: rgba(255, 255, 255, 0.50);
+    --notex-topbar-height: 0px;
+}
+@media (prefers-color-scheme: dark) {
+    html:not(.light-mode) {
+        --notex-topbar-background: rgba(28, 29, 31, 0.50);
+    }
+}
+html.dark-mode {
+    --notex-topbar-background: rgba(28, 29, 31, 0.50);
+}
+#top {
+    position: sticky;
+    top: 0;
+    background: var(--notex-topbar-background);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    backdrop-filter: saturate(180%) blur(12px);
+}
+/* Without blur support the bar must stay opaque to stay readable. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    #top {
+        background: var(--header-background);
+    }
+}
+/* Anchor targets would otherwise land underneath the sticky bar. */
+a.anchor {
+    scroll-margin-top: calc(var(--notex-topbar-height) + var(--spacing-large));
+}
+/* Space before the search box, now that the toggle sits there. */
+doxygen-awesome-dark-mode-toggle {
+    margin-right: 0.5em;
+}
+/* Circular GitHub icon, replacing the theme's corner ribbon. */
+#notex-github-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    color: var(--page-secondary-foreground-color, #52606d);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+#notex-github-icon:hover {
+    background-color: var(--separator-color, rgba(0, 0, 0, 0.08));
+    color: var(--page-foreground-color, #14181d);
+}
+</style>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectalign">
+   <div id="projectname">NoTeX<span id="projectnumber">&#160;1.0.0</span>
+   </div>
+   <div id="projectbrief">A modern noteworthy LaTeX template</div>
+  </td>
+  <td style="padding-left: 0.5em; vertical-align: middle;">
+   <a id="notex-github-icon" href="https://github.com/marcotallone/notex" title="View source on GitHub" target="_blank" rel="noopener noreferrer">
+    <svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+   </a>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.17.0 -->
+<script type="text/javascript">
+let searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', codefold.init);
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', () => {
+  initMenu('',false);
+  init_search();
+});
+</script>
+<div id="main-nav-mobile">
+<div class="sm sm-dox"><input id="main-menu-state" type="checkbox"/>
+<label class="main-menu-btn" for="main-menu-state">
+<span class="main-menu-btn-icon"></span> Toggle main menu visibility</label>
+<span id="searchBoxPos1" style="position:absolute;right:8px;top:8px;height:36px;"></span>
+</div>
+</div><!-- main-nav-mobile -->
+<div id="main-nav">
+  <ul class="sm sm-dox" id="main-menu">
+    <li id="searchBoxPos2" style="float:right">
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+    </li>
+  </ul>
+</div><!-- main-nav -->
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a href="namespacenotex.html">notex</a></li><li class="navelem"><a href="classnotex_1_1UsageError.html">UsageError</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="headertitle"><div class="title">notex::UsageError Member List</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>This is the complete list of members for <a class="el" href="classnotex_1_1UsageError.html">notex::UsageError</a>, including all inherited members.</p>
+<table class="directory">
+  <tr class="even"><td class="entry"><a class="el" href="classnotex_1_1NotexError.html#a2804099f1644c927dd134c9db304d074">exit_code</a>() const noexcept</td><td class="entry"><a class="el" href="classnotex_1_1NotexError.html">notex::NotexError</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classnotex_1_1NotexError.html#af9c796e2f4e001032f3c1264a2d7f8d3">NotexError</a>(std::string message, ExitCode exit_code)</td><td class="entry"><a class="el" href="classnotex_1_1NotexError.html">notex::NotexError</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>UsageError</b>(std::string message) (defined in <a class="el" href="classnotex_1_1UsageError.html">notex::UsageError</a>)</td><td class="entry"><a class="el" href="classnotex_1_1UsageError.html">notex::UsageError</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">explicit</span></td></tr>
+</table></div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.17.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

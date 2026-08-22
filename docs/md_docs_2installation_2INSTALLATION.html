@@ -1,0 +1,392 @@
+<!-- Custom Doxygen HTML_HEADER for NoTeX. Rationale for every choice
+     here: docs/plan/CHANGELOG.md, entries 26-29. Keep every comment in
+     this file to 1-3 lines; longer ones have repeatedly broken rendering. -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.17.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>NoTeX: Installation</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="codefolding.js"></script>
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="doxygen-awesome-interactive-toc.js"></script>
+<script type="text/javascript" src="doxygen-awesome-tabs.js"></script>
+<script type="text/javascript" src="mermaid.min.js"></script>
+<script type="text/javascript">
+    // Guarded so one extension failing degrades to a console message
+    // instead of aborting this whole block (CHANGELOG entry 34).
+    function notexInit(name, extension) {
+        try {
+            if (extension && typeof extension.init === 'function') {
+                extension.init();
+            } else {
+                console.error('NoTeX: ' + name + '.init() unavailable, skipped');
+            }
+        } catch (error) {
+            console.error('NoTeX: ' + name + '.init() threw', error);
+        }
+    }
+    notexInit('DoxygenAwesomeFragmentCopyButton', typeof DoxygenAwesomeFragmentCopyButton !== 'undefined' ? DoxygenAwesomeFragmentCopyButton : null);
+    notexInit('DoxygenAwesomeDarkModeToggle', typeof DoxygenAwesomeDarkModeToggle !== 'undefined' ? DoxygenAwesomeDarkModeToggle : null);
+    notexInit('DoxygenAwesomeParagraphLink', typeof DoxygenAwesomeParagraphLink !== 'undefined' ? DoxygenAwesomeParagraphLink : null);
+    notexInit('DoxygenAwesomeInteractiveToc', typeof DoxygenAwesomeInteractiveToc !== 'undefined' ? DoxygenAwesomeInteractiveToc : null);
+    notexInit('DoxygenAwesomeTabs', typeof DoxygenAwesomeTabs !== 'undefined' ? DoxygenAwesomeTabs : null);
+</script>
+<script type="text/javascript">
+    // Deliberately its own <script>: a throw in another block cannot
+    // abort this one, which is what silently killed mermaid before.
+    (function() {
+        if (typeof mermaid === 'undefined') { return; }
+        var toggle = typeof DoxygenAwesomeDarkModeToggle !== 'undefined' ? DoxygenAwesomeDarkModeToggle : null;
+        var counter = 0;
+        // Must run here, before DOMContentLoaded: mermaid's own autorun
+        // would otherwise overwrite each diagram's source with its SVG.
+        mermaid.initialize({ startOnLoad: false });
+        // darkMode is a separate themeVariable; theme 'dark' alone leaves
+        // most computed colors on their light-mode branch.
+        function config(dark) {
+            return dark
+                ? { startOnLoad: false, theme: 'dark', themeVariables: { darkMode: true } }
+                : { startOnLoad: false, theme: 'neutral' };
+        }
+        // Source captured once, up front, so every re-render redraws from
+        // it rather than from a previous render's own output.
+        function saveSource() {
+            document.querySelectorAll('.mermaid').forEach(function(el) {
+                if (!el.hasAttribute('data-notex-source')) {
+                    el.setAttribute('data-notex-source', el.textContent);
+                }
+            });
+        }
+        // The third argument matters: without it mermaid measures label
+        // text against <body>'s font, so nodes size wrong and text crops.
+        function render(dark) {
+            mermaid.initialize(config(dark));
+            document.querySelectorAll('.mermaid').forEach(function(el) {
+                var source = el.getAttribute('data-notex-source');
+                if (!source) { return; }
+                mermaid.render('notex-mermaid-' + (counter++), source, el).then(function(result) {
+                    el.innerHTML = result.svg;
+                }).catch(function(error) {
+                    // mermaid empties the element first, so restore the
+                    // source rather than leave the diagram blank.
+                    el.textContent = source;
+                    console.error('NoTeX: mermaid render failed', error);
+                });
+            });
+        }
+        // userPreference is a getter over localStorage and the system
+        // setting, so it reads correctly even if init() never ran.
+        function darkNow() {
+            return toggle ? toggle.userPreference : false;
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            saveSource();
+            render(darkNow());
+        });
+        // Every mode-change path dispatches through this one property,
+        // so replacing it re-renders on toggle, system change and restore.
+        if (toggle) {
+            var originalEnableDarkMode = toggle.enableDarkMode;
+            toggle.enableDarkMode = function(enable) {
+                originalEnableDarkMode(enable);
+                render(enable);
+            };
+        }
+    })();
+</script>
+<script type="text/javascript">
+    // Moves the toggle button before the search box; MutationObserver
+    // since the extension re-appends it after on every resize.
+    document.addEventListener('DOMContentLoaded', function() {
+        function moveToggleBeforeSearch() {
+            var searchBox = document.getElementById("MSearchBox");
+            var toggle = document.querySelector("doxygen-awesome-dark-mode-toggle");
+            if (searchBox && toggle && searchBox.previousElementSibling !== toggle) {
+                searchBox.parentNode.insertBefore(toggle, searchBox);
+            }
+        }
+        new MutationObserver(moveToggleBeforeSearch).observe(document.body, {childList: true, subtree: true});
+        moveToggleBeforeSearch();
+    });
+</script>
+<script type="text/javascript">
+    // Publishes the sticky bar's measured height, which CSS cannot read
+    // on its own, so anchor targets can offset by it.
+    document.addEventListener('DOMContentLoaded', function() {
+        var topBar = document.getElementById('top');
+        if (!topBar) { return; }
+        function publishHeight() {
+            document.documentElement.style.setProperty('--notex-topbar-height', topBar.offsetHeight + 'px');
+        }
+        publishHeight();
+        if (typeof ResizeObserver !== 'undefined') {
+            new ResizeObserver(publishHeight).observe(topBar);
+        }
+    });
+</script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<style>
+/* Sticky, blurred top bar. Colours mirror the theme's own light/dark
+   custom-property pattern so the toggle keeps driving them. */
+:root {
+    --notex-topbar-background: rgba(255, 255, 255, 0.50);
+    --notex-topbar-height: 0px;
+}
+@media (prefers-color-scheme: dark) {
+    html:not(.light-mode) {
+        --notex-topbar-background: rgba(28, 29, 31, 0.50);
+    }
+}
+html.dark-mode {
+    --notex-topbar-background: rgba(28, 29, 31, 0.50);
+}
+#top {
+    position: sticky;
+    top: 0;
+    background: var(--notex-topbar-background);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    backdrop-filter: saturate(180%) blur(12px);
+}
+/* Without blur support the bar must stay opaque to stay readable. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    #top {
+        background: var(--header-background);
+    }
+}
+/* Anchor targets would otherwise land underneath the sticky bar. */
+a.anchor {
+    scroll-margin-top: calc(var(--notex-topbar-height) + var(--spacing-large));
+}
+/* Space before the search box, now that the toggle sits there. */
+doxygen-awesome-dark-mode-toggle {
+    margin-right: 0.5em;
+}
+/* Circular GitHub icon, replacing the theme's corner ribbon. */
+#notex-github-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    color: var(--page-secondary-foreground-color, #52606d);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+#notex-github-icon:hover {
+    background-color: var(--separator-color, rgba(0, 0, 0, 0.08));
+    color: var(--page-foreground-color, #14181d);
+}
+</style>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectalign">
+   <div id="projectname">NoTeX<span id="projectnumber">&#160;1.0.0</span>
+   </div>
+   <div id="projectbrief">A modern noteworthy LaTeX template</div>
+  </td>
+  <td style="padding-left: 0.5em; vertical-align: middle;">
+   <a id="notex-github-icon" href="https://github.com/marcotallone/notex" title="View source on GitHub" target="_blank" rel="noopener noreferrer">
+    <svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+   </a>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.17.0 -->
+<script type="text/javascript">
+let searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', codefold.init);
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', () => {
+  initMenu('',false);
+  init_search();
+});
+</script>
+<div id="main-nav-mobile">
+<div class="sm sm-dox"><input id="main-menu-state" type="checkbox"/>
+<label class="main-menu-btn" for="main-menu-state">
+<span class="main-menu-btn-icon"></span> Toggle main menu visibility</label>
+<span id="searchBoxPos1" style="position:absolute;right:8px;top:8px;height:36px;"></span>
+</div>
+</div><!-- main-nav-mobile -->
+<div id="main-nav">
+  <ul class="sm sm-dox" id="main-menu">
+    <li id="searchBoxPos2" style="float:right">
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+    </li>
+  </ul>
+</div><!-- main-nav -->
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+</div><!-- top -->
+<div id="doc-content">
+<div><div class="header">
+  <div class="headertitle"><div class="title">Installation </div></div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><p><a class="anchor" id="installation-1"></a></p>
+<p>The following document clarifies how to setup and install the NoTeX software and the LaTeX template.</p>
+<h1 class="doxsection"><a class="anchor" id="requirements"></a>
+Requirements</h1>
+<p>The project requires the following dependencies installed in your system:</p>
+<ul>
+<li>CMake (&gt;= 3.20)</li>
+<li>C++ compiler (C++20)</li>
+<li><a href="https://www.latex-project.org/get/">LaTeX distribution</a> installed, with the following packages:<ul>
+<li><span class="tt">texlive-latex-base</span></li>
+<li><span class="tt">texlive-latex-extra</span></li>
+<li><span class="tt">texlive-fonts-recommended</span></li>
+<li><span class="tt">texlive-fonts-extra</span></li>
+<li><span class="tt">texlive-luatex</span></li>
+<li><span class="tt">texlive-lang-english</span></li>
+<li><span class="tt">texlive-bibtex-extra</span></li>
+<li><span class="tt">texlive-science</span></li>
+<li><span class="tt">biber</span></li>
+<li><span class="tt">latexmk</span></li>
+</ul>
+</li>
+<li><a href="https://www.luatex.org/">LuaLaTeX</a> compiler: this can be installed with the above <span class="tt">texlive-luatex</span> package</li>
+<li><a href="https://pygments.org/">Pygments</a> python package: can be installed with <span class="tt">pip install Pygments</span> in your preferred environment</li>
+</ul>
+<h1 class="doxsection"><a class="anchor" id="cli-utility-installation"></a>
+CLI Utility Installation</h1>
+<h2 class="doxsection"><a class="anchor" id="building-from-source"></a>
+Building from source</h2>
+<p>The NoTeX software can be built from source following these steps:</p>
+<ol type="1">
+<li><p class="startli">Clone the repository:</p>
+<div class="fragment"><div class="line">git clone https://github.com/marcotallone/notex.git</div>
+</div><!-- fragment --><p class="startli">and go at project's root:</p>
+<div class="fragment"><div class="line">cd notex</div>
+</div><!-- fragment --></li>
+<li><p class="startli">Compile using cmake:</p>
+<div class="fragment"><div class="line">mkdir -p build \</div>
+<div class="line">&amp;&amp; cmake -S . -B build  -DCMAKE_BUILD_TYPE=Release \</div>
+<div class="line">&amp;&amp; cmake --build build --parallel $(nproc)</div>
+</div><!-- fragment --><p class="startli">This will produce a unique binary in <span class="tt">./bin/notex</span>, containing the CLI utility with embedded LaTeX template.</p>
+</li>
+<li><p class="startli"><em>Optionally</em>, you can install the software system-wise for easier usage:</p>
+<div class="fragment"><div class="line">sudo cmake --install build</div>
+</div><!-- fragment --><p class="startli">This will allow to use <span class="tt"><a class="el" href="namespacenotex.html">notex</a></span> as a normal binary everywhere in your system.</p>
+</li>
+</ol>
+<dl class="section warning"><dt>Warning</dt><dd>The system-wise installation might require sudo priviledges!</dd></dl>
+<ol type="1">
+<li><p class="startli">Check if your installation was successful by running:</p>
+<div class="fragment"><div class="line">notex info</div>
+<div class="line"># or, if you skipped step 3:</div>
+<div class="line"># ./bin/notex info</div>
+</div><!-- fragment --></li>
+</ol>
+<p>The <a href="../../install.sh"><span class="tt">install.sh</span></a> script provided in the project's repository helps to automate these steps with:</p>
+<div class="fragment"><div class="line">./install.sh # for local compilation only</div>
+</div><!-- fragment --><p>or:</p>
+<div class="fragment"><div class="line">sudo ./install.sh global # for system-wise installation</div>
+</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Mind that the latter option also installs the LaTeX template system-wise, see belo for further details.</dd></dl>
+<h3 class="doxsection"><a class="anchor" id="build-options"></a>
+Build options</h3>
+<p>When building from source, the CMake compilation offers multiple options that are not set by default:</p>
+<ul>
+<li><span class="tt">DEBUG</span>: enables debug mode, with extended logging reporting.</li>
+<li><span class="tt">VERBOSE</span>: enables verbose mode.</li>
+<li><span class="tt">LOGGING</span>: enables logging reporting. Logs are always stored in the <span class="tt">./log/notex.log</span> file in the project where <span class="tt"><a class="el" href="namespacenotex.html">notex</a></span> is used.</li>
+<li><span class="tt">TESTS</span>: enables tests. See <a class="el" href="md_docs_2installation_2Testing.html" title="Testing &amp; Coverage">Testing</a> for details.</li>
+<li><span class="tt">COVERAGE</span>: enables coverage report. See <a class="el" href="md_docs_2installation_2Testing.html" title="Testing &amp; Coverage">Testing</a> for details.</li>
+<li><p class="startli"><span class="tt">DOCS</span>: allows to build project documentation providing the <span class="tt">docs</span> target. After setting this option with <span class="tt">-DDOCS=ON</span>, documentation can be built in <span class="tt">./build/docs/</span> with:</p>
+<div class="fragment"><div class="line">cmake --build build --target docs</div>
+</div><!-- fragment --></li>
+</ul>
+<h2 class="doxsection"><a class="anchor" id="uninstall"></a>
+Uninstall</h2>
+<p>You can uninstall a global <span class="tt"><a class="el" href="namespacenotex.html">notex</a></span> installation with the command:</p>
+<div class="fragment"><div class="line">notex uninstall</div>
+</div><!-- fragment --><p>Or, equivalently:</p>
+<div class="fragment"><div class="line">notex prune</div>
+</div><!-- fragment --><p>A local installation can be analogously uninstalled by providing the path to the project installation:</p>
+<div class="fragment"><div class="line">notex uninstall &lt;path&gt;</div>
+</div><!-- fragment --><h1 class="doxsection"><a class="anchor" id="latex-template-installation"></a>
+LaTeX Template Installation</h1>
+<p>After installing the <span class="tt"><a class="el" href="namespacenotex.html">notex</a></span> CLI utility, the LaTeX template can be installed either <b>globally</b> (system-wise available) or <b>locally</b> (for the single LaTeX project).</p>
+<h2 class="doxsection"><a class="anchor" id="global-installation"></a>
+Global Installation</h2>
+<p>The template can be globally installed with:</p>
+<div class="fragment"><div class="line">notex install</div>
+</div><!-- fragment --><p>Which will install the LaTeX classes and styles, as well as required fonts, into your TeX distribution's <span class="tt">TEXMFHOME</span> directory. To check which directory this is in your own system, you can run:</p>
+<div class="fragment"><div class="line">kpsewhich -var-value=TEXMFHOME</div>
+</div><!-- fragment --><dl class="section remark"><dt>Remarks</dt><dd>Pass <span class="tt">--force</span> to overwrite an existing installation without being asked to confirm.</dd></dl>
+<p>After a global installation te template can be loaded as:</p>
+<div class="fragment"><div class="line">\documentclass[OPTIONS]{notex}</div>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="local-installation"></a>
+Local Installation</h2>
+<p>You can install the template locally, for yor project only, by running:</p>
+<div class="fragment"><div class="line">notex install &lt;path&gt;</div>
+</div><!-- fragment --><p>where <span class="tt">&lt;path&gt;</span> is the path to your LaTeX project root directory. For instance if the root directory of your project is the current one run:</p>
+<div class="fragment"><div class="line">notex install .</div>
+</div><!-- fragment --><p>The local installation will install the template and its classes in the <span class="tt">&lt;path&gt;/settings/</span> directory, while fonts will be placed in <span class="tt">&lt;path&gt;/fonts/</span>.</p>
+<p>After a local installation the template can be loaded as:</p>
+<div class="fragment"><div class="line">\documentclass[OPTIONS]{settings/notex}</div>
+</div><!-- fragment --><hr  />
+<div align="center"> <sub> <b>NoTeX</b> <br  style="margin-bottom: 0.3rem;" />
+</sub></div><div align="center"><sub>Home &#160;•&#160; <a class="el" href="md_docs_2installation_2INSTALLATION.html" title="Installation">Installation</a> &#160;•&#160; <a class="el" href="md_docs_2usage_2USAGE.html" title="Usage">Usage</a> &#160;•&#160; <a class="el" href="md_docs_2implementation_2IMPLEMENTATION.html" title="Implementation">Implementation</a></sub></div><div align="center"><sub></sub> </div> </div></div><!-- contents -->
+</div><!-- PageDoc -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.17.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

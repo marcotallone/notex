@@ -1,0 +1,454 @@
+<!-- Custom Doxygen HTML_HEADER for NoTeX. Rationale for every choice
+     here: docs/plan/CHANGELOG.md, entries 26-29. Keep every comment in
+     this file to 1-3 lines; longer ones have repeatedly broken rendering. -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.17.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>NoTeX: Architecture</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="codefolding.js"></script>
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="doxygen-awesome-interactive-toc.js"></script>
+<script type="text/javascript" src="doxygen-awesome-tabs.js"></script>
+<script type="text/javascript" src="mermaid.min.js"></script>
+<script type="text/javascript">
+    // Guarded so one extension failing degrades to a console message
+    // instead of aborting this whole block (CHANGELOG entry 34).
+    function notexInit(name, extension) {
+        try {
+            if (extension && typeof extension.init === 'function') {
+                extension.init();
+            } else {
+                console.error('NoTeX: ' + name + '.init() unavailable, skipped');
+            }
+        } catch (error) {
+            console.error('NoTeX: ' + name + '.init() threw', error);
+        }
+    }
+    notexInit('DoxygenAwesomeFragmentCopyButton', typeof DoxygenAwesomeFragmentCopyButton !== 'undefined' ? DoxygenAwesomeFragmentCopyButton : null);
+    notexInit('DoxygenAwesomeDarkModeToggle', typeof DoxygenAwesomeDarkModeToggle !== 'undefined' ? DoxygenAwesomeDarkModeToggle : null);
+    notexInit('DoxygenAwesomeParagraphLink', typeof DoxygenAwesomeParagraphLink !== 'undefined' ? DoxygenAwesomeParagraphLink : null);
+    notexInit('DoxygenAwesomeInteractiveToc', typeof DoxygenAwesomeInteractiveToc !== 'undefined' ? DoxygenAwesomeInteractiveToc : null);
+    notexInit('DoxygenAwesomeTabs', typeof DoxygenAwesomeTabs !== 'undefined' ? DoxygenAwesomeTabs : null);
+</script>
+<script type="text/javascript">
+    // Deliberately its own <script>: a throw in another block cannot
+    // abort this one, which is what silently killed mermaid before.
+    (function() {
+        if (typeof mermaid === 'undefined') { return; }
+        var toggle = typeof DoxygenAwesomeDarkModeToggle !== 'undefined' ? DoxygenAwesomeDarkModeToggle : null;
+        var counter = 0;
+        // Must run here, before DOMContentLoaded: mermaid's own autorun
+        // would otherwise overwrite each diagram's source with its SVG.
+        mermaid.initialize({ startOnLoad: false });
+        // darkMode is a separate themeVariable; theme 'dark' alone leaves
+        // most computed colors on their light-mode branch.
+        function config(dark) {
+            return dark
+                ? { startOnLoad: false, theme: 'dark', themeVariables: { darkMode: true } }
+                : { startOnLoad: false, theme: 'neutral' };
+        }
+        // Source captured once, up front, so every re-render redraws from
+        // it rather than from a previous render's own output.
+        function saveSource() {
+            document.querySelectorAll('.mermaid').forEach(function(el) {
+                if (!el.hasAttribute('data-notex-source')) {
+                    el.setAttribute('data-notex-source', el.textContent);
+                }
+            });
+        }
+        // The third argument matters: without it mermaid measures label
+        // text against <body>'s font, so nodes size wrong and text crops.
+        function render(dark) {
+            mermaid.initialize(config(dark));
+            document.querySelectorAll('.mermaid').forEach(function(el) {
+                var source = el.getAttribute('data-notex-source');
+                if (!source) { return; }
+                mermaid.render('notex-mermaid-' + (counter++), source, el).then(function(result) {
+                    el.innerHTML = result.svg;
+                }).catch(function(error) {
+                    // mermaid empties the element first, so restore the
+                    // source rather than leave the diagram blank.
+                    el.textContent = source;
+                    console.error('NoTeX: mermaid render failed', error);
+                });
+            });
+        }
+        // userPreference is a getter over localStorage and the system
+        // setting, so it reads correctly even if init() never ran.
+        function darkNow() {
+            return toggle ? toggle.userPreference : false;
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            saveSource();
+            render(darkNow());
+        });
+        // Every mode-change path dispatches through this one property,
+        // so replacing it re-renders on toggle, system change and restore.
+        if (toggle) {
+            var originalEnableDarkMode = toggle.enableDarkMode;
+            toggle.enableDarkMode = function(enable) {
+                originalEnableDarkMode(enable);
+                render(enable);
+            };
+        }
+    })();
+</script>
+<script type="text/javascript">
+    // Moves the toggle button before the search box; MutationObserver
+    // since the extension re-appends it after on every resize.
+    document.addEventListener('DOMContentLoaded', function() {
+        function moveToggleBeforeSearch() {
+            var searchBox = document.getElementById("MSearchBox");
+            var toggle = document.querySelector("doxygen-awesome-dark-mode-toggle");
+            if (searchBox && toggle && searchBox.previousElementSibling !== toggle) {
+                searchBox.parentNode.insertBefore(toggle, searchBox);
+            }
+        }
+        new MutationObserver(moveToggleBeforeSearch).observe(document.body, {childList: true, subtree: true});
+        moveToggleBeforeSearch();
+    });
+</script>
+<script type="text/javascript">
+    // Publishes the sticky bar's measured height, which CSS cannot read
+    // on its own, so anchor targets can offset by it.
+    document.addEventListener('DOMContentLoaded', function() {
+        var topBar = document.getElementById('top');
+        if (!topBar) { return; }
+        function publishHeight() {
+            document.documentElement.style.setProperty('--notex-topbar-height', topBar.offsetHeight + 'px');
+        }
+        publishHeight();
+        if (typeof ResizeObserver !== 'undefined') {
+            new ResizeObserver(publishHeight).observe(topBar);
+        }
+    });
+</script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<style>
+/* Sticky, blurred top bar. Colours mirror the theme's own light/dark
+   custom-property pattern so the toggle keeps driving them. */
+:root {
+    --notex-topbar-background: rgba(255, 255, 255, 0.50);
+    --notex-topbar-height: 0px;
+}
+@media (prefers-color-scheme: dark) {
+    html:not(.light-mode) {
+        --notex-topbar-background: rgba(28, 29, 31, 0.50);
+    }
+}
+html.dark-mode {
+    --notex-topbar-background: rgba(28, 29, 31, 0.50);
+}
+#top {
+    position: sticky;
+    top: 0;
+    background: var(--notex-topbar-background);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    backdrop-filter: saturate(180%) blur(12px);
+}
+/* Without blur support the bar must stay opaque to stay readable. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    #top {
+        background: var(--header-background);
+    }
+}
+/* Anchor targets would otherwise land underneath the sticky bar. */
+a.anchor {
+    scroll-margin-top: calc(var(--notex-topbar-height) + var(--spacing-large));
+}
+/* Space before the search box, now that the toggle sits there. */
+doxygen-awesome-dark-mode-toggle {
+    margin-right: 0.5em;
+}
+/* Circular GitHub icon, replacing the theme's corner ribbon. */
+#notex-github-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    color: var(--page-secondary-foreground-color, #52606d);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+#notex-github-icon:hover {
+    background-color: var(--separator-color, rgba(0, 0, 0, 0.08));
+    color: var(--page-foreground-color, #14181d);
+}
+</style>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectalign">
+   <div id="projectname">NoTeX<span id="projectnumber">&#160;1.0.0</span>
+   </div>
+   <div id="projectbrief">A modern noteworthy LaTeX template</div>
+  </td>
+  <td style="padding-left: 0.5em; vertical-align: middle;">
+   <a id="notex-github-icon" href="https://github.com/marcotallone/notex" title="View source on GitHub" target="_blank" rel="noopener noreferrer">
+    <svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+   </a>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.17.0 -->
+<script type="text/javascript">
+let searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', codefold.init);
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', () => {
+  initMenu('',false);
+  init_search();
+});
+</script>
+<div id="main-nav-mobile">
+<div class="sm sm-dox"><input id="main-menu-state" type="checkbox"/>
+<label class="main-menu-btn" for="main-menu-state">
+<span class="main-menu-btn-icon"></span> Toggle main menu visibility</label>
+<span id="searchBoxPos1" style="position:absolute;right:8px;top:8px;height:36px;"></span>
+</div>
+</div><!-- main-nav-mobile -->
+<div id="main-nav">
+  <ul class="sm sm-dox" id="main-menu">
+    <li id="searchBoxPos2" style="float:right">
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+    </li>
+  </ul>
+</div><!-- main-nav -->
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+</div><!-- top -->
+<div id="doc-content">
+<div><div class="header">
+  <div class="headertitle"><div class="title">Architecture </div></div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><p><a class="anchor" id="architecture"></a></p>
+<p>This page walks through how the <span class="tt"><a class="el" href="namespacenotex.html">notex</a></span> C++ software is put together: the two layers it's split into, the five classes that do the actual work, and how a single command travels through all of them, from a keystroke on the terminal down to a modified file on disk.</p>
+<h1 class="doxsection"><a class="anchor" id="software-structure"></a>
+Software Structure</h1>
+<div align="center"></div><div align="center"><div class="mermaidgraph">
+<pre class="mermaid">
+graph LR
+    subgraph frontend [&quot;&lt;b&gt;1. Command-Line Forntend&lt;/b&gt;&quot;]
+        cli[&quot;&lt;code&gt;notex&lt;/code&gt;&lt;br&gt;&lt;i&gt;Main CLI executable.&lt;/i&gt;&quot;]
+    end
+
+    subgraph library [&quot;&lt;b&gt;2. Core Library&lt;/b&gt;&quot;]
+        core[&quot;&lt;code&gt;notex_core&lt;/code&gt;&lt;br&gt;&lt;i&gt;Logic and document&lt;br&gt;management.&lt;/i&gt;&quot;]
+    end
+
+    subgraph document [&quot;&lt;b&gt;LaTeX Document(s)&lt;/b&gt;&quot;]
+        tex_file[&quot;&lt;code&gt;.tex&lt;/code&gt;&quot;]
+    end
+
+    frontend -- &quot;requests&quot; --&gt; library
+    library --&gt; document</pre>
+</div>
+</div><div align="center"></div><p>The NoTeX C++ software is built around <b>five classes</b>, plus a series of <b>sidecar components</b> embedding useful assets, and it is deliberately organised into 2 layers, each with different responsibilities and well-divided roles:</p>
+<ol type="1">
+<li>The main entrypoint is a thin <b>command-line "frontend"</b>, the actual <span class="tt"><a class="el" href="namespacenotex.html">notex</a></span> executable, whose job is to translate what the user typed on the terminal into calls on an underneath library.<br  />
+ This software layer is composed by the <span class="tt">main()</span> function and an <span class="tt">Orchestrator</span> class, whose role is to act as a bridge between user requests and the core library.</li>
+<li>At the bottom, sits a reusable <b>core library</b>, <span class="tt">notex_core</span>, which contains the fundamental logic and handles actual <span class="tt">tex</span> files, but it is agnostic to the way it happens to be invoked.<br  />
+ The whole design of the library is based on 4 classes (<span class="tt">Installer</span>, <span class="tt">Manager</span>, <span class="tt">Environemnt</span> and <span class="tt">Document</span>) that interact together and use a set of shared assets to provide the requested functionalities.</li>
+</ol>
+<p>The detailed diagram below shows the direction of dependencies, flowing top-to-bottom, and the various interactions between the classes in the two layers. Notice how the frontend component redirects requests via the <span class="tt">Orchestrator</span>, but the classes of the core library, each with its independent responsibility, know nothing about the frontend itself, they just perform their task as they get invoked.</p>
+<div align="center"></div><div align="center"><div class="mermaidgraph">
+<pre class="mermaid">
+graph TD
+    subgraph frontend [&quot;1. &lt;code&gt;notex&lt;/code&gt; (&lt;i&gt;Command-Line Forntend&lt;/i&gt;)&quot;]
+        main[&quot;&lt;code&gt;main()&lt;/code&gt;&quot;]
+        orchestrator[&quot;&lt;code&gt;Orchestrator&lt;/code&gt;&quot;]
+    end
+
+    subgraph core [&quot;2. &lt;code&gt;notex_core&lt;/code&gt; &lt;i&gt;(Core Library)&lt;/i&gt;&quot;]
+        environment[&quot;&lt;code&gt;Environment&lt;/code&gt;&quot;]
+        installer[&quot;&lt;code&gt;Installer&lt;/code&gt;&quot;]
+        manager[&quot;&lt;code&gt;Manager&lt;/code&gt;&quot;]
+        document[&quot;&lt;code&gt;Document&lt;/code&gt;&quot;]
+        data[&quot;&lt;b&gt;Sidecar Components&lt;/b&gt;&lt;br&gt;&lt;i&gt;assets · templates · reference&lt;/i&gt;&lt;br/&gt;&lt;i&gt;error · output · system&lt;/i&gt;&quot;]
+    end
+
+    main --&gt; orchestrator
+    orchestrator --&gt; environment
+    orchestrator --&gt; installer
+    orchestrator --&gt; manager
+    orchestrator --&gt; data
+    installer --&gt; environment
+    installer --&gt; data
+    manager --&gt; environment
+    manager --&gt; document
+    manager --&gt; data</pre>
+</div>
+</div><div align="center"></div><p>It's worth to keep this chart in mind while we analyze the next sections where the classes are described in more detail.</p>
+<h1 class="doxsection"><a class="anchor" id="classes"></a>
+Classes</h1>
+<h2 class="doxsection"><a class="anchor" id="orchestrator"></a>
+<span class="tt">Orchestrator</span></h2>
+<blockquote class="doxtable">
+<p><span class="tt">Orchestrator</span>: <em>driving the command line</em><br  />
+ <a href="../../notex/include/orchestrator.hpp"><span class="tt">orchestrator.hpp</span></a> | <a href="../../notex/src/orchestrator.cpp"><span class="tt">orchestrator.cpp</span></a> </p>
+</blockquote>
+<p>The <span class="tt">Orchestrator</span> is the single entry point every <span class="tt"><a class="el" href="namespacenotex.html">notex</a></span> command passes through. It owns the command-line parser (built on the <a href="https://github.com/CLIUtils/CLI11">CLI11</a> library), registers every subcommand up front when the program starts, and keeps track of the state that needs to survive across a whole invocation, things like the global <span class="tt">--yes</span> and <span class="tt">--verbose</span> flags, or the arguments a specific subcommand was called with.</p>
+<p>It is also the only place in the entire program that catches exceptions. Every other class is free to raise an error and simply stop, trusting that it will eventually turn into a proper message and the right exit code, because there is exactly one spot where that translation happens: inside <span class="tt">Orchestrator::run()</span>.</p>
+<p>Beyond that, the <span class="tt">Orchestrator</span> deliberately knows nothing about how the real work gets done. It decides what needs to happen and in what order, hands the actual logic off to <span class="tt">Environment</span>, <span class="tt">Installer</span>, or <span class="tt">Manager</span>, and formats whatever comes back for the terminal. The finer points of how CLI11 is wired up, together with the full picture of error handling, live on the <a class="el" href="md_docs_2implementation_2CLIErrorsDiagnostic.html" title="CLI, Errors &amp; Diagnostics">CLI, Errors &amp; Diagnostics</a> page.</p>
+<h2 class="doxsection"><a class="anchor" id="environment"></a>
+<span class="tt">Environment</span></h2>
+<blockquote class="doxtable">
+<p><span class="tt">Environment</span>: <em>reading the system</em><br  />
+ <a href="../../notex/include/notex/environment.hpp"><span class="tt">environment.hpp</span></a> | <a href="../../notex/src/notex/environment.cpp"><span class="tt">environment.cpp</span></a> </p>
+</blockquote>
+<p><span class="tt">Environment</span> answers one question:</p>
+<blockquote class="doxtable">
+<p><em>On this particular machine, where does the TeX installation expect user files to live, and has NoTeX already been installed there?</em> </p>
+</blockquote>
+<p>To find out, it checks the <span class="tt">TEXMFHOME</span> environment variable first, and only falls back to asking the TeX toolchain directly (by running <span class="tt">kpsewhich -var-value=TEXMFHOME</span>) if that variable isn't set. From that resolved path, it works out where a <em>global</em> installation's files would sit and separately checks whether the current directory already holds a <em>local</em> one of its own. This last situation happens, in practice, whenever a <span class="tt">settings/notex.cls</span> exists in the current directory.</p>
+<p>Implementing this functionality in a concrete class, rather than a couple of loose functions, mostly comes down to "cost". Resolving the environment can genuinely be expensive, since it might mean launching an external process. Moreover doinf so it's often needed by commands that otherwise have nothing in common: <span class="tt"><a class="el" href="namespacenotex.html">notex</a> install</span> needs an answer before any project even exists, and <span class="tt"><a class="el" href="namespacenotex.html">notex</a> info</span> needs one purely to report on. Building an <span class="tt">Environment</span> once and querying it afterward means that cost is paid exactly once per run.</p>
+<p>An <span class="tt">Environment</span> is also read-only by design: constructing one never writes anything to disk. That's precisely what lets commands like <span class="tt"><a class="el" href="namespacenotex.html">notex</a> info</span> and <span class="tt"><a class="el" href="namespacenotex.html">notex</a> checkhealth</span> build one freely, just to look around.</p>
+<h2 class="doxsection"><a class="anchor" id="installer"></a>
+<span class="tt">Installer</span></h2>
+<blockquote class="doxtable">
+<p><span class="tt">Installer</span>: <em>deploying and removing the framework</em><br  />
+ <a href="../../notex/include/notex/installer.hpp"><span class="tt">installer.hpp</span></a> | <a href="../../notex/src/notex/installer.cpp"><span class="tt">installer.cpp</span></a> </p>
+</blockquote>
+<p>The main responsibility of the <span class="tt">Installer</span> class is to copy the embedded LaTeX template and fonts onto the system, and later, if required, remove the eventual installation from the system itself.</p>
+<p>Every method of this class is <span class="tt">static</span>, which isn't just a stylistic choice. In fact, the LaTeX template is installed in a system directory and it's not a persistent state of the <span class="tt">Installer</span> class itself. Hence we don't need to preserve an istance of this class between calls. The constructor is explicitly deleted to make that intention obvious, rather than leaving it as something nobody ever happened to call.</p>
+<p>Where <span class="tt">Installer</span> actually writes its files, and why, is covered in more detail on the <a class="el" href="md_docs_2implementation_2LaTeXIntegration.html" title="LaTeX Template Integration">LaTeX Template Integration</a> page.</p>
+<h2 class="doxsection"><a class="anchor" id="manager"></a>
+<span class="tt">Manager</span></h2>
+<blockquote class="doxtable">
+<p><span class="tt">Manager</span>: <em>operating on a project</em><br  />
+ <a href="../../notex/include/notex/manager.hpp"><span class="tt">manager.hpp</span></a> | <a href="../../notex/src/notex/manager.cpp"><span class="tt">manager.cpp</span></a> </p>
+</blockquote>
+<p>A <span class="tt">Manager</span> represents a single NoTeX project, concretized in the directory holding a <span class="tt">.notex/</span> folder, plus everything recorded about that project in the <span class="tt">.notex/notex.json</span> configuration file.</p>
+<p>Nearly every command that changes something about a project ultimately runs through a <span class="tt">Manager</span>. These include tasks such as switching the theme, adding or removing a section or a bibliography, listing files, resetting or deleting the <span class="tt">main.tex</span> document, etc.</p>
+<p>Creating an object of this class triggers project discovery process in which the <span class="tt">Manager</span> walks upward from the current directory looking for the <span class="tt">.notex/</span> directory, the same way <span class="tt">git</span> looks for <span class="tt">.git/</span>. That's what makes it possible to run a <span class="tt"><a class="el" href="namespacenotex.html">notex</a></span> command from anywhere inside a project, not only from its root.</p>
+<p>Given its core importance to the inner working of the NoTeX software, the <span class="tt">Manager</span> gets a full page to itself in <a class="el" href="md_docs_2implementation_2ProjectManagement.html" title="Project Management">Project Management</a>, which covers how <span class="tt">.notex/notex.json</span> is structured (<em>including things it deliberately leaves out</em>) and exactly how sections and bibliographies get added and removed.</p>
+<h2 class="doxsection"><a class="anchor" id="document"></a>
+<span class="tt">Document</span></h2>
+<blockquote class="doxtable">
+<p><span class="tt">Document</span>: <em>editing a single file safely</em><br  />
+ <a href="../../notex/include/notex/document.hpp"><span class="tt">document.hpp</span></a> | <a href="../../notex/src/notex/document.cpp"><span class="tt">document.cpp</span></a> </p>
+</blockquote>
+<p>When a <span class="tt">Manager</span> operation needs to change the text of a <span class="tt">.tex</span> file, it never edits that text directly. It hands the job to a <span class="tt">Document</span> object instead. That separation keeps <span class="tt">Manager</span> focused on <em>what</em> should happen, while <span class="tt">Document</span> is the only place in the codebase concerned with <em>how</em> a file's lines get found, inserted, or rewritten.</p>
+<p>Additional details about the <span class="tt">Document</span> class are also provided in the <a class="el" href="md_docs_2implementation_2ProjectManagement.html" title="Project Management">Project Management</a> page. In summary, the <span class="tt">Document</span> follows a <em>"fail closed"</em> philosophy, meaning it refuses to guess when something about a file "looks off". In other terms, if a <span class="tt">Document</span> object is tasked with running an editing operation onto a file, but the file is missing a key landmark or a sought feature that is expected to be found, the operation simply aborts and the file is left untouched. That's exactly what makes it safe to run <span class="tt"><a class="el" href="namespacenotex.html">notex</a></span> commands against a file a person has also been editing by hand.</p>
+<h1 class="doxsection"><a class="anchor" id="sidecar-components"></a>
+Sidecar components</h1>
+<p>Beyond the five classes above, a handful of smaller components support them without being substantial enough to deserve a class of their own. These are the <b>Sidecar Components</b> of the <span class="tt">notex_core</span> library.</p>
+<p>Three of them are essentially <b>compiled-in LaTeX data</b>:</p>
+<ul>
+<li><span class="tt">assets</span> holds the embedded copy of the LaTeX template and its fonts;</li>
+<li><span class="tt">templates</span> holds the files skeletons <span class="tt"><a class="el" href="namespacenotex.html">notex</a> init</span> scaffolds new projects from;</li>
+<li><span class="tt">reference</span> is the table of ready-to-paste snippets behind <span class="tt"><a class="el" href="namespacenotex.html">notex</a> get</span>.</li>
+</ul>
+<p>The other three:</p>
+<ul>
+<li><span class="tt">errors</span>,</li>
+<li><span class="tt">output</span>,</li>
+<li><span class="tt">system</span></li>
+</ul>
+<p>are <b>shared infrastructure</b> used almost everywhere in the codebase. These implement the exception hierarchy, the styled terminal output and confirmation prompts, and the single choke point through which the library shells out to external tools or reads environment variables.</p>
+<p>The <a class="el" href="md_docs_2implementation_2EmbeddedAssets.html" title="Embedded Assets">Embedded Assets</a> page covers the first group in detail, along with how the LaTeX template ends up compiled into the binary in the first place.</p>
+<h1 class="doxsection"><a class="anchor" id="working-example"></a>
+Working Example</h1>
+<p>Reading five class descriptions in isolation doesn't really show how a real command moves through them. Seeing them work together makes the picture much clearer, so here's what actually happens when the command</p>
+<div class="fragment"><div class="line">notex add section &quot;My Section&quot;</div>
+</div><!-- fragment --><p>runs inside an existing multi-file project that already has two sections on disk. The following diagram illustrates the flow of control and the interactions between the classes, including the filesystem, from the moment the user hits Enter until the new section is added to <span class="tt">main.tex</span> and a new file is created in <span class="tt">sections/</span>.</p>
+<div align="center"></div><div align="center"><div class="mermaidgraph">
+<pre class="mermaid">
+sequenceDiagram
+    actor User
+    participant O as Orchestrator
+    participant M as Manager
+    participant D as Document
+    participant FS as Filesystem
+
+    User-&gt;&gt;O: notex add section &quot;My Section&quot;
+    O-&gt;&gt;M: Manager() - construct for the current directory
+    M-&gt;&gt;FS: walk upward looking for .notex/
+    FS--&gt;&gt;M: project root found, notex.json loaded
+    O-&gt;&gt;M: add_section(&quot;My Section&quot;)
+    M-&gt;&gt;D: Document::load(main.tex)
+    M-&gt;&gt;FS: scan sections/ for the highest existing number
+    FS--&gt;&gt;M: highest number found is 2
+    M-&gt;&gt;FS: write sections/3_my_section.tex
+    M-&gt;&gt;D: find the last \subfile line in main.tex
+    D--&gt;&gt;M: index of that line
+    M-&gt;&gt;D: insert a new \subfile line right after it
+    M-&gt;&gt;D: save() - write to a temp file, then rename it into place
+    M--&gt;&gt;O: done
+    O--&gt;&gt;User: &quot;Added section &#39;My Section&#39;.&quot;</pre>
+</div>
+</div><div align="center"></div><p>Two details in that sequence are worth calling out, since neither one shows up from the method signatures.</p>
+<ol type="1">
+<li>First, the next section number doesn't come from anywhere in <span class="tt">notex.json</span>. <span class="tt">Manager</span> finds it by actually looking at what's currently in the <span class="tt">sections/</span> folder and picking the next one up.</li>
+<li>Second, the spot where the new <span class="tt">\subfile</span> line gets inserted isn't tracked anywhere either. <span class="tt">Manager</span> finds it by locating the <em>last</em> <span class="tt">\subfile</span> line already present in <span class="tt">main.tex</span> and inserting right after it.</li>
+</ol>
+<p>In principle, both of these could have been cached somewhere for speed. However, a project's sections can just as easily be added or deleted by hand, entirely outside of <span class="tt"><a class="el" href="namespacenotex.html">notex</a></span>, and a cached value would have no way of noticing that had happened. Scanning the filesystem every time means there's never a stale answer to give. <a class="el" href="md_docs_2implementation_2ProjectManagement.html" title="Project Management">Project Management</a> goes into this in more depth, since the same reasoning shapes the whole <span class="tt">.notex/notex.json</span> schema.</p>
+<p>Moreover, notice that <span class="tt">Manager</span> never touches <span class="tt">main.tex</span>'s text on its own; every edit goes through <span class="tt">Document</span>. If any step along the way had failed, <span class="tt">Document::save()</span> would simply never be reached, and <span class="tt">main.tex</span> would be left exactly as it was found. The new <span class="tt">sections/3_my_section.tex</span> file might already exist on disk at that point, but that's a harmless, purely additive side effect, never a half-edited main file.</p>
+<hr  />
+<div align="center"> <sub> <b>NoTeX</b> <br  style="margin-bottom: 0.3rem;" />
+</sub></div><div align="center"><sub>Home &#160;•&#160; <a class="el" href="md_docs_2installation_2INSTALLATION.html" title="Installation">Installation</a> &#160;•&#160; <a class="el" href="md_docs_2usage_2USAGE.html" title="Usage">Usage</a> &#160;•&#160; <a class="el" href="md_docs_2implementation_2IMPLEMENTATION.html" title="Implementation">Implementation</a></sub></div><div align="center"><sub></sub> </div> </div></div><!-- contents -->
+</div><!-- PageDoc -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.17.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

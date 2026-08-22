@@ -1,0 +1,1034 @@
+<!-- Custom Doxygen HTML_HEADER for NoTeX. Rationale for every choice
+     here: docs/plan/CHANGELOG.md, entries 26-29. Keep every comment in
+     this file to 1-3 lines; longer ones have repeatedly broken rendering. -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.17.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>NoTeX: notex/src/orchestrator.cpp Source File</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="codefolding.js"></script>
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="doxygen-awesome-interactive-toc.js"></script>
+<script type="text/javascript" src="doxygen-awesome-tabs.js"></script>
+<script type="text/javascript" src="mermaid.min.js"></script>
+<script type="text/javascript">
+    // Guarded so one extension failing degrades to a console message
+    // instead of aborting this whole block (CHANGELOG entry 34).
+    function notexInit(name, extension) {
+        try {
+            if (extension && typeof extension.init === 'function') {
+                extension.init();
+            } else {
+                console.error('NoTeX: ' + name + '.init() unavailable, skipped');
+            }
+        } catch (error) {
+            console.error('NoTeX: ' + name + '.init() threw', error);
+        }
+    }
+    notexInit('DoxygenAwesomeFragmentCopyButton', typeof DoxygenAwesomeFragmentCopyButton !== 'undefined' ? DoxygenAwesomeFragmentCopyButton : null);
+    notexInit('DoxygenAwesomeDarkModeToggle', typeof DoxygenAwesomeDarkModeToggle !== 'undefined' ? DoxygenAwesomeDarkModeToggle : null);
+    notexInit('DoxygenAwesomeParagraphLink', typeof DoxygenAwesomeParagraphLink !== 'undefined' ? DoxygenAwesomeParagraphLink : null);
+    notexInit('DoxygenAwesomeInteractiveToc', typeof DoxygenAwesomeInteractiveToc !== 'undefined' ? DoxygenAwesomeInteractiveToc : null);
+    notexInit('DoxygenAwesomeTabs', typeof DoxygenAwesomeTabs !== 'undefined' ? DoxygenAwesomeTabs : null);
+</script>
+<script type="text/javascript">
+    // Deliberately its own <script>: a throw in another block cannot
+    // abort this one, which is what silently killed mermaid before.
+    (function() {
+        if (typeof mermaid === 'undefined') { return; }
+        var toggle = typeof DoxygenAwesomeDarkModeToggle !== 'undefined' ? DoxygenAwesomeDarkModeToggle : null;
+        var counter = 0;
+        // Must run here, before DOMContentLoaded: mermaid's own autorun
+        // would otherwise overwrite each diagram's source with its SVG.
+        mermaid.initialize({ startOnLoad: false });
+        // darkMode is a separate themeVariable; theme 'dark' alone leaves
+        // most computed colors on their light-mode branch.
+        function config(dark) {
+            return dark
+                ? { startOnLoad: false, theme: 'dark', themeVariables: { darkMode: true } }
+                : { startOnLoad: false, theme: 'neutral' };
+        }
+        // Source captured once, up front, so every re-render redraws from
+        // it rather than from a previous render's own output.
+        function saveSource() {
+            document.querySelectorAll('.mermaid').forEach(function(el) {
+                if (!el.hasAttribute('data-notex-source')) {
+                    el.setAttribute('data-notex-source', el.textContent);
+                }
+            });
+        }
+        // The third argument matters: without it mermaid measures label
+        // text against <body>'s font, so nodes size wrong and text crops.
+        function render(dark) {
+            mermaid.initialize(config(dark));
+            document.querySelectorAll('.mermaid').forEach(function(el) {
+                var source = el.getAttribute('data-notex-source');
+                if (!source) { return; }
+                mermaid.render('notex-mermaid-' + (counter++), source, el).then(function(result) {
+                    el.innerHTML = result.svg;
+                }).catch(function(error) {
+                    // mermaid empties the element first, so restore the
+                    // source rather than leave the diagram blank.
+                    el.textContent = source;
+                    console.error('NoTeX: mermaid render failed', error);
+                });
+            });
+        }
+        // userPreference is a getter over localStorage and the system
+        // setting, so it reads correctly even if init() never ran.
+        function darkNow() {
+            return toggle ? toggle.userPreference : false;
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            saveSource();
+            render(darkNow());
+        });
+        // Every mode-change path dispatches through this one property,
+        // so replacing it re-renders on toggle, system change and restore.
+        if (toggle) {
+            var originalEnableDarkMode = toggle.enableDarkMode;
+            toggle.enableDarkMode = function(enable) {
+                originalEnableDarkMode(enable);
+                render(enable);
+            };
+        }
+    })();
+</script>
+<script type="text/javascript">
+    // Moves the toggle button before the search box; MutationObserver
+    // since the extension re-appends it after on every resize.
+    document.addEventListener('DOMContentLoaded', function() {
+        function moveToggleBeforeSearch() {
+            var searchBox = document.getElementById("MSearchBox");
+            var toggle = document.querySelector("doxygen-awesome-dark-mode-toggle");
+            if (searchBox && toggle && searchBox.previousElementSibling !== toggle) {
+                searchBox.parentNode.insertBefore(toggle, searchBox);
+            }
+        }
+        new MutationObserver(moveToggleBeforeSearch).observe(document.body, {childList: true, subtree: true});
+        moveToggleBeforeSearch();
+    });
+</script>
+<script type="text/javascript">
+    // Publishes the sticky bar's measured height, which CSS cannot read
+    // on its own, so anchor targets can offset by it.
+    document.addEventListener('DOMContentLoaded', function() {
+        var topBar = document.getElementById('top');
+        if (!topBar) { return; }
+        function publishHeight() {
+            document.documentElement.style.setProperty('--notex-topbar-height', topBar.offsetHeight + 'px');
+        }
+        publishHeight();
+        if (typeof ResizeObserver !== 'undefined') {
+            new ResizeObserver(publishHeight).observe(topBar);
+        }
+    });
+</script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<style>
+/* Sticky, blurred top bar. Colours mirror the theme's own light/dark
+   custom-property pattern so the toggle keeps driving them. */
+:root {
+    --notex-topbar-background: rgba(255, 255, 255, 0.50);
+    --notex-topbar-height: 0px;
+}
+@media (prefers-color-scheme: dark) {
+    html:not(.light-mode) {
+        --notex-topbar-background: rgba(28, 29, 31, 0.50);
+    }
+}
+html.dark-mode {
+    --notex-topbar-background: rgba(28, 29, 31, 0.50);
+}
+#top {
+    position: sticky;
+    top: 0;
+    background: var(--notex-topbar-background);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    backdrop-filter: saturate(180%) blur(12px);
+}
+/* Without blur support the bar must stay opaque to stay readable. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    #top {
+        background: var(--header-background);
+    }
+}
+/* Anchor targets would otherwise land underneath the sticky bar. */
+a.anchor {
+    scroll-margin-top: calc(var(--notex-topbar-height) + var(--spacing-large));
+}
+/* Space before the search box, now that the toggle sits there. */
+doxygen-awesome-dark-mode-toggle {
+    margin-right: 0.5em;
+}
+/* Circular GitHub icon, replacing the theme's corner ribbon. */
+#notex-github-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    color: var(--page-secondary-foreground-color, #52606d);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+#notex-github-icon:hover {
+    background-color: var(--separator-color, rgba(0, 0, 0, 0.08));
+    color: var(--page-foreground-color, #14181d);
+}
+</style>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectalign">
+   <div id="projectname">NoTeX<span id="projectnumber">&#160;1.0.0</span>
+   </div>
+   <div id="projectbrief">A modern noteworthy LaTeX template</div>
+  </td>
+  <td style="padding-left: 0.5em; vertical-align: middle;">
+   <a id="notex-github-icon" href="https://github.com/marcotallone/notex" title="View source on GitHub" target="_blank" rel="noopener noreferrer">
+    <svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+   </a>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.17.0 -->
+<script type="text/javascript">
+let searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', codefold.init);
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', () => {
+  initMenu('',false);
+  init_search();
+});
+</script>
+<div id="main-nav-mobile">
+<div class="sm sm-dox"><input id="main-menu-state" type="checkbox"/>
+<label class="main-menu-btn" for="main-menu-state">
+<span class="main-menu-btn-icon"></span> Toggle main menu visibility</label>
+<span id="searchBoxPos1" style="position:absolute;right:8px;top:8px;height:36px;"></span>
+</div>
+</div><!-- main-nav-mobile -->
+<div id="main-nav">
+  <ul class="sm sm-dox" id="main-menu">
+    <li id="searchBoxPos2" style="float:right">
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+    </li>
+  </ul>
+</div><!-- main-nav -->
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><b>notex</b></li><li class="navelem"><b>src</b></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="headertitle"><div class="title">orchestrator.cpp</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;<a class="code" href="orchestrator_8hpp.html">orchestrator.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;algorithm&gt;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &lt;filesystem&gt;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &lt;iostream&gt;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#include &quot;<a class="code" href="environment_8hpp.html">notex/environment.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#include &quot;<a class="code" href="installer_8hpp.html">notex/installer.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="preprocessor">#include &quot;<a class="code" href="logging_8hpp.html">notex/logging.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">#include &quot;<a class="code" href="manager_8hpp.html">notex/manager.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="preprocessor">#include &quot;<a class="code" href="output_8hpp.html">notex/output.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">#include &quot;<a class="code" href="reference_8hpp.html">notex/reference.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#include &quot;<a class="code" href="system_8hpp.html">notex/system.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#include &quot;<a class="code" href="templates_8hpp.html">notex/templates.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacenotex.html">notex</a> {</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>Orchestrator::Orchestrator() { register_commands(); }</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="keywordtype">void</span> Orchestrator::run_version()<span class="keyword"> const </span>{ <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(PROJECT_VERSION); }</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="keywordtype">void</span> Orchestrator::run_help()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    <span class="comment">// app_.help() itself won&#39;t do here: by the time this callback runs,</span></div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="comment">// &quot;help&quot; has already been recorded as app_&#39;s selected subcommand, and</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <span class="comment">// App::help() delegates to a selected subcommand&#39;s own (much</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    <span class="comment">// shorter) help text rather than the top-level one --help shows.</span></div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    <span class="comment">// Calling the formatter directly, exactly as App::exit()&#39;s</span></div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    <span class="comment">// CallForHelp branch does, bypasses that delegation.</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    std::cout &lt;&lt; app_.get_formatter()-&gt;make_help(</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>        &amp;app_, app_.get_name(), CLI::AppFormatMode::Normal);</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>}</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="keywordtype">void</span> Orchestrator::run_info()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <span class="comment">// OLD:</span></div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="comment">// ui::step(&quot;NoTeX&quot;);</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    <span class="comment">// ui::info(std::string(&quot;Version:     &quot;) + PROJECT_VERSION);</span></div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    <span class="comment">// ui::info(std::string(&quot;Author:      &quot;) + PROJECT_AUTHOR);</span></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    <span class="comment">// ui::info(std::string(&quot;License:     &quot;) + PROJECT_LICENSE);</span></div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    <span class="comment">// ui::info(std::string(&quot;Homepage:    &quot;) + PROJECT_HOMEPAGE_URL);</span></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="comment">// ui::info(std::string(&quot;Description: &quot;) + PROJECT_DESCRIPTION);</span></div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <span class="comment">// NEW:</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>        std::string(<span class="stringliteral">&quot;┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━&quot;</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>                    <span class="stringliteral">&quot;━━━━━━━━━━━━━━━━━━━┓&quot;</span>));</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>        std::string(<span class="stringliteral">&quot;┃                                                         &quot;</span></div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>                    <span class="stringliteral">&quot;                   ┃&quot;</span>));</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        std::string(<span class="stringliteral">&quot;┃                         ░███                 ░███       &quot;</span></div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>                    <span class="stringliteral">&quot;                   ┃&quot;</span>));</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>        std::string(<span class="stringliteral">&quot;┃                        ░██     ░███    ░██     ░██      &quot;</span></div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>                    <span class="stringliteral">&quot;                   ┃&quot;</span>));</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>        std::string(<span class="stringliteral">&quot;┃                        ░██     ░████   ░██     ░██      &quot;</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>                    <span class="stringliteral">&quot;                   ┃&quot;</span>));</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>        std::string(<span class="stringliteral">&quot;┃                        ░██     ░██░██  ░██     ░██      &quot;</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>                    <span class="stringliteral">&quot;                   ┃&quot;</span>));</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>        std::string(<span class="stringliteral">&quot;┃                      ░███      ░██ ░██ ░██      ░██     &quot;</span></div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>                    <span class="stringliteral">&quot;                   ┃&quot;</span>));</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>        std::string(<span class="stringliteral">&quot;┃                        ░██     ░██  ░██░██     ░██      &quot;</span></div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>                    <span class="stringliteral">&quot;                   ┃&quot;</span>));</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        std::string(<span class="stringliteral">&quot;┃                        ░██     ░██   ░████     ░██      &quot;</span></div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>                    <span class="stringliteral">&quot;                   ┃&quot;</span>));</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>        std::string(<span class="stringliteral">&quot;┃                        ░██     ░██    ░███     ░██      &quot;</span></div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>                    <span class="stringliteral">&quot;                   ┃&quot;</span>));</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>        std::string(<span class="stringliteral">&quot;┃                         ░███                 ░███       &quot;</span></div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>                    <span class="stringliteral">&quot;                   ┃&quot;</span>));</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>        std::string(<span class="stringliteral">&quot;┃                                                         &quot;</span></div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>                    <span class="stringliteral">&quot;                   ┃&quot;</span>));</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>        std::string(<span class="stringliteral">&quot;┃                               ~ N O T E X ~             &quot;</span></div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>                    <span class="stringliteral">&quot;                   ┃&quot;</span>));</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(std::string(<span class="stringliteral">&quot;┃                     &quot;</span>) + PROJECT_DESCRIPTION +</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>             std::string(<span class="stringliteral">&quot;                     ┃&quot;</span>));</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(std::string(<span class="stringliteral">&quot;┃                               Version &quot;</span>) +</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>             PROJECT_VERSION +</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>             std::string(<span class="stringliteral">&quot;                                ┃&quot;</span>));</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>        std::string(<span class="stringliteral">&quot;┃                                                         &quot;</span></div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>                    <span class="stringliteral">&quot;                   ┃&quot;</span>));</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(std::string(<span class="stringliteral">&quot;┃                      Copyright (c) 2026 &quot;</span>) +</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>             PROJECT_AUTHOR + std::string(<span class="stringliteral">&quot;                      ┃&quot;</span>));</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(std::string(<span class="stringliteral">&quot;┃                                &quot;</span>) +</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>             PROJECT_LICENSE +</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>             std::string(<span class="stringliteral">&quot; License                                 ┃&quot;</span>));</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>        std::string(<span class="stringliteral">&quot;┃                                                         &quot;</span></div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>                    <span class="stringliteral">&quot;                   ┃&quot;</span>));</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(std::string(<span class="stringliteral">&quot;┃                   &quot;</span>) + PROJECT_HOMEPAGE_URL +</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>             std::string(<span class="stringliteral">&quot;                    ┃&quot;</span>));</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>        std::string(<span class="stringliteral">&quot;┃                                                         &quot;</span></div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>                    <span class="stringliteral">&quot;                   ┃&quot;</span>));</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>        std::string(<span class="stringliteral">&quot;┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━&quot;</span></div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>                    <span class="stringliteral">&quot;━━━━━━━━━━━━━━━━━━━┛&quot;</span>));</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span> </div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#aef946fa1b58056b5b207a4c637c277be">ui::step</a>(<span class="stringliteral">&quot;Environment&quot;</span>);</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>        <span class="keyword">const</span> Environment environment;</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(std::string(<span class="stringliteral">&quot;  TEXMFHOME:         &quot;</span>) +</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>                 environment.texmf_home().string());</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(std::string(<span class="stringliteral">&quot;  Global class dir:  &quot;</span>) +</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>                 environment.global_latex_dir().string());</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(std::string(<span class="stringliteral">&quot;  Local class dir:   &quot;</span>) +</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>                 environment.local_latex_dir().string());</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(std::string(<span class="stringliteral">&quot;  Installation:      &quot;</span>) +</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>                 std::string(<a class="code hl_function" href="namespacenotex.html#af485eee1a7625e78e49d778471499f1b">to_string</a>(environment.installation_type())));</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>    } <span class="keywordflow">catch</span> (<span class="keyword">const</span> EnvironmentError&amp; e) {</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>        PLOG_WARNING &lt;&lt; e.what();</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#acc0ed633d837aeac2bfa4ba43be38947">ui::warning</a>(e.what());</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>    }</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span> </div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#aef946fa1b58056b5b207a4c637c277be">ui::step</a>(<span class="stringliteral">&quot;Project&quot;</span>);</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>        <span class="keyword">const</span> Manager manager;</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>        <span class="keyword">const</span> ProjectConfig&amp; config = manager.config();</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(std::string(<span class="stringliteral">&quot;  Root:              &quot;</span>) +</div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>                 manager.root_dir().string());</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>            std::string(<span class="stringliteral">&quot;  Project type:      &quot;</span>) +</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>            (config.project_type.empty() ? <span class="stringliteral">&quot;(unknown)&quot;</span> : config.project_type));</div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(std::string(<span class="stringliteral">&quot;  Main file:         &quot;</span>) + config.main_file);</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(std::string(<span class="stringliteral">&quot;  Installation type: &quot;</span>) +</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>                 (config.installation_type.empty() ? <span class="stringliteral">&quot;(unknown)&quot;</span></div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>                                                   : config.installation_type));</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(std::string(<span class="stringliteral">&quot;  Theme:             &quot;</span>) +</div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>                 (config.theme.empty() ? <span class="stringliteral">&quot;(none)&quot;</span> : config.theme));</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>    } <span class="keywordflow">catch</span> (<span class="keyword">const</span> ProjectNotFoundError&amp;) {</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(<span class="stringliteral">&quot;  Not inside a NoTeX project (.notex/ directory not found).&quot;</span>);</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>    }</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>}</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span> </div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span><span class="keywordtype">void</span> Orchestrator::run_clean()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>    <span class="keyword">const</span> std::filesystem::path path(clean_path_);</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span> </div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="classnotex_1_1Manager.html#a875c5c99bf002939eb34945b936eba21">Manager::find_project_root</a>(path).has_value()) {</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>        PLOG_WARNING &lt;&lt; <span class="stringliteral">&quot;&#39;clean&#39; invoked outside a NoTeX project; cleaning &#39;&quot;</span></div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>                     &lt;&lt; path.string() &lt;&lt; <span class="stringliteral">&quot;&#39; directly.&quot;</span>;</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#acc0ed633d837aeac2bfa4ba43be38947">ui::warning</a>(<span class="stringliteral">&quot;You&#39;re not inside a NoTeX project.&quot;</span>);</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(<span class="stringliteral">&quot;Cleaning inside &#39;&quot;</span> + path.string() + <span class="stringliteral">&quot;&#39; directly.&quot;</span>);</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>    }</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span> </div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>    <span class="keyword">const</span> CleanReport report = <a class="code hl_function" href="classnotex_1_1Manager.html#a5a175da830271adbb4f4f06644d281ef">Manager::clean</a>(path, clean_dry_run_);</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span> </div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>    <span class="keyword">const</span> std::string verb = clean_dry_run_ ? <span class="stringliteral">&quot;Would remove: &quot;</span> : <span class="stringliteral">&quot;Removed: &quot;</span>;</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; file : report.removed_files) {</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#aef946fa1b58056b5b207a4c637c277be">ui::step</a>(verb + file.string());</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>    }</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; directory : report.removed_directories) {</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#aef946fa1b58056b5b207a4c637c277be">ui::step</a>(verb + directory.string());</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>    }</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span> </div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>    <span class="keywordflow">if</span> (report.total_removed() == 0) {</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>        PLOG_INFO &lt;&lt; <span class="stringliteral">&quot;Clean found nothing to remove in &#39;&quot;</span> &lt;&lt; path.string()</div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>                  &lt;&lt; <span class="stringliteral">&quot;&#39;.&quot;</span>;</div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a8f739befeb2b45f5f388e0bde02700e2">ui::success</a>(<span class="stringliteral">&quot;Nothing to clean.&quot;</span>);</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>        <span class="keyword">const</span> std::string count = std::to_string(report.total_removed());</div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>        PLOG_INFO &lt;&lt; count &lt;&lt; <span class="stringliteral">&quot; item(s) &quot;</span></div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>                  &lt;&lt; (clean_dry_run_ ? <span class="stringliteral">&quot;would be removed from &#39;&quot;</span></div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>                                     : <span class="stringliteral">&quot;removed from &#39;&quot;</span>)</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>                  &lt;&lt; path.string() &lt;&lt; <span class="stringliteral">&quot;&#39;.&quot;</span>;</div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a8f739befeb2b45f5f388e0bde02700e2">ui::success</a>(count + <span class="stringliteral">&quot; item(s) &quot;</span> +</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>                    (clean_dry_run_ ? <span class="stringliteral">&quot;would be removed.&quot;</span> : <span class="stringliteral">&quot;removed.&quot;</span>));</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>    }</div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>}</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span> </div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span><span class="keywordtype">void</span> Orchestrator::run_install_global()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>    <span class="keyword">const</span> Environment environment;</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classnotex_1_1Installer.html#aff5d44ecdc99a7ecd05823c88c92ac1a">Installer::install_global</a>(environment, install_force_)) {</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>        PLOG_INFO &lt;&lt; <span class="stringliteral">&quot;Installed NoTeX globally into &#39;&quot;</span></div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>                  &lt;&lt; environment.global_latex_dir().string() &lt;&lt; <span class="stringliteral">&quot;&#39;.&quot;</span>;</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a8f739befeb2b45f5f388e0bde02700e2">ui::success</a>(<span class="stringliteral">&quot;Installed NoTeX globally into &#39;&quot;</span> +</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>                    environment.global_latex_dir().string() + <span class="stringliteral">&quot;&#39;.&quot;</span>);</div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>    }</div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>}</div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span> </div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span><span class="keywordtype">void</span> Orchestrator::run_install_local()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>    <span class="keyword">const</span> std::filesystem::path target_dir(install_path_);</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classnotex_1_1Installer.html#a05605ecd654dbf3c2adeb6a2635f93be">Installer::install_local</a>(target_dir, install_force_)) {</div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>        PLOG_INFO &lt;&lt; <span class="stringliteral">&quot;Installed NoTeX locally into &#39;&quot;</span></div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>                  &lt;&lt; (target_dir / <span class="stringliteral">&quot;settings&quot;</span>).<span class="keywordtype">string</span>() &lt;&lt; <span class="stringliteral">&quot;&#39;.&quot;</span>;</div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a8f739befeb2b45f5f388e0bde02700e2">ui::success</a>(</div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>            <span class="stringliteral">&quot;Installed NoTeX locally into &#39;&quot;</span> +</div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>            (target_dir / <span class="stringliteral">&quot;settings&quot;</span>).<span class="keywordtype">string</span>() +</div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>            <span class="stringliteral">&quot;&#39;. Documents should refer to \\documentclass{settings/notex}.&quot;</span>);</div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>    }</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>}</div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span> </div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span><span class="keywordtype">void</span> Orchestrator::run_init()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>    <span class="comment">// `notex init .` and `notex init multi .` are equivalent (DESIGN.md,</span></div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>    <span class="comment">// &quot;initialization&quot;): the first positional is only a type when it</span></div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>    <span class="comment">// parses as one and a second positional was also given; a lone</span></div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>    <span class="comment">// positional is always the path, defaulting the type to multi-file.</span></div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>    <a class="code hl_enumeration" href="namespacenotex_1_1templates.html#a977697e38a355c48e450e1dadeb0b2fb">templates::ProjectType</a> project_type = <a class="code hl_enumvalue" href="namespacenotex_1_1templates.html#a977697e38a355c48e450e1dadeb0b2fbaf26be970aac1b06fa62b87562bc73deb">templates::ProjectType::MULTI</a>;</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>    std::string path = <span class="stringliteral">&quot;.&quot;</span>;</div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span> </div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>    <span class="keywordflow">if</span> (!init_path_arg_.empty()) {</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>        <span class="keyword">const</span> <span class="keyword">auto</span> parsed = <a class="code hl_function" href="namespacenotex_1_1templates.html#a9db2c65a028e46b6f367b68e07f42b2e">templates::project_type_from_string</a>(init_type_arg_);</div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>        <span class="keywordflow">if</span> (!parsed.has_value()) {</div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>            <span class="keywordflow">throw</span> UsageError(<span class="stringliteral">&quot;&#39;&quot;</span> + init_type_arg_ +</div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>                             <span class="stringliteral">&quot;&#39; is not a valid project type; expected &quot;</span></div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>                             <span class="stringliteral">&quot;&#39;mono&#39; or &#39;multi&#39;.&quot;</span>);</div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>        }</div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>        project_type = *parsed;</div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>        path = init_path_arg_;</div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (!init_type_arg_.empty()) {</div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>        <span class="keywordflow">if</span> (<span class="keyword">const</span> <span class="keyword">auto</span> parsed =</div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>                <a class="code hl_function" href="namespacenotex_1_1templates.html#a9db2c65a028e46b6f367b68e07f42b2e">templates::project_type_from_string</a>(init_type_arg_);</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>            parsed.has_value()) {</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>            project_type = *parsed;</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>            path = init_type_arg_;</div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>        }</div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>    }</div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span> </div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>    <span class="keyword">const</span> Manager manager =</div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>        <a class="code hl_function" href="classnotex_1_1Manager.html#ae2daa9191329ede25d5dfd57cfc3095c">Manager::init</a>(std::filesystem::path(path), project_type, init_force_);</div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>    PLOG_INFO &lt;&lt; <span class="stringliteral">&quot;Initialized a &quot;</span> &lt;&lt; <a class="code hl_function" href="namespacenotex_1_1templates.html#aac31fd8d464c000cf3327b7831a3a963">templates::to_string</a>(project_type)</div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>              &lt;&lt; <span class="stringliteral">&quot;-file NoTeX project in &#39;&quot;</span> &lt;&lt; manager.root_dir().string()</div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>              &lt;&lt; <span class="stringliteral">&quot;&#39;.&quot;</span>;</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8f739befeb2b45f5f388e0bde02700e2">ui::success</a>(<span class="stringliteral">&quot;Initialized a &quot;</span> +</div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>               std::string(<a class="code hl_function" href="namespacenotex_1_1templates.html#aac31fd8d464c000cf3327b7831a3a963">templates::to_string</a>(project_type)) +</div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>               <span class="stringliteral">&quot;-file NoTeX project in &#39;&quot;</span> + manager.root_dir().string() +</div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>               <span class="stringliteral">&quot;&#39;.&quot;</span>);</div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>}</div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span> </div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span><span class="keywordtype">void</span> Orchestrator::run_theme()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>    Manager manager;</div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>    manager.set_theme(theme_name_);</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>    PLOG_INFO &lt;&lt; <span class="stringliteral">&quot;Theme set to &#39;&quot;</span> &lt;&lt; theme_name_ &lt;&lt; <span class="stringliteral">&quot;&#39; for project at &#39;&quot;</span></div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>              &lt;&lt; manager.root_dir().string() &lt;&lt; <span class="stringliteral">&quot;&#39;.&quot;</span>;</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8f739befeb2b45f5f388e0bde02700e2">ui::success</a>(<span class="stringliteral">&quot;Theme set to &#39;&quot;</span> + theme_name_ + <span class="stringliteral">&quot;&#39;.&quot;</span>);</div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>}</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span> </div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span><span class="keywordtype">void</span> Orchestrator::run_add_section()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>    Manager manager;</div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>    manager.add_section(section_title_);</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>    PLOG_INFO &lt;&lt; <span class="stringliteral">&quot;Added section &#39;&quot;</span> &lt;&lt; section_title_ &lt;&lt; <span class="stringliteral">&quot;&#39; to project at &#39;&quot;</span></div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>              &lt;&lt; manager.root_dir().string() &lt;&lt; <span class="stringliteral">&quot;&#39;.&quot;</span>;</div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8f739befeb2b45f5f388e0bde02700e2">ui::success</a>(<span class="stringliteral">&quot;Added section &#39;&quot;</span> + section_title_ + <span class="stringliteral">&quot;&#39;.&quot;</span>);</div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>}</div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span> </div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span><span class="keywordtype">void</span> Orchestrator::run_remove_section()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>    Manager manager;</div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>    <span class="keywordflow">if</span> (manager.remove_section(section_number_)) {</div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>        PLOG_INFO &lt;&lt; <span class="stringliteral">&quot;Removed section &quot;</span> &lt;&lt; section_number_</div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>                  &lt;&lt; <span class="stringliteral">&quot; from project at &#39;&quot;</span> &lt;&lt; manager.root_dir().string()</div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>                  &lt;&lt; <span class="stringliteral">&quot;&#39;.&quot;</span>;</div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a8f739befeb2b45f5f388e0bde02700e2">ui::success</a>(<span class="stringliteral">&quot;Removed section &quot;</span> + std::to_string(section_number_) +</div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>                    <span class="stringliteral">&quot;.&quot;</span>);</div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>    }</div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>}</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span> </div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span><span class="keywordtype">void</span> Orchestrator::run_add_bib()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>    Manager manager;</div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>    manager.add_bibliography();</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>    PLOG_INFO &lt;&lt; <span class="stringliteral">&quot;Bibliography ready: &#39;&quot;</span> &lt;&lt; manager.config().bibliography_file</div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>              &lt;&lt; <span class="stringliteral">&quot;&#39;.&quot;</span>;</div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8f739befeb2b45f5f388e0bde02700e2">ui::success</a>(<span class="stringliteral">&quot;Bibliography ready: &#39;&quot;</span> + manager.config().bibliography_file +</div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>               <span class="stringliteral">&quot;&#39;.&quot;</span>);</div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>}</div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span> </div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span><span class="keywordtype">void</span> Orchestrator::run_remove_bib()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>    Manager manager;</div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>    manager.remove_bibliography();</div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>    PLOG_INFO &lt;&lt; <span class="stringliteral">&quot;Removed the bibliography from project at &#39;&quot;</span></div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>              &lt;&lt; manager.root_dir().string() &lt;&lt; <span class="stringliteral">&quot;&#39;.&quot;</span>;</div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8f739befeb2b45f5f388e0bde02700e2">ui::success</a>(<span class="stringliteral">&quot;Bibliography removed.&quot;</span>);</div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>}</div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span> </div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span><span class="keywordtype">void</span> Orchestrator::run_get()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>    <span class="keyword">const</span> <span class="keyword">auto</span> print_names = [] {</div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>        <span class="keywordflow">for</span> (<span class="keyword">const</span> std::string_view name : <a class="code hl_function" href="namespacenotex_1_1reference.html#a86e1b9357928f272d7caf6c2e3b4eff8">reference::snippet_names</a>()) {</div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>            <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(<span class="stringliteral">&quot;  &quot;</span> + std::string(name));</div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>        }</div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span>    };</div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span> </div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>    <span class="keywordflow">if</span> (get_name_.empty()) {</div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#aef946fa1b58056b5b207a4c637c277be">ui::step</a>(<span class="stringliteral">&quot;Available snippets&quot;</span>);</div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>        print_names();</div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>    }</div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span> </div>
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>    <span class="keyword">const</span> std::vector&lt;reference::Snippet&gt; snippets =</div>
+<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span>        <a class="code hl_function" href="namespacenotex_1_1reference.html#acf928beb55e6f9ef610b58c1fed383a1">reference::find_snippets</a>(get_name_);</div>
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span>    <span class="keywordflow">if</span> (snippets.empty()) {</div>
+<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>        PLOG_WARNING &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; get_name_ &lt;&lt; <span class="stringliteral">&quot;&#39; is not a known snippet name.&quot;</span>;</div>
+<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#acc0ed633d837aeac2bfa4ba43be38947">ui::warning</a>(<span class="stringliteral">&quot;&#39;&quot;</span> + get_name_ + <span class="stringliteral">&quot;&#39; is not a known snippet name.&quot;</span>);</div>
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>        std::vector&lt;std::string_view&gt; suggestions;</div>
+<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>        <span class="keywordflow">for</span> (<span class="keyword">const</span> std::string_view name : <a class="code hl_function" href="namespacenotex_1_1reference.html#a86e1b9357928f272d7caf6c2e3b4eff8">reference::snippet_names</a>()) {</div>
+<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>            <span class="keywordflow">if</span> (name.find(get_name_) != std::string_view::npos) {</div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>                suggestions.push_back(name);</div>
+<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>            }</div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>        }</div>
+<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#aef946fa1b58056b5b207a4c637c277be">ui::step</a>(suggestions.empty() ? <span class="stringliteral">&quot;Available snippets&quot;</span> : <span class="stringliteral">&quot;Did you mean&quot;</span>);</div>
+<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span>        <span class="keywordflow">if</span> (suggestions.empty()) {</div>
+<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span>            print_names();</div>
+<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span>            <span class="keywordflow">for</span> (<span class="keyword">const</span> std::string_view name : suggestions) {</div>
+<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>                <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(<span class="stringliteral">&quot;  &quot;</span> + std::string(name));</div>
+<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span>            }</div>
+<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span>        }</div>
+<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span>    }</div>
+<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span> </div>
+<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> reference::Snippet&amp; snippet : snippets) {</div>
+<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>        <span class="keywordflow">if</span> (snippets.size() &gt; 1) { <a class="code hl_function" href="namespacenotex_1_1ui.html#aef946fa1b58056b5b207a4c637c277be">ui::step</a>(std::string(snippet.name)); }</div>
+<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span>        std::cout &lt;&lt; snippet.content;</div>
+<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span>    }</div>
+<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span>}</div>
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span> </div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span><span class="keywordtype">void</span> Orchestrator::run_checkhealth()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span>    <span class="keywordtype">bool</span> healthy = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span>    <span class="keyword">const</span> <span class="keyword">auto</span> check = [&amp;healthy](<span class="keywordtype">bool</span> ok, <span class="keyword">const</span> std::string&amp; message) {</div>
+<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span>        <span class="keywordflow">if</span> (ok) {</div>
+<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span>            PLOG_INFO &lt;&lt; message;</div>
+<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span>            <a class="code hl_function" href="namespacenotex_1_1ui.html#a8f739befeb2b45f5f388e0bde02700e2">ui::success</a>(message);</div>
+<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span>            PLOG_ERROR &lt;&lt; message;</div>
+<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>            <a class="code hl_function" href="namespacenotex_1_1ui.html#a7612668d102cc65d29636d8594b8358b">ui::error</a>(message);</div>
+<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span>            healthy = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>        }</div>
+<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>    };</div>
+<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span> </div>
+<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#aef946fa1b58056b5b207a4c637c277be">ui::step</a>(<span class="stringliteral">&quot;Environment&quot;</span>);</div>
+<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span>        <a class="code hl_function" href="namespacenotex_1_1system.html#ab29e78f0a91ad32788e4b15f04922b49">system::run_command</a>(<span class="stringliteral">&quot;kpsewhich --version&quot;</span>);</div>
+<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span>        check(<span class="keyword">true</span>, <span class="stringliteral">&quot;kpsewhich is available.&quot;</span>);</div>
+<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>    } <span class="keywordflow">catch</span> (<span class="keyword">const</span> NotexError&amp;) {</div>
+<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>        check(<span class="keyword">false</span>, <span class="stringliteral">&quot;kpsewhich is not available on PATH.&quot;</span>);</div>
+<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span>    }</div>
+<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span> </div>
+<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>        <span class="keyword">const</span> Environment environment;</div>
+<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>        check(<span class="keyword">true</span>, <span class="stringliteral">&quot;TEXMFHOME resolved: &quot;</span> + environment.texmf_home().string());</div>
+<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span> </div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>        <span class="keyword">const</span> <a class="code hl_enumeration" href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6">InstallationType</a> type = environment.installation_type();</div>
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>        check(type != <a class="code hl_enumvalue" href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6ab50339a10e1de285ac99d4c3990b8693">InstallationType::NONE</a>,</div>
+<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>             std::string(<span class="stringliteral">&quot;Installation detected: &quot;</span>) +</div>
+<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>                 std::string(<a class="code hl_function" href="namespacenotex.html#af485eee1a7625e78e49d778471499f1b">to_string</a>(type)));</div>
+<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span> </div>
+<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span>        <span class="keywordflow">if</span> (type == <a class="code hl_enumvalue" href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6a54b4c4075463b2e02cd69f5cd139b5b2">InstallationType::LOCAL</a> &amp;&amp;</div>
+<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span>            <a class="code hl_function" href="classnotex_1_1Installer.html#a1f6977673a28754e67ded1cfe2b2940d">Installer::installation_differs</a>(environment.local_latex_dir(),</div>
+<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span>                                            environment.local_fonts_dir())) {</div>
+<div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span>            PLOG_WARNING &lt;&lt; <span class="stringliteral">&quot;The local installation differs from the &quot;</span></div>
+<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span>                            <span class="stringliteral">&quot;embedded template (customised install?).&quot;</span>;</div>
+<div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span>            <a class="code hl_function" href="namespacenotex_1_1ui.html#acc0ed633d837aeac2bfa4ba43be38947">ui::warning</a>(<span class="stringliteral">&quot;The local installation differs from the embedded &quot;</span></div>
+<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span>                        <span class="stringliteral">&quot;template (customised install?).&quot;</span>);</div>
+<div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span>        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (type == <a class="code hl_enumvalue" href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6a6eecfba72d12922ee1dead07a0ef3334">InstallationType::GLOBAL</a> &amp;&amp;</div>
+<div class="line"><a id="l00372" name="l00372"></a><span class="lineno">  372</span>                  <a class="code hl_function" href="classnotex_1_1Installer.html#a1f6977673a28754e67ded1cfe2b2940d">Installer::installation_differs</a>(</div>
+<div class="line"><a id="l00373" name="l00373"></a><span class="lineno">  373</span>                      environment.global_latex_dir(),</div>
+<div class="line"><a id="l00374" name="l00374"></a><span class="lineno">  374</span>                      environment.global_fonts_dir())) {</div>
+<div class="line"><a id="l00375" name="l00375"></a><span class="lineno">  375</span>            PLOG_WARNING &lt;&lt; <span class="stringliteral">&quot;The global installation differs from the &quot;</span></div>
+<div class="line"><a id="l00376" name="l00376"></a><span class="lineno">  376</span>                            <span class="stringliteral">&quot;embedded template (customised install?).&quot;</span>;</div>
+<div class="line"><a id="l00377" name="l00377"></a><span class="lineno">  377</span>            <a class="code hl_function" href="namespacenotex_1_1ui.html#acc0ed633d837aeac2bfa4ba43be38947">ui::warning</a>(<span class="stringliteral">&quot;The global installation differs from the embedded &quot;</span></div>
+<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span>                        <span class="stringliteral">&quot;template (customised install?).&quot;</span>);</div>
+<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span>        }</div>
+<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span>    } <span class="keywordflow">catch</span> (<span class="keyword">const</span> EnvironmentError&amp; e) { check(<span class="keyword">false</span>, e.what()); }</div>
+<div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span> </div>
+<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#aef946fa1b58056b5b207a4c637c277be">ui::step</a>(<span class="stringliteral">&quot;Project&quot;</span>);</div>
+<div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span>        <span class="keyword">const</span> Manager manager;</div>
+<div class="line"><a id="l00385" name="l00385"></a><span class="lineno">  385</span>        check(<span class="keyword">true</span>, <span class="stringliteral">&quot;Project metadata parses.&quot;</span>);</div>
+<div class="line"><a id="l00386" name="l00386"></a><span class="lineno">  386</span> </div>
+<div class="line"><a id="l00387" name="l00387"></a><span class="lineno">  387</span>        <span class="keyword">const</span> std::filesystem::path main_path =</div>
+<div class="line"><a id="l00388" name="l00388"></a><span class="lineno">  388</span>            manager.root_dir() / manager.config().main_file;</div>
+<div class="line"><a id="l00389" name="l00389"></a><span class="lineno">  389</span>        check(std::filesystem::exists(main_path),</div>
+<div class="line"><a id="l00390" name="l00390"></a><span class="lineno">  390</span>             <span class="stringliteral">&quot;Main file exists: &quot;</span> + manager.config().main_file);</div>
+<div class="line"><a id="l00391" name="l00391"></a><span class="lineno">  391</span> </div>
+<div class="line"><a id="l00392" name="l00392"></a><span class="lineno">  392</span>        <span class="keywordflow">if</span> (!manager.config().theme.empty()) {</div>
+<div class="line"><a id="l00393" name="l00393"></a><span class="lineno">  393</span>            <span class="keyword">const</span> std::vector&lt;std::string&gt; themes = <a class="code hl_function" href="classnotex_1_1Manager.html#ac537ba1b18bff0711d28df820a767ab3">Manager::available_themes</a>();</div>
+<div class="line"><a id="l00394" name="l00394"></a><span class="lineno">  394</span>            check(std::find(themes.begin(), themes.end(),</div>
+<div class="line"><a id="l00395" name="l00395"></a><span class="lineno">  395</span>                            manager.config().theme) != themes.end(),</div>
+<div class="line"><a id="l00396" name="l00396"></a><span class="lineno">  396</span>                 <span class="stringliteral">&quot;Theme is valid: &quot;</span> + manager.config().theme);</div>
+<div class="line"><a id="l00397" name="l00397"></a><span class="lineno">  397</span>        }</div>
+<div class="line"><a id="l00398" name="l00398"></a><span class="lineno">  398</span> </div>
+<div class="line"><a id="l00399" name="l00399"></a><span class="lineno">  399</span>        <span class="keyword">const</span> std::vector&lt;std::string&gt; orphans = manager.orphan_sections();</div>
+<div class="line"><a id="l00400" name="l00400"></a><span class="lineno">  400</span>        <span class="keywordflow">if</span> (orphans.empty()) {</div>
+<div class="line"><a id="l00401" name="l00401"></a><span class="lineno">  401</span>            PLOG_INFO &lt;&lt; <span class="stringliteral">&quot;Every section file is referenced from the main &quot;</span></div>
+<div class="line"><a id="l00402" name="l00402"></a><span class="lineno">  402</span>                         <span class="stringliteral">&quot;file.&quot;</span>;</div>
+<div class="line"><a id="l00403" name="l00403"></a><span class="lineno">  403</span>            <a class="code hl_function" href="namespacenotex_1_1ui.html#a8f739befeb2b45f5f388e0bde02700e2">ui::success</a>(<span class="stringliteral">&quot;Every section file is referenced from the main &quot;</span></div>
+<div class="line"><a id="l00404" name="l00404"></a><span class="lineno">  404</span>                        <span class="stringliteral">&quot;file.&quot;</span>);</div>
+<div class="line"><a id="l00405" name="l00405"></a><span class="lineno">  405</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00406" name="l00406"></a><span class="lineno">  406</span>            <span class="keywordflow">for</span> (<span class="keyword">const</span> std::string&amp; stem : orphans) {</div>
+<div class="line"><a id="l00407" name="l00407"></a><span class="lineno">  407</span>                PLOG_WARNING &lt;&lt; <span class="stringliteral">&quot;Section file &#39;&quot;</span> &lt;&lt; stem</div>
+<div class="line"><a id="l00408" name="l00408"></a><span class="lineno">  408</span>                             &lt;&lt; <span class="stringliteral">&quot;&#39; is not referenced by any \\subfile line.&quot;</span>;</div>
+<div class="line"><a id="l00409" name="l00409"></a><span class="lineno">  409</span>                <a class="code hl_function" href="namespacenotex_1_1ui.html#acc0ed633d837aeac2bfa4ba43be38947">ui::warning</a>(<span class="stringliteral">&quot;Section file &#39;&quot;</span> + stem +</div>
+<div class="line"><a id="l00410" name="l00410"></a><span class="lineno">  410</span>                            <span class="stringliteral">&quot;&#39; is not referenced by any \\subfile line.&quot;</span>);</div>
+<div class="line"><a id="l00411" name="l00411"></a><span class="lineno">  411</span>            }</div>
+<div class="line"><a id="l00412" name="l00412"></a><span class="lineno">  412</span>        }</div>
+<div class="line"><a id="l00413" name="l00413"></a><span class="lineno">  413</span>    } <span class="keywordflow">catch</span> (<span class="keyword">const</span> ProjectNotFoundError&amp;) {</div>
+<div class="line"><a id="l00414" name="l00414"></a><span class="lineno">  414</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(<span class="stringliteral">&quot;Not inside a NoTeX project; skipping project checks.&quot;</span>);</div>
+<div class="line"><a id="l00415" name="l00415"></a><span class="lineno">  415</span>    } <span class="keywordflow">catch</span> (<span class="keyword">const</span> ConfigError&amp; e) { check(<span class="keyword">false</span>, e.what()); }</div>
+<div class="line"><a id="l00416" name="l00416"></a><span class="lineno">  416</span> </div>
+<div class="line"><a id="l00417" name="l00417"></a><span class="lineno">  417</span>    <span class="keywordflow">if</span> (!healthy) {</div>
+<div class="line"><a id="l00418" name="l00418"></a><span class="lineno">  418</span>        <span class="keywordflow">throw</span> NotexError(<span class="stringliteral">&quot;checkhealth found one or more problems.&quot;</span>,</div>
+<div class="line"><a id="l00419" name="l00419"></a><span class="lineno">  419</span>                         <a class="code hl_enumvalue" href="namespacenotex.html#abf1a6f5c58df614b2266a424c2eb2be3a36fc6065a3e970bc3e6b2e59da52bf2a">ExitCode::FAILURE</a>);</div>
+<div class="line"><a id="l00420" name="l00420"></a><span class="lineno">  420</span>    }</div>
+<div class="line"><a id="l00421" name="l00421"></a><span class="lineno">  421</span>    PLOG_INFO &lt;&lt; <span class="stringliteral">&quot;checkhealth: everything looks healthy.&quot;</span>;</div>
+<div class="line"><a id="l00422" name="l00422"></a><span class="lineno">  422</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8f739befeb2b45f5f388e0bde02700e2">ui::success</a>(<span class="stringliteral">&quot;Everything looks healthy.&quot;</span>);</div>
+<div class="line"><a id="l00423" name="l00423"></a><span class="lineno">  423</span>}</div>
+<div class="line"><a id="l00424" name="l00424"></a><span class="lineno">  424</span> </div>
+<div class="line"><a id="l00425" name="l00425"></a><span class="lineno">  425</span><span class="keywordtype">void</span> Orchestrator::run_set()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00426" name="l00426"></a><span class="lineno">  426</span>    Manager manager;</div>
+<div class="line"><a id="l00427" name="l00427"></a><span class="lineno">  427</span>    manager.set_config_value(set_key_, set_value_);</div>
+<div class="line"><a id="l00428" name="l00428"></a><span class="lineno">  428</span>    PLOG_INFO &lt;&lt; <span class="stringliteral">&quot;Set &#39;&quot;</span> &lt;&lt; set_key_ &lt;&lt; <span class="stringliteral">&quot;&#39; to &#39;&quot;</span> &lt;&lt; set_value_</div>
+<div class="line"><a id="l00429" name="l00429"></a><span class="lineno">  429</span>              &lt;&lt; <span class="stringliteral">&quot;&#39; for project at &#39;&quot;</span> &lt;&lt; manager.root_dir().string() &lt;&lt; <span class="stringliteral">&quot;&#39;.&quot;</span>;</div>
+<div class="line"><a id="l00430" name="l00430"></a><span class="lineno">  430</span>    <a class="code hl_function" href="namespacenotex_1_1ui.html#a8f739befeb2b45f5f388e0bde02700e2">ui::success</a>(<span class="stringliteral">&quot;Set &#39;&quot;</span> + set_key_ + <span class="stringliteral">&quot;&#39; to &#39;&quot;</span> + set_value_ + <span class="stringliteral">&quot;&#39;.&quot;</span>);</div>
+<div class="line"><a id="l00431" name="l00431"></a><span class="lineno">  431</span>}</div>
+<div class="line"><a id="l00432" name="l00432"></a><span class="lineno">  432</span> </div>
+<div class="line"><a id="l00433" name="l00433"></a><span class="lineno">  433</span><span class="keywordtype">void</span> Orchestrator::run_ls()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00434" name="l00434"></a><span class="lineno">  434</span>    <span class="keyword">const</span> Manager manager{std::filesystem::path(ls_path_)};</div>
+<div class="line"><a id="l00435" name="l00435"></a><span class="lineno">  435</span>    <span class="keyword">const</span> std::vector&lt;std::filesystem::path&gt; files = manager.project_files();</div>
+<div class="line"><a id="l00436" name="l00436"></a><span class="lineno">  436</span> </div>
+<div class="line"><a id="l00437" name="l00437"></a><span class="lineno">  437</span>    <span class="keywordflow">if</span> (files.empty()) {</div>
+<div class="line"><a id="l00438" name="l00438"></a><span class="lineno">  438</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(<span class="stringliteral">&quot;No project files found.&quot;</span>);</div>
+<div class="line"><a id="l00439" name="l00439"></a><span class="lineno">  439</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00440" name="l00440"></a><span class="lineno">  440</span>    }</div>
+<div class="line"><a id="l00441" name="l00441"></a><span class="lineno">  441</span> </div>
+<div class="line"><a id="l00442" name="l00442"></a><span class="lineno">  442</span>    <span class="keyword">const</span> std::filesystem::path main_path =</div>
+<div class="line"><a id="l00443" name="l00443"></a><span class="lineno">  443</span>        manager.root_dir() / manager.config().main_file;</div>
+<div class="line"><a id="l00444" name="l00444"></a><span class="lineno">  444</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> std::filesystem::path&amp; file : files) {</div>
+<div class="line"><a id="l00445" name="l00445"></a><span class="lineno">  445</span>        <span class="keywordflow">if</span> (file == main_path) {</div>
+<div class="line"><a id="l00446" name="l00446"></a><span class="lineno">  446</span>            <a class="code hl_function" href="namespacenotex_1_1ui.html#a8f739befeb2b45f5f388e0bde02700e2">ui::success</a>(file.string() + <span class="stringliteral">&quot; (main)&quot;</span>);</div>
+<div class="line"><a id="l00447" name="l00447"></a><span class="lineno">  447</span>        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (file.extension() == <span class="stringliteral">&quot;.bib&quot;</span>) {</div>
+<div class="line"><a id="l00448" name="l00448"></a><span class="lineno">  448</span>            <a class="code hl_function" href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">ui::info</a>(file.string() + <span class="stringliteral">&quot; (bibliography)&quot;</span>);</div>
+<div class="line"><a id="l00449" name="l00449"></a><span class="lineno">  449</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00450" name="l00450"></a><span class="lineno">  450</span>            <a class="code hl_function" href="namespacenotex_1_1ui.html#aef946fa1b58056b5b207a4c637c277be">ui::step</a>(file.string());</div>
+<div class="line"><a id="l00451" name="l00451"></a><span class="lineno">  451</span>        }</div>
+<div class="line"><a id="l00452" name="l00452"></a><span class="lineno">  452</span>    }</div>
+<div class="line"><a id="l00453" name="l00453"></a><span class="lineno">  453</span>}</div>
+<div class="line"><a id="l00454" name="l00454"></a><span class="lineno">  454</span> </div>
+<div class="line"><a id="l00455" name="l00455"></a><span class="lineno">  455</span><span class="keywordtype">void</span> Orchestrator::run_uninstall_global()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00456" name="l00456"></a><span class="lineno">  456</span>    <span class="keyword">const</span> Environment environment;</div>
+<div class="line"><a id="l00457" name="l00457"></a><span class="lineno">  457</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classnotex_1_1Installer.html#acd133690ff3c45a68144294f27350605">Installer::uninstall_global</a>(environment, uninstall_force_)) {</div>
+<div class="line"><a id="l00458" name="l00458"></a><span class="lineno">  458</span>        PLOG_INFO &lt;&lt; <span class="stringliteral">&quot;Uninstalled the global NoTeX template.&quot;</span>;</div>
+<div class="line"><a id="l00459" name="l00459"></a><span class="lineno">  459</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a8f739befeb2b45f5f388e0bde02700e2">ui::success</a>(<span class="stringliteral">&quot;Uninstalled the global NoTeX template.&quot;</span>);</div>
+<div class="line"><a id="l00460" name="l00460"></a><span class="lineno">  460</span>    }</div>
+<div class="line"><a id="l00461" name="l00461"></a><span class="lineno">  461</span>}</div>
+<div class="line"><a id="l00462" name="l00462"></a><span class="lineno">  462</span> </div>
+<div class="line"><a id="l00463" name="l00463"></a><span class="lineno">  463</span><span class="keywordtype">void</span> Orchestrator::run_uninstall_local()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00464" name="l00464"></a><span class="lineno">  464</span>    <span class="keyword">const</span> std::filesystem::path target_dir(uninstall_path_);</div>
+<div class="line"><a id="l00465" name="l00465"></a><span class="lineno">  465</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classnotex_1_1Installer.html#ad812606ae8665d32dc6932ff8be325ec">Installer::uninstall_local</a>(target_dir, uninstall_force_)) {</div>
+<div class="line"><a id="l00466" name="l00466"></a><span class="lineno">  466</span>        PLOG_INFO &lt;&lt; <span class="stringliteral">&quot;Uninstalled the local NoTeX template from &#39;&quot;</span></div>
+<div class="line"><a id="l00467" name="l00467"></a><span class="lineno">  467</span>                  &lt;&lt; target_dir.string() &lt;&lt; <span class="stringliteral">&quot;&#39;.&quot;</span>;</div>
+<div class="line"><a id="l00468" name="l00468"></a><span class="lineno">  468</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a8f739befeb2b45f5f388e0bde02700e2">ui::success</a>(<span class="stringliteral">&quot;Uninstalled the local NoTeX template from &#39;&quot;</span> +</div>
+<div class="line"><a id="l00469" name="l00469"></a><span class="lineno">  469</span>                    target_dir.string() + <span class="stringliteral">&quot;&#39;.&quot;</span>);</div>
+<div class="line"><a id="l00470" name="l00470"></a><span class="lineno">  470</span>    }</div>
+<div class="line"><a id="l00471" name="l00471"></a><span class="lineno">  471</span>}</div>
+<div class="line"><a id="l00472" name="l00472"></a><span class="lineno">  472</span> </div>
+<div class="line"><a id="l00473" name="l00473"></a><span class="lineno">  473</span><span class="keywordtype">void</span> Orchestrator::run_reset()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00474" name="l00474"></a><span class="lineno">  474</span>    Manager manager;</div>
+<div class="line"><a id="l00475" name="l00475"></a><span class="lineno">  475</span>    <span class="keyword">const</span> std::string main_file = manager.config().main_file;</div>
+<div class="line"><a id="l00476" name="l00476"></a><span class="lineno">  476</span>    <span class="keywordflow">if</span> (manager.reset(reset_force_)) {</div>
+<div class="line"><a id="l00477" name="l00477"></a><span class="lineno">  477</span>        PLOG_INFO &lt;&lt; <span class="stringliteral">&quot;Regenerated &#39;&quot;</span> &lt;&lt; main_file</div>
+<div class="line"><a id="l00478" name="l00478"></a><span class="lineno">  478</span>                  &lt;&lt; <span class="stringliteral">&quot;&#39; from the template for project at &#39;&quot;</span></div>
+<div class="line"><a id="l00479" name="l00479"></a><span class="lineno">  479</span>                  &lt;&lt; manager.root_dir().string() &lt;&lt; <span class="stringliteral">&quot;&#39;.&quot;</span>;</div>
+<div class="line"><a id="l00480" name="l00480"></a><span class="lineno">  480</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a8f739befeb2b45f5f388e0bde02700e2">ui::success</a>(<span class="stringliteral">&quot;Regenerated &#39;&quot;</span> + main_file + <span class="stringliteral">&quot;&#39; from the template.&quot;</span>);</div>
+<div class="line"><a id="l00481" name="l00481"></a><span class="lineno">  481</span>    }</div>
+<div class="line"><a id="l00482" name="l00482"></a><span class="lineno">  482</span>}</div>
+<div class="line"><a id="l00483" name="l00483"></a><span class="lineno">  483</span> </div>
+<div class="line"><a id="l00484" name="l00484"></a><span class="lineno">  484</span><span class="keywordtype">void</span> Orchestrator::run_delete()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00485" name="l00485"></a><span class="lineno">  485</span>    Manager manager;</div>
+<div class="line"><a id="l00486" name="l00486"></a><span class="lineno">  486</span>    <span class="keyword">const</span> std::filesystem::path root = manager.root_dir();</div>
+<div class="line"><a id="l00487" name="l00487"></a><span class="lineno">  487</span>    <span class="keywordflow">if</span> (manager.delete_scaffolding(delete_all_, delete_force_)) {</div>
+<div class="line"><a id="l00488" name="l00488"></a><span class="lineno">  488</span>        PLOG_INFO &lt;&lt; (delete_all_ ? <span class="stringliteral">&quot;Deleted the project at &#39;&quot;</span></div>
+<div class="line"><a id="l00489" name="l00489"></a><span class="lineno">  489</span>                                  : <span class="stringliteral">&quot;Removed NoTeX&#39;s scaffolding from &#39;&quot;</span>)</div>
+<div class="line"><a id="l00490" name="l00490"></a><span class="lineno">  490</span>                  &lt;&lt; root.string() &lt;&lt; <span class="stringliteral">&quot;&#39;.&quot;</span>;</div>
+<div class="line"><a id="l00491" name="l00491"></a><span class="lineno">  491</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a8f739befeb2b45f5f388e0bde02700e2">ui::success</a>((delete_all_ ? <span class="stringliteral">&quot;Deleted the project at &#39;&quot;</span></div>
+<div class="line"><a id="l00492" name="l00492"></a><span class="lineno">  492</span>                                : <span class="stringliteral">&quot;Removed NoTeX&#39;s scaffolding from &#39;&quot;</span>) +</div>
+<div class="line"><a id="l00493" name="l00493"></a><span class="lineno">  493</span>                    root.string() + <span class="stringliteral">&quot;&#39;.&quot;</span>);</div>
+<div class="line"><a id="l00494" name="l00494"></a><span class="lineno">  494</span>    }</div>
+<div class="line"><a id="l00495" name="l00495"></a><span class="lineno">  495</span>}</div>
+<div class="line"><a id="l00496" name="l00496"></a><span class="lineno">  496</span> </div>
+<div class="line"><a id="l00497" name="l00497"></a><span class="lineno">  497</span><span class="keywordtype">void</span> Orchestrator::register_commands() {</div>
+<div class="line"><a id="l00498" name="l00498"></a><span class="lineno">  498</span>    <span class="comment">// Without this, a token that matches another top-level subcommand&#39;s</span></div>
+<div class="line"><a id="l00499" name="l00499"></a><span class="lineno">  499</span>    <span class="comment">// name (e.g. &quot;info&quot;) is parsed as chaining into that sibling</span></div>
+<div class="line"><a id="l00500" name="l00500"></a><span class="lineno">  500</span>    <span class="comment">// subcommand rather than as consumed by the current one&#39;s own</span></div>
+<div class="line"><a id="l00501" name="l00501"></a><span class="lineno">  501</span>    <span class="comment">// positional argument — so e.g. `notex get info` would silently run</span></div>
+<div class="line"><a id="l00502" name="l00502"></a><span class="lineno">  502</span>    <span class="comment">// both `get` (with no name) and `info`, rather than passing &quot;info&quot;</span></div>
+<div class="line"><a id="l00503" name="l00503"></a><span class="lineno">  503</span>    <span class="comment">// as get&#39;s snippet name. Capping at one subcommand per invocation</span></div>
+<div class="line"><a id="l00504" name="l00504"></a><span class="lineno">  504</span>    <span class="comment">// keeps a token that matches a subcommand name from matching as a</span></div>
+<div class="line"><a id="l00505" name="l00505"></a><span class="lineno">  505</span>    <span class="comment">// second, chained subcommand once the first has already claimed its</span></div>
+<div class="line"><a id="l00506" name="l00506"></a><span class="lineno">  506</span>    <span class="comment">// positionals (see CLI11&#39;s docs on require_subcommand: &quot;limiting</span></div>
+<div class="line"><a id="l00507" name="l00507"></a><span class="lineno">  507</span>    <span class="comment">// the maximum number allows you to keep arguments that match a</span></div>
+<div class="line"><a id="l00508" name="l00508"></a><span class="lineno">  508</span>    <span class="comment">// previous subcommand name from matching&quot;).</span></div>
+<div class="line"><a id="l00509" name="l00509"></a><span class="lineno">  509</span>    app_.require_subcommand(0, 1);</div>
+<div class="line"><a id="l00510" name="l00510"></a><span class="lineno">  510</span> </div>
+<div class="line"><a id="l00511" name="l00511"></a><span class="lineno">  511</span>    app_.set_version_flag(<span class="stringliteral">&quot;--version&quot;</span>, std::string(PROJECT_VERSION));</div>
+<div class="line"><a id="l00512" name="l00512"></a><span class="lineno">  512</span>    <span class="comment">// Propagates to notex::ui immediately as the flag is parsed, via</span></div>
+<div class="line"><a id="l00513" name="l00513"></a><span class="lineno">  513</span>    <span class="comment">// CLI11&#39;s per-token -&gt;each() callback, rather than through App&#39;s own</span></div>
+<div class="line"><a id="l00514" name="l00514"></a><span class="lineno">  514</span>    <span class="comment">// deferred callback() mechanism: a subcommand&#39;s callback can run</span></div>
+<div class="line"><a id="l00515" name="l00515"></a><span class="lineno">  515</span>    <span class="comment">// ui::confirm() while argv is still being parsed, so waiting for a</span></div>
+<div class="line"><a id="l00516" name="l00516"></a><span class="lineno">  516</span>    <span class="comment">// callback that fires only once parsing finishes would be too late.</span></div>
+<div class="line"><a id="l00517" name="l00517"></a><span class="lineno">  517</span>    app_.add_flag(<span class="stringliteral">&quot;-y,--yes&quot;</span>, assume_yes_,</div>
+<div class="line"><a id="l00518" name="l00518"></a><span class="lineno">  518</span>                  <span class="stringliteral">&quot;Assume &#39;yes&#39; to every confirmation prompt&quot;</span>)</div>
+<div class="line"><a id="l00519" name="l00519"></a><span class="lineno">  519</span>        -&gt;each([](<span class="keyword">const</span> std::string&amp;) { <a class="code hl_function" href="namespacenotex_1_1ui.html#ae2769f38ec18885ee799370a254d1341">ui::set_assume_yes</a>(<span class="keyword">true</span>); });</div>
+<div class="line"><a id="l00520" name="l00520"></a><span class="lineno">  520</span>    app_.add_flag(<span class="stringliteral">&quot;-v,--verbose&quot;</span>, verbose_, <span class="stringliteral">&quot;Enable verbose output&quot;</span>);</div>
+<div class="line"><a id="l00521" name="l00521"></a><span class="lineno">  521</span> </div>
+<div class="line"><a id="l00522" name="l00522"></a><span class="lineno">  522</span>    <span class="comment">// Subcommand equivalents of the --version/--help flags above, for</span></div>
+<div class="line"><a id="l00523" name="l00523"></a><span class="lineno">  523</span>    <span class="comment">// users who reach for a subcommand out of habit; both print exactly</span></div>
+<div class="line"><a id="l00524" name="l00524"></a><span class="lineno">  524</span>    <span class="comment">// what their flag counterpart does.</span></div>
+<div class="line"><a id="l00525" name="l00525"></a><span class="lineno">  525</span>    app_.add_subcommand(<span class="stringliteral">&quot;version&quot;</span>, <span class="stringliteral">&quot;Show version information and exit&quot;</span>)</div>
+<div class="line"><a id="l00526" name="l00526"></a><span class="lineno">  526</span>        -&gt;callback([<span class="keyword">this</span>] { run_version(); });</div>
+<div class="line"><a id="l00527" name="l00527"></a><span class="lineno">  527</span>    app_.add_subcommand(<span class="stringliteral">&quot;help&quot;</span>, <span class="stringliteral">&quot;Show this help message and exit&quot;</span>)</div>
+<div class="line"><a id="l00528" name="l00528"></a><span class="lineno">  528</span>        -&gt;callback([<span class="keyword">this</span>] { run_help(); });</div>
+<div class="line"><a id="l00529" name="l00529"></a><span class="lineno">  529</span> </div>
+<div class="line"><a id="l00530" name="l00530"></a><span class="lineno">  530</span>    app_.add_subcommand(<span class="stringliteral">&quot;info&quot;</span>,</div>
+<div class="line"><a id="l00531" name="l00531"></a><span class="lineno">  531</span>                        <span class="stringliteral">&quot;Show information about the project, the &quot;</span></div>
+<div class="line"><a id="l00532" name="l00532"></a><span class="lineno">  532</span>                        <span class="stringliteral">&quot;installation, and the template&quot;</span>)</div>
+<div class="line"><a id="l00533" name="l00533"></a><span class="lineno">  533</span>        -&gt;callback([<span class="keyword">this</span>] { run_info(); });</div>
+<div class="line"><a id="l00534" name="l00534"></a><span class="lineno">  534</span> </div>
+<div class="line"><a id="l00535" name="l00535"></a><span class="lineno">  535</span>    <span class="keyword">auto</span>* clean_command = app_.add_subcommand(</div>
+<div class="line"><a id="l00536" name="l00536"></a><span class="lineno">  536</span>        <span class="stringliteral">&quot;clean&quot;</span>, <span class="stringliteral">&quot;Remove build artefacts recursively from a directory&quot;</span>);</div>
+<div class="line"><a id="l00537" name="l00537"></a><span class="lineno">  537</span>    clean_command-&gt;add_option(<span class="stringliteral">&quot;path&quot;</span>, clean_path_,</div>
+<div class="line"><a id="l00538" name="l00538"></a><span class="lineno">  538</span>                              <span class="stringliteral">&quot;Directory to clean (default: current &quot;</span></div>
+<div class="line"><a id="l00539" name="l00539"></a><span class="lineno">  539</span>                              <span class="stringliteral">&quot;directory)&quot;</span>);</div>
+<div class="line"><a id="l00540" name="l00540"></a><span class="lineno">  540</span>    clean_command-&gt;add_flag(<span class="stringliteral">&quot;--dry-run&quot;</span>, clean_dry_run_,</div>
+<div class="line"><a id="l00541" name="l00541"></a><span class="lineno">  541</span>                            <span class="stringliteral">&quot;Report what would be removed without &quot;</span></div>
+<div class="line"><a id="l00542" name="l00542"></a><span class="lineno">  542</span>                            <span class="stringliteral">&quot;deleting anything&quot;</span>);</div>
+<div class="line"><a id="l00543" name="l00543"></a><span class="lineno">  543</span>    clean_command-&gt;callback([<span class="keyword">this</span>] { run_clean(); });</div>
+<div class="line"><a id="l00544" name="l00544"></a><span class="lineno">  544</span> </div>
+<div class="line"><a id="l00545" name="l00545"></a><span class="lineno">  545</span>    <span class="keyword">auto</span>* install_command = app_.add_subcommand(</div>
+<div class="line"><a id="l00546" name="l00546"></a><span class="lineno">  546</span>        <span class="stringliteral">&quot;install&quot;</span>, <span class="stringliteral">&quot;Install the NoTeX template globally, or locally when &quot;</span></div>
+<div class="line"><a id="l00547" name="l00547"></a><span class="lineno">  547</span>                    <span class="stringliteral">&quot;a path is given&quot;</span>);</div>
+<div class="line"><a id="l00548" name="l00548"></a><span class="lineno">  548</span>    <span class="keyword">auto</span>* install_path_option = install_command-&gt;add_option(</div>
+<div class="line"><a id="l00549" name="l00549"></a><span class="lineno">  549</span>        <span class="stringliteral">&quot;path&quot;</span>, install_path_,</div>
+<div class="line"><a id="l00550" name="l00550"></a><span class="lineno">  550</span>        <span class="stringliteral">&quot;Install locally into this directory instead of globally&quot;</span>);</div>
+<div class="line"><a id="l00551" name="l00551"></a><span class="lineno">  551</span>    install_command-&gt;add_flag(</div>
+<div class="line"><a id="l00552" name="l00552"></a><span class="lineno">  552</span>        <span class="stringliteral">&quot;--force&quot;</span>, install_force_,</div>
+<div class="line"><a id="l00553" name="l00553"></a><span class="lineno">  553</span>        <span class="stringliteral">&quot;Overwrite a differing existing installation without asking&quot;</span>);</div>
+<div class="line"><a id="l00554" name="l00554"></a><span class="lineno">  554</span>    install_command-&gt;callback([<span class="keyword">this</span>, install_path_option] {</div>
+<div class="line"><a id="l00555" name="l00555"></a><span class="lineno">  555</span>        <span class="keywordflow">if</span> (install_path_option-&gt;count() &gt; 0) {</div>
+<div class="line"><a id="l00556" name="l00556"></a><span class="lineno">  556</span>            run_install_local();</div>
+<div class="line"><a id="l00557" name="l00557"></a><span class="lineno">  557</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00558" name="l00558"></a><span class="lineno">  558</span>            run_install_global();</div>
+<div class="line"><a id="l00559" name="l00559"></a><span class="lineno">  559</span>        }</div>
+<div class="line"><a id="l00560" name="l00560"></a><span class="lineno">  560</span>    });</div>
+<div class="line"><a id="l00561" name="l00561"></a><span class="lineno">  561</span> </div>
+<div class="line"><a id="l00562" name="l00562"></a><span class="lineno">  562</span>    <span class="keyword">auto</span>* init_command = app_.add_subcommand(</div>
+<div class="line"><a id="l00563" name="l00563"></a><span class="lineno">  563</span>        <span class="stringliteral">&quot;init&quot;</span>, <span class="stringliteral">&quot;Initialize a new NoTeX project (defaults to multi-file &quot;</span></div>
+<div class="line"><a id="l00564" name="l00564"></a><span class="lineno">  564</span>                 <span class="stringliteral">&quot;in the current directory)&quot;</span>);</div>
+<div class="line"><a id="l00565" name="l00565"></a><span class="lineno">  565</span>    init_command-&gt;add_option(</div>
+<div class="line"><a id="l00566" name="l00566"></a><span class="lineno">  566</span>        <span class="stringliteral">&quot;type&quot;</span>, init_type_arg_,</div>
+<div class="line"><a id="l00567" name="l00567"></a><span class="lineno">  567</span>        <span class="stringliteral">&quot;&#39;mono&#39; or &#39;multi&#39; (default: multi); may be omitted, in which &quot;</span></div>
+<div class="line"><a id="l00568" name="l00568"></a><span class="lineno">  568</span>        <span class="stringliteral">&quot;case a lone positional argument is treated as the path instead&quot;</span>);</div>
+<div class="line"><a id="l00569" name="l00569"></a><span class="lineno">  569</span>    init_command-&gt;add_option(</div>
+<div class="line"><a id="l00570" name="l00570"></a><span class="lineno">  570</span>        <span class="stringliteral">&quot;path&quot;</span>, init_path_arg_,</div>
+<div class="line"><a id="l00571" name="l00571"></a><span class="lineno">  571</span>        <span class="stringliteral">&quot;Directory to initialize the project in (default: current &quot;</span></div>
+<div class="line"><a id="l00572" name="l00572"></a><span class="lineno">  572</span>        <span class="stringliteral">&quot;directory)&quot;</span>);</div>
+<div class="line"><a id="l00573" name="l00573"></a><span class="lineno">  573</span>    init_command-&gt;add_flag(</div>
+<div class="line"><a id="l00574" name="l00574"></a><span class="lineno">  574</span>        <span class="stringliteral">&quot;--force&quot;</span>, init_force_,</div>
+<div class="line"><a id="l00575" name="l00575"></a><span class="lineno">  575</span>        <span class="stringliteral">&quot;Overwrite an existing project instead of refusing to&quot;</span>);</div>
+<div class="line"><a id="l00576" name="l00576"></a><span class="lineno">  576</span>    init_command-&gt;callback([<span class="keyword">this</span>] { run_init(); });</div>
+<div class="line"><a id="l00577" name="l00577"></a><span class="lineno">  577</span> </div>
+<div class="line"><a id="l00578" name="l00578"></a><span class="lineno">  578</span>    <span class="keyword">auto</span>* theme_command =</div>
+<div class="line"><a id="l00579" name="l00579"></a><span class="lineno">  579</span>        app_.add_subcommand(<span class="stringliteral">&quot;theme&quot;</span>, <span class="stringliteral">&quot;Switch the project&#39;s theme&quot;</span>);</div>
+<div class="line"><a id="l00580" name="l00580"></a><span class="lineno">  580</span>    theme_command</div>
+<div class="line"><a id="l00581" name="l00581"></a><span class="lineno">  581</span>        -&gt;add_option(<span class="stringliteral">&quot;name&quot;</span>, theme_name_,</div>
+<div class="line"><a id="l00582" name="l00582"></a><span class="lineno">  582</span>                    <span class="stringliteral">&quot;Theme to switch to, e.g. &#39;light&#39;, &#39;dark&#39;, &#39;tokyo&#39;, &quot;</span></div>
+<div class="line"><a id="l00583" name="l00583"></a><span class="lineno">  583</span>                    <span class="stringliteral">&quot;or &#39;bw&#39;&quot;</span>)</div>
+<div class="line"><a id="l00584" name="l00584"></a><span class="lineno">  584</span>        -&gt;required();</div>
+<div class="line"><a id="l00585" name="l00585"></a><span class="lineno">  585</span>    theme_command-&gt;callback([<span class="keyword">this</span>] { run_theme(); });</div>
+<div class="line"><a id="l00586" name="l00586"></a><span class="lineno">  586</span> </div>
+<div class="line"><a id="l00587" name="l00587"></a><span class="lineno">  587</span>    app_.add_subcommand(<span class="stringliteral">&quot;checkhealth&quot;</span>,</div>
+<div class="line"><a id="l00588" name="l00588"></a><span class="lineno">  588</span>                       <span class="stringliteral">&quot;Check the installation and project state&quot;</span>)</div>
+<div class="line"><a id="l00589" name="l00589"></a><span class="lineno">  589</span>        -&gt;callback([<span class="keyword">this</span>] { run_checkhealth(); });</div>
+<div class="line"><a id="l00590" name="l00590"></a><span class="lineno">  590</span> </div>
+<div class="line"><a id="l00591" name="l00591"></a><span class="lineno">  591</span>    <span class="keyword">auto</span>* set_command = app_.add_subcommand(</div>
+<div class="line"><a id="l00592" name="l00592"></a><span class="lineno">  592</span>        <span class="stringliteral">&quot;set&quot;</span>, <span class="stringliteral">&quot;Change a project configuration value&quot;</span>);</div>
+<div class="line"><a id="l00593" name="l00593"></a><span class="lineno">  593</span>    set_command</div>
+<div class="line"><a id="l00594" name="l00594"></a><span class="lineno">  594</span>        -&gt;add_option(<span class="stringliteral">&quot;key&quot;</span>, set_key_,</div>
+<div class="line"><a id="l00595" name="l00595"></a><span class="lineno">  595</span>                    <span class="stringliteral">&quot;Configuration key to change: &#39;main_file&#39;, &#39;theme&#39;, &quot;</span></div>
+<div class="line"><a id="l00596" name="l00596"></a><span class="lineno">  596</span>                    <span class="stringliteral">&quot;or &#39;bibliography_file&#39;&quot;</span>)</div>
+<div class="line"><a id="l00597" name="l00597"></a><span class="lineno">  597</span>        -&gt;required();</div>
+<div class="line"><a id="l00598" name="l00598"></a><span class="lineno">  598</span>    set_command-&gt;add_option(<span class="stringliteral">&quot;value&quot;</span>, set_value_, <span class="stringliteral">&quot;New value&quot;</span>)-&gt;required();</div>
+<div class="line"><a id="l00599" name="l00599"></a><span class="lineno">  599</span>    set_command-&gt;callback([<span class="keyword">this</span>] { run_set(); });</div>
+<div class="line"><a id="l00600" name="l00600"></a><span class="lineno">  600</span> </div>
+<div class="line"><a id="l00601" name="l00601"></a><span class="lineno">  601</span>    <span class="keyword">auto</span>* ls_command = app_.add_subcommand(</div>
+<div class="line"><a id="l00602" name="l00602"></a><span class="lineno">  602</span>        <span class="stringliteral">&quot;ls&quot;</span>, <span class="stringliteral">&quot;List the files that belong to a project&quot;</span>);</div>
+<div class="line"><a id="l00603" name="l00603"></a><span class="lineno">  603</span>    ls_command-&gt;add_option(<span class="stringliteral">&quot;path&quot;</span>, ls_path_,</div>
+<div class="line"><a id="l00604" name="l00604"></a><span class="lineno">  604</span>                           <span class="stringliteral">&quot;Directory to list the project files of &quot;</span></div>
+<div class="line"><a id="l00605" name="l00605"></a><span class="lineno">  605</span>                           <span class="stringliteral">&quot;(default: current directory)&quot;</span>);</div>
+<div class="line"><a id="l00606" name="l00606"></a><span class="lineno">  606</span>    ls_command-&gt;callback([<span class="keyword">this</span>] { run_ls(); });</div>
+<div class="line"><a id="l00607" name="l00607"></a><span class="lineno">  607</span> </div>
+<div class="line"><a id="l00608" name="l00608"></a><span class="lineno">  608</span>    <span class="keyword">auto</span>* get_command = app_.add_subcommand(</div>
+<div class="line"><a id="l00609" name="l00609"></a><span class="lineno">  609</span>        <span class="stringliteral">&quot;get&quot;</span>, <span class="stringliteral">&quot;Print a ready-to-paste template snippet&quot;</span>);</div>
+<div class="line"><a id="l00610" name="l00610"></a><span class="lineno">  610</span>    get_command-&gt;add_option(<span class="stringliteral">&quot;name&quot;</span>, get_name_,</div>
+<div class="line"><a id="l00611" name="l00611"></a><span class="lineno">  611</span>                            <span class="stringliteral">&quot;Snippet name (omit to list every available &quot;</span></div>
+<div class="line"><a id="l00612" name="l00612"></a><span class="lineno">  612</span>                            <span class="stringliteral">&quot;name)&quot;</span>);</div>
+<div class="line"><a id="l00613" name="l00613"></a><span class="lineno">  613</span>    get_command-&gt;callback([<span class="keyword">this</span>] { run_get(); });</div>
+<div class="line"><a id="l00614" name="l00614"></a><span class="lineno">  614</span> </div>
+<div class="line"><a id="l00615" name="l00615"></a><span class="lineno">  615</span>    <span class="comment">// `prune` is a plain alias for `uninstall`: both subcommands share</span></div>
+<div class="line"><a id="l00616" name="l00616"></a><span class="lineno">  616</span>    <span class="comment">// the same backing storage and dispatch logic, since only one of</span></div>
+<div class="line"><a id="l00617" name="l00617"></a><span class="lineno">  617</span>    <span class="comment">// them is ever actually invoked in a given run.</span></div>
+<div class="line"><a id="l00618" name="l00618"></a><span class="lineno">  618</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keywordtype">char</span>* name : {<span class="stringliteral">&quot;uninstall&quot;</span>, <span class="stringliteral">&quot;prune&quot;</span>}) {</div>
+<div class="line"><a id="l00619" name="l00619"></a><span class="lineno">  619</span>        <span class="keyword">auto</span>* command = app_.add_subcommand(</div>
+<div class="line"><a id="l00620" name="l00620"></a><span class="lineno">  620</span>            name, <span class="stringliteral">&quot;Remove the NoTeX template installation, globally or &quot;</span></div>
+<div class="line"><a id="l00621" name="l00621"></a><span class="lineno">  621</span>                   <span class="stringliteral">&quot;(given a path) locally&quot;</span>);</div>
+<div class="line"><a id="l00622" name="l00622"></a><span class="lineno">  622</span>        <span class="keyword">auto</span>* path_option = command-&gt;add_option(</div>
+<div class="line"><a id="l00623" name="l00623"></a><span class="lineno">  623</span>            <span class="stringliteral">&quot;path&quot;</span>, uninstall_path_,</div>
+<div class="line"><a id="l00624" name="l00624"></a><span class="lineno">  624</span>            <span class="stringliteral">&quot;Uninstall from this directory instead of globally&quot;</span>);</div>
+<div class="line"><a id="l00625" name="l00625"></a><span class="lineno">  625</span>        command-&gt;add_flag(<span class="stringliteral">&quot;--force&quot;</span>, uninstall_force_,</div>
+<div class="line"><a id="l00626" name="l00626"></a><span class="lineno">  626</span>                          <span class="stringliteral">&quot;Skip the confirmation prompt&quot;</span>);</div>
+<div class="line"><a id="l00627" name="l00627"></a><span class="lineno">  627</span>        command-&gt;callback([<span class="keyword">this</span>, path_option] {</div>
+<div class="line"><a id="l00628" name="l00628"></a><span class="lineno">  628</span>            <span class="keywordflow">if</span> (path_option-&gt;count() &gt; 0) {</div>
+<div class="line"><a id="l00629" name="l00629"></a><span class="lineno">  629</span>                run_uninstall_local();</div>
+<div class="line"><a id="l00630" name="l00630"></a><span class="lineno">  630</span>            } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00631" name="l00631"></a><span class="lineno">  631</span>                run_uninstall_global();</div>
+<div class="line"><a id="l00632" name="l00632"></a><span class="lineno">  632</span>            }</div>
+<div class="line"><a id="l00633" name="l00633"></a><span class="lineno">  633</span>        });</div>
+<div class="line"><a id="l00634" name="l00634"></a><span class="lineno">  634</span>    }</div>
+<div class="line"><a id="l00635" name="l00635"></a><span class="lineno">  635</span> </div>
+<div class="line"><a id="l00636" name="l00636"></a><span class="lineno">  636</span>    <span class="keyword">auto</span>* reset_command = app_.add_subcommand(</div>
+<div class="line"><a id="l00637" name="l00637"></a><span class="lineno">  637</span>        <span class="stringliteral">&quot;reset&quot;</span>, <span class="stringliteral">&quot;Regenerate the project&#39;s main file from the template&quot;</span>);</div>
+<div class="line"><a id="l00638" name="l00638"></a><span class="lineno">  638</span>    reset_command-&gt;add_flag(<span class="stringliteral">&quot;--force&quot;</span>, reset_force_,</div>
+<div class="line"><a id="l00639" name="l00639"></a><span class="lineno">  639</span>                            <span class="stringliteral">&quot;Skip the confirmation prompt&quot;</span>);</div>
+<div class="line"><a id="l00640" name="l00640"></a><span class="lineno">  640</span>    reset_command-&gt;callback([<span class="keyword">this</span>] { run_reset(); });</div>
+<div class="line"><a id="l00641" name="l00641"></a><span class="lineno">  641</span> </div>
+<div class="line"><a id="l00642" name="l00642"></a><span class="lineno">  642</span>    <span class="keyword">auto</span>* delete_command = app_.add_subcommand(</div>
+<div class="line"><a id="l00643" name="l00643"></a><span class="lineno">  643</span>        <span class="stringliteral">&quot;delete&quot;</span>, <span class="stringliteral">&quot;Remove NoTeX&#39;s own scaffolding from a project&quot;</span>);</div>
+<div class="line"><a id="l00644" name="l00644"></a><span class="lineno">  644</span>    delete_command-&gt;add_flag(</div>
+<div class="line"><a id="l00645" name="l00645"></a><span class="lineno">  645</span>        <span class="stringliteral">&quot;--all&quot;</span>, delete_all_,</div>
+<div class="line"><a id="l00646" name="l00646"></a><span class="lineno">  646</span>        <span class="stringliteral">&quot;Also remove every user-authored file (the whole project)&quot;</span>);</div>
+<div class="line"><a id="l00647" name="l00647"></a><span class="lineno">  647</span>    delete_command-&gt;add_flag(<span class="stringliteral">&quot;--force&quot;</span>, delete_force_,</div>
+<div class="line"><a id="l00648" name="l00648"></a><span class="lineno">  648</span>                             <span class="stringliteral">&quot;Skip the confirmation prompt&quot;</span>);</div>
+<div class="line"><a id="l00649" name="l00649"></a><span class="lineno">  649</span>    delete_command-&gt;callback([<span class="keyword">this</span>] { run_delete(); });</div>
+<div class="line"><a id="l00650" name="l00650"></a><span class="lineno">  650</span> </div>
+<div class="line"><a id="l00651" name="l00651"></a><span class="lineno">  651</span>    <span class="keyword">auto</span>* add_command = app_.add_subcommand(</div>
+<div class="line"><a id="l00652" name="l00652"></a><span class="lineno">  652</span>        <span class="stringliteral">&quot;add&quot;</span>, <span class="stringliteral">&quot;Add a section or a bibliography to the project&quot;</span>);</div>
+<div class="line"><a id="l00653" name="l00653"></a><span class="lineno">  653</span>    <span class="keyword">auto</span>* add_section_command = add_command-&gt;add_subcommand(</div>
+<div class="line"><a id="l00654" name="l00654"></a><span class="lineno">  654</span>        <span class="stringliteral">&quot;section&quot;</span>, <span class="stringliteral">&quot;Add a section to the project&quot;</span>);</div>
+<div class="line"><a id="l00655" name="l00655"></a><span class="lineno">  655</span>    add_section_command-&gt;add_option(<span class="stringliteral">&quot;title&quot;</span>, section_title_, <span class="stringliteral">&quot;Section title&quot;</span>)</div>
+<div class="line"><a id="l00656" name="l00656"></a><span class="lineno">  656</span>        -&gt;required();</div>
+<div class="line"><a id="l00657" name="l00657"></a><span class="lineno">  657</span>    add_section_command-&gt;callback([<span class="keyword">this</span>] { run_add_section(); });</div>
+<div class="line"><a id="l00658" name="l00658"></a><span class="lineno">  658</span>    add_command-&gt;add_subcommand(<span class="stringliteral">&quot;bib&quot;</span>, <span class="stringliteral">&quot;Add a bibliography to the project&quot;</span>)</div>
+<div class="line"><a id="l00659" name="l00659"></a><span class="lineno">  659</span>        -&gt;callback([<span class="keyword">this</span>] { run_add_bib(); });</div>
+<div class="line"><a id="l00660" name="l00660"></a><span class="lineno">  660</span> </div>
+<div class="line"><a id="l00661" name="l00661"></a><span class="lineno">  661</span>    <span class="keyword">auto</span>* remove_command = app_.add_subcommand(</div>
+<div class="line"><a id="l00662" name="l00662"></a><span class="lineno">  662</span>        <span class="stringliteral">&quot;remove&quot;</span>, <span class="stringliteral">&quot;Remove a section or the bibliography from the project&quot;</span>);</div>
+<div class="line"><a id="l00663" name="l00663"></a><span class="lineno">  663</span>    <span class="keyword">auto</span>* remove_section_command = remove_command-&gt;add_subcommand(</div>
+<div class="line"><a id="l00664" name="l00664"></a><span class="lineno">  664</span>        <span class="stringliteral">&quot;section&quot;</span>, <span class="stringliteral">&quot;Remove a section from the project&quot;</span>);</div>
+<div class="line"><a id="l00665" name="l00665"></a><span class="lineno">  665</span>    remove_section_command</div>
+<div class="line"><a id="l00666" name="l00666"></a><span class="lineno">  666</span>        -&gt;add_option(<span class="stringliteral">&quot;number&quot;</span>, section_number_,</div>
+<div class="line"><a id="l00667" name="l00667"></a><span class="lineno">  667</span>                    <span class="stringliteral">&quot;Number of the section to remove, as scanned from &quot;</span></div>
+<div class="line"><a id="l00668" name="l00668"></a><span class="lineno">  668</span>                    <span class="stringliteral">&quot;sections/&quot;</span>)</div>
+<div class="line"><a id="l00669" name="l00669"></a><span class="lineno">  669</span>        -&gt;required();</div>
+<div class="line"><a id="l00670" name="l00670"></a><span class="lineno">  670</span>    remove_section_command-&gt;callback([<span class="keyword">this</span>] { run_remove_section(); });</div>
+<div class="line"><a id="l00671" name="l00671"></a><span class="lineno">  671</span>    remove_command</div>
+<div class="line"><a id="l00672" name="l00672"></a><span class="lineno">  672</span>        -&gt;add_subcommand(<span class="stringliteral">&quot;bib&quot;</span>, <span class="stringliteral">&quot;Remove the bibliography from the project&quot;</span>)</div>
+<div class="line"><a id="l00673" name="l00673"></a><span class="lineno">  673</span>        -&gt;callback([<span class="keyword">this</span>] { run_remove_bib(); });</div>
+<div class="line"><a id="l00674" name="l00674"></a><span class="lineno">  674</span>}</div>
+<div class="line"><a id="l00675" name="l00675"></a><span class="lineno">  675</span> </div>
+<div class="foldopen" id="foldopen00676" data-start="{" data-end="}">
+<div class="line"><a id="l00676" name="l00676"></a><span class="lineno"><a class="line" href="classnotex_1_1Orchestrator.html#ade2f7f4b6d3397cccf92c743754d35f4">  676</a></span><a class="code hl_enumeration" href="namespacenotex.html#abf1a6f5c58df614b2266a424c2eb2be3">ExitCode</a> <a class="code hl_function" href="classnotex_1_1Orchestrator.html#ade2f7f4b6d3397cccf92c743754d35f4">Orchestrator::run</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv) {</div>
+<div class="line"><a id="l00677" name="l00677"></a><span class="lineno">  677</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><a id="l00678" name="l00678"></a><span class="lineno">  678</span>        app_.parse(argc, argv);</div>
+<div class="line"><a id="l00679" name="l00679"></a><span class="lineno">  679</span>    } <span class="keywordflow">catch</span> (<span class="keyword">const</span> CLI::ParseError&amp; e) {</div>
+<div class="line"><a id="l00680" name="l00680"></a><span class="lineno">  680</span>        <span class="comment">// Covers both real usage errors and CLI11&#39;s internal use of</span></div>
+<div class="line"><a id="l00681" name="l00681"></a><span class="lineno">  681</span>        <span class="comment">// ParseError to unwind for --help/--version, so this isn&#39;t</span></div>
+<div class="line"><a id="l00682" name="l00682"></a><span class="lineno">  682</span>        <span class="comment">// necessarily a failure; logged at DEBUG rather than ERROR.</span></div>
+<div class="line"><a id="l00683" name="l00683"></a><span class="lineno">  683</span>        <span class="keyword">const</span> <span class="keywordtype">int</span> code = app_.exit(e);</div>
+<div class="line"><a id="l00684" name="l00684"></a><span class="lineno">  684</span>        PLOG_DEBUG &lt;&lt; <span class="stringliteral">&quot;CLI parsing exited with code &quot;</span> &lt;&lt; code &lt;&lt; <span class="stringliteral">&quot;: &quot;</span></div>
+<div class="line"><a id="l00685" name="l00685"></a><span class="lineno">  685</span>                   &lt;&lt; e.what();</div>
+<div class="line"><a id="l00686" name="l00686"></a><span class="lineno">  686</span>        <span class="keywordflow">return</span> code == 0 ? <a class="code hl_enumvalue" href="namespacenotex.html#abf1a6f5c58df614b2266a424c2eb2be3ad0749aaba8b833466dfcbb0428e4f89c">ExitCode::SUCCESS</a> : <a class="code hl_enumvalue" href="namespacenotex.html#abf1a6f5c58df614b2266a424c2eb2be3a4e5b992f3597828613df927155642001">ExitCode::USAGE_ERROR</a>;</div>
+<div class="line"><a id="l00687" name="l00687"></a><span class="lineno">  687</span>    } <span class="keywordflow">catch</span> (<span class="keyword">const</span> <a class="code hl_class" href="classnotex_1_1NotexError.html">NotexError</a>&amp; e) {</div>
+<div class="line"><a id="l00688" name="l00688"></a><span class="lineno">  688</span>        PLOG_ERROR &lt;&lt; e.what();</div>
+<div class="line"><a id="l00689" name="l00689"></a><span class="lineno">  689</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a7612668d102cc65d29636d8594b8358b">ui::error</a>(e.what());</div>
+<div class="line"><a id="l00690" name="l00690"></a><span class="lineno">  690</span>        <span class="keywordflow">return</span> e.exit_code();</div>
+<div class="line"><a id="l00691" name="l00691"></a><span class="lineno">  691</span>    } <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; e) {</div>
+<div class="line"><a id="l00692" name="l00692"></a><span class="lineno">  692</span>        PLOG_ERROR &lt;&lt; e.what();</div>
+<div class="line"><a id="l00693" name="l00693"></a><span class="lineno">  693</span>        <a class="code hl_function" href="namespacenotex_1_1ui.html#a7612668d102cc65d29636d8594b8358b">ui::error</a>(e.what());</div>
+<div class="line"><a id="l00694" name="l00694"></a><span class="lineno">  694</span>        <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="namespacenotex.html#abf1a6f5c58df614b2266a424c2eb2be3a36fc6065a3e970bc3e6b2e59da52bf2a">ExitCode::FAILURE</a>;</div>
+<div class="line"><a id="l00695" name="l00695"></a><span class="lineno">  695</span>    }</div>
+<div class="line"><a id="l00696" name="l00696"></a><span class="lineno">  696</span> </div>
+<div class="line"><a id="l00697" name="l00697"></a><span class="lineno">  697</span>    <span class="keywordflow">if</span> (app_.get_subcommands().empty()) {</div>
+<div class="line"><a id="l00698" name="l00698"></a><span class="lineno">  698</span>        std::cout &lt;&lt; app_.help() &lt;&lt; std::flush;</div>
+<div class="line"><a id="l00699" name="l00699"></a><span class="lineno">  699</span>    }</div>
+<div class="line"><a id="l00700" name="l00700"></a><span class="lineno">  700</span> </div>
+<div class="line"><a id="l00701" name="l00701"></a><span class="lineno">  701</span>    <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="namespacenotex.html#abf1a6f5c58df614b2266a424c2eb2be3ad0749aaba8b833466dfcbb0428e4f89c">ExitCode::SUCCESS</a>;</div>
+<div class="line"><a id="l00702" name="l00702"></a><span class="lineno">  702</span>}</div>
+</div>
+<div class="line"><a id="l00703" name="l00703"></a><span class="lineno">  703</span> </div>
+<div class="line"><a id="l00704" name="l00704"></a><span class="lineno">  704</span>}  <span class="comment">// namespace notex</span></div>
+<div class="ttc" id="aclassnotex_1_1Installer_html_a05605ecd654dbf3c2adeb6a2635f93be"><div class="ttname"><a href="classnotex_1_1Installer.html#a05605ecd654dbf3c2adeb6a2635f93be">notex::Installer::install_local</a></div><div class="ttdeci">static bool install_local(const std::filesystem::path &amp;target_dir, bool force=false)</div><div class="ttdoc">Installs the template locally into target_dir.</div><div class="ttdef"><b>Definition</b> <a href="installer_8cpp_source.html#l00117">installer.cpp:117</a></div></div>
+<div class="ttc" id="aclassnotex_1_1Installer_html_a1f6977673a28754e67ded1cfe2b2940d"><div class="ttname"><a href="classnotex_1_1Installer.html#a1f6977673a28754e67ded1cfe2b2940d">notex::Installer::installation_differs</a></div><div class="ttdeci">static bool installation_differs(const std::filesystem::path &amp;latex_dir, const std::filesystem::path &amp;fonts_dir)</div><div class="ttdoc">Reports whether an installation at latex_dir/fonts_dir differs from what would be freshly installed.</div><div class="ttdef"><b>Definition</b> <a href="installer_8cpp_source.html#l00200">installer.cpp:200</a></div></div>
+<div class="ttc" id="aclassnotex_1_1Installer_html_acd133690ff3c45a68144294f27350605"><div class="ttname"><a href="classnotex_1_1Installer.html#acd133690ff3c45a68144294f27350605">notex::Installer::uninstall_global</a></div><div class="ttdeci">static bool uninstall_global(const Environment &amp;environment, bool force=false)</div><div class="ttdoc">Removes a global installation: every embedded LaTeX and font file&#39;s target directory inside environme...</div><div class="ttdef"><b>Definition</b> <a href="installer_8cpp_source.html#l00144">installer.cpp:144</a></div></div>
+<div class="ttc" id="aclassnotex_1_1Installer_html_ad812606ae8665d32dc6932ff8be325ec"><div class="ttname"><a href="classnotex_1_1Installer.html#ad812606ae8665d32dc6932ff8be325ec">notex::Installer::uninstall_local</a></div><div class="ttdeci">static bool uninstall_local(const std::filesystem::path &amp;target_dir, bool force=false)</div><div class="ttdoc">Removes a local installation: target_dir&#39;s settings/ and fonts/ directories, then clears installation...</div><div class="ttdef"><b>Definition</b> <a href="installer_8cpp_source.html#l00174">installer.cpp:174</a></div></div>
+<div class="ttc" id="aclassnotex_1_1Installer_html_aff5d44ecdc99a7ecd05823c88c92ac1a"><div class="ttname"><a href="classnotex_1_1Installer.html#aff5d44ecdc99a7ecd05823c88c92ac1a">notex::Installer::install_global</a></div><div class="ttdeci">static bool install_global(const Environment &amp;environment, bool force=false)</div><div class="ttdoc">Installs the template globally, using environment to resolve the target directories inside the TeX tr...</div><div class="ttdef"><b>Definition</b> <a href="installer_8cpp_source.html#l00091">installer.cpp:91</a></div></div>
+<div class="ttc" id="aclassnotex_1_1Manager_html_a5a175da830271adbb4f4f06644d281ef"><div class="ttname"><a href="classnotex_1_1Manager.html#a5a175da830271adbb4f4f06644d281ef">notex::Manager::clean</a></div><div class="ttdeci">static CleanReport clean(const std::filesystem::path &amp;start_dir, bool dry_run=false)</div><div class="ttdoc">Recursively removes known LaTeX build artefacts from start_dir.</div><div class="ttdef"><b>Definition</b> <a href="manager_8cpp_source.html#l00410">manager.cpp:410</a></div></div>
+<div class="ttc" id="aclassnotex_1_1Manager_html_a875c5c99bf002939eb34945b936eba21"><div class="ttname"><a href="classnotex_1_1Manager.html#a875c5c99bf002939eb34945b936eba21">notex::Manager::find_project_root</a></div><div class="ttdeci">static std::optional&lt; std::filesystem::path &gt; find_project_root(const std::filesystem::path &amp;start_dir)</div><div class="ttdoc">Searches upward from start_dir for a .notex/ directory, without requiring one to exist.</div><div class="ttdef"><b>Definition</b> <a href="manager_8cpp_source.html#l00279">manager.cpp:279</a></div></div>
+<div class="ttc" id="aclassnotex_1_1Manager_html_ac537ba1b18bff0711d28df820a767ab3"><div class="ttname"><a href="classnotex_1_1Manager.html#ac537ba1b18bff0711d28df820a767ab3">notex::Manager::available_themes</a></div><div class="ttdeci">static std::vector&lt; std::string &gt; available_themes()</div><div class="ttdef"><b>Definition</b> <a href="manager_8cpp_source.html#l00451">manager.cpp:451</a></div></div>
+<div class="ttc" id="aclassnotex_1_1Manager_html_ae2daa9191329ede25d5dfd57cfc3095c"><div class="ttname"><a href="classnotex_1_1Manager.html#ae2daa9191329ede25d5dfd57cfc3095c">notex::Manager::init</a></div><div class="ttdeci">static Manager init(const std::filesystem::path &amp;target_dir, templates::ProjectType project_type=templates::ProjectType::MULTI, bool force=false)</div><div class="ttdoc">Creates a new NoTeX project inside target_dir.</div><div class="ttdef"><b>Definition</b> <a href="manager_8cpp_source.html#l00374">manager.cpp:374</a></div></div>
+<div class="ttc" id="aclassnotex_1_1NotexError_html"><div class="ttname"><a href="classnotex_1_1NotexError.html">notex::NotexError</a></div><div class="ttdoc">Base class for every exception raised by the NoTeX core library.</div><div class="ttdef"><b>Definition</b> <a href="errors_8hpp_source.html#l00043">errors.hpp:43</a></div></div>
+<div class="ttc" id="aclassnotex_1_1Orchestrator_html_ade2f7f4b6d3397cccf92c743754d35f4"><div class="ttname"><a href="classnotex_1_1Orchestrator.html#ade2f7f4b6d3397cccf92c743754d35f4">notex::Orchestrator::run</a></div><div class="ttdeci">ExitCode run(int argc, char **argv)</div><div class="ttdoc">Parses the command line and dispatches to the requested command, catching every exception at this sin...</div><div class="ttdef"><b>Definition</b> <a href="#l00676">orchestrator.cpp:676</a></div></div>
+<div class="ttc" id="aenvironment_8hpp_html"><div class="ttname"><a href="environment_8hpp.html">environment.hpp</a></div><div class="ttdoc">Environment: discovers where TeX lives and whether NoTeX is installed.</div></div>
+<div class="ttc" id="ainstaller_8hpp_html"><div class="ttname"><a href="installer_8hpp.html">installer.hpp</a></div><div class="ttdoc">Installer: deploys the NoTeX LaTeX template, globally into the TeX tree or locally into a project.</div></div>
+<div class="ttc" id="alogging_8hpp_html"><div class="ttname"><a href="logging_8hpp.html">logging.hpp</a></div><div class="ttdoc">Logging utility with plog initialization.</div></div>
+<div class="ttc" id="amanager_8hpp_html"><div class="ttname"><a href="manager_8hpp.html">manager.hpp</a></div><div class="ttdoc">Manager: represents and operates on a single NoTeX project.</div></div>
+<div class="ttc" id="anamespacenotex_1_1reference_html_a86e1b9357928f272d7caf6c2e3b4eff8"><div class="ttname"><a href="namespacenotex_1_1reference.html#a86e1b9357928f272d7caf6c2e3b4eff8">notex::reference::snippet_names</a></div><div class="ttdeci">std::vector&lt; std::string_view &gt; snippet_names()</div><div class="ttdef"><b>Definition</b> <a href="reference_8cpp_source.html#l00119">reference.cpp:119</a></div></div>
+<div class="ttc" id="anamespacenotex_1_1reference_html_acf928beb55e6f9ef610b58c1fed383a1"><div class="ttname"><a href="namespacenotex_1_1reference.html#acf928beb55e6f9ef610b58c1fed383a1">notex::reference::find_snippets</a></div><div class="ttdeci">std::vector&lt; Snippet &gt; find_snippets(std::string_view name)</div><div class="ttdoc">Looks up every snippet registered under name, whether as its canonical name or as an alias.</div><div class="ttdef"><b>Definition</b> <a href="reference_8cpp_source.html#l00132">reference.cpp:132</a></div></div>
+<div class="ttc" id="anamespacenotex_1_1system_html_ab29e78f0a91ad32788e4b15f04922b49"><div class="ttname"><a href="namespacenotex_1_1system.html#ab29e78f0a91ad32788e4b15f04922b49">notex::system::run_command</a></div><div class="ttdeci">std::string run_command(const std::string &amp;command)</div><div class="ttdoc">Runs command through the shell and returns everything it wrote to standard output (and standard error...</div><div class="ttdef"><b>Definition</b> <a href="system_8cpp_source.html#l00019">system.cpp:19</a></div></div>
+<div class="ttc" id="anamespacenotex_1_1templates_html_a977697e38a355c48e450e1dadeb0b2fb"><div class="ttname"><a href="namespacenotex_1_1templates.html#a977697e38a355c48e450e1dadeb0b2fb">notex::templates::ProjectType</a></div><div class="ttdeci">ProjectType</div><div class="ttdef"><b>Definition</b> <a href="templates_8hpp_source.html#l00022">templates.hpp:22</a></div></div>
+<div class="ttc" id="anamespacenotex_1_1templates_html_a977697e38a355c48e450e1dadeb0b2fbaf26be970aac1b06fa62b87562bc73deb"><div class="ttname"><a href="namespacenotex_1_1templates.html#a977697e38a355c48e450e1dadeb0b2fbaf26be970aac1b06fa62b87562bc73deb">notex::templates::ProjectType::MULTI</a></div><div class="ttdeci">@ MULTI</div><div class="ttdoc">main.tex plus a sections/ directory of subfiles.</div><div class="ttdef"><b>Definition</b> <a href="templates_8hpp_source.html#l00024">templates.hpp:24</a></div></div>
+<div class="ttc" id="anamespacenotex_1_1templates_html_a9db2c65a028e46b6f367b68e07f42b2e"><div class="ttname"><a href="namespacenotex_1_1templates.html#a9db2c65a028e46b6f367b68e07f42b2e">notex::templates::project_type_from_string</a></div><div class="ttdeci">std::optional&lt; ProjectType &gt; project_type_from_string(std::string_view name)</div><div class="ttdoc">Parses a project type name.</div><div class="ttdef"><b>Definition</b> <a href="templates_8cpp_source.html#l00134">templates.cpp:134</a></div></div>
+<div class="ttc" id="anamespacenotex_1_1templates_html_aac31fd8d464c000cf3327b7831a3a963"><div class="ttname"><a href="namespacenotex_1_1templates.html#aac31fd8d464c000cf3327b7831a3a963">notex::templates::to_string</a></div><div class="ttdeci">std::string_view to_string(ProjectType type)</div><div class="ttdef"><b>Definition</b> <a href="templates_8cpp_source.html#l00124">templates.cpp:124</a></div></div>
+<div class="ttc" id="anamespacenotex_1_1ui_html_a7612668d102cc65d29636d8594b8358b"><div class="ttname"><a href="namespacenotex_1_1ui.html#a7612668d102cc65d29636d8594b8358b">notex::ui::error</a></div><div class="ttdeci">void error(std::string_view message)</div><div class="ttdoc">Prints an error message, prefixed with a red cross, to stderr.</div><div class="ttdef"><b>Definition</b> <a href="output_8cpp_source.html#l00058">output.cpp:58</a></div></div>
+<div class="ttc" id="anamespacenotex_1_1ui_html_a8cc7e7f6cda71b1f1bcf8c2cea7de9f1"><div class="ttname"><a href="namespacenotex_1_1ui.html#a8cc7e7f6cda71b1f1bcf8c2cea7de9f1">notex::ui::info</a></div><div class="ttdeci">void info(std::string_view message)</div><div class="ttdoc">Prints a plain informational message to stdout.</div><div class="ttdef"><b>Definition</b> <a href="output_8cpp_source.html#l00066">output.cpp:66</a></div></div>
+<div class="ttc" id="anamespacenotex_1_1ui_html_a8f739befeb2b45f5f388e0bde02700e2"><div class="ttname"><a href="namespacenotex_1_1ui.html#a8f739befeb2b45f5f388e0bde02700e2">notex::ui::success</a></div><div class="ttdeci">void success(std::string_view message)</div><div class="ttdoc">Prints a success message, prefixed with a green checkmark, to stdout.</div><div class="ttdef"><b>Definition</b> <a href="output_8cpp_source.html#l00050">output.cpp:50</a></div></div>
+<div class="ttc" id="anamespacenotex_1_1ui_html_acc0ed633d837aeac2bfa4ba43be38947"><div class="ttname"><a href="namespacenotex_1_1ui.html#acc0ed633d837aeac2bfa4ba43be38947">notex::ui::warning</a></div><div class="ttdeci">void warning(std::string_view message)</div><div class="ttdef"><b>Definition</b> <a href="output_8cpp_source.html#l00054">output.cpp:54</a></div></div>
+<div class="ttc" id="anamespacenotex_1_1ui_html_ae2769f38ec18885ee799370a254d1341"><div class="ttname"><a href="namespacenotex_1_1ui.html#ae2769f38ec18885ee799370a254d1341">notex::ui::set_assume_yes</a></div><div class="ttdeci">void set_assume_yes(bool assume_yes)</div><div class="ttdoc">Sets whether confirm() should answer &quot;yes&quot; without prompting.</div><div class="ttdef"><b>Definition</b> <a href="output_8cpp_source.html#l00041">output.cpp:41</a></div></div>
+<div class="ttc" id="anamespacenotex_1_1ui_html_aef946fa1b58056b5b207a4c637c277be"><div class="ttname"><a href="namespacenotex_1_1ui.html#aef946fa1b58056b5b207a4c637c277be">notex::ui::step</a></div><div class="ttdeci">void step(std::string_view message)</div><div class="ttdoc">Prints a step or progress message, prefixed with an arrow, to stdout.</div><div class="ttdef"><b>Definition</b> <a href="output_8cpp_source.html#l00062">output.cpp:62</a></div></div>
+<div class="ttc" id="anamespacenotex_html"><div class="ttname"><a href="namespacenotex.html">notex</a></div><div class="ttdef"><b>Definition</b> <a href="assets_8hpp_source.html#l00020">assets.hpp:20</a></div></div>
+<div class="ttc" id="anamespacenotex_html_abf1a6f5c58df614b2266a424c2eb2be3"><div class="ttname"><a href="namespacenotex.html#abf1a6f5c58df614b2266a424c2eb2be3">notex::ExitCode</a></div><div class="ttdeci">ExitCode</div><div class="ttdoc">Process exit codes returned by the notex executable.</div><div class="ttdef"><b>Definition</b> <a href="errors_8hpp_source.html#l00021">errors.hpp:21</a></div></div>
+<div class="ttc" id="anamespacenotex_html_abf1a6f5c58df614b2266a424c2eb2be3a36fc6065a3e970bc3e6b2e59da52bf2a"><div class="ttname"><a href="namespacenotex.html#abf1a6f5c58df614b2266a424c2eb2be3a36fc6065a3e970bc3e6b2e59da52bf2a">notex::ExitCode::FAILURE</a></div><div class="ttdeci">@ FAILURE</div><div class="ttdoc">An unexpected, unclassified error.</div><div class="ttdef"><b>Definition</b> <a href="errors_8hpp_source.html#l00023">errors.hpp:23</a></div></div>
+<div class="ttc" id="anamespacenotex_html_abf1a6f5c58df614b2266a424c2eb2be3a4e5b992f3597828613df927155642001"><div class="ttname"><a href="namespacenotex.html#abf1a6f5c58df614b2266a424c2eb2be3a4e5b992f3597828613df927155642001">notex::ExitCode::USAGE_ERROR</a></div><div class="ttdeci">@ USAGE_ERROR</div><div class="ttdoc">The command line was invalid.</div><div class="ttdef"><b>Definition</b> <a href="errors_8hpp_source.html#l00024">errors.hpp:24</a></div></div>
+<div class="ttc" id="anamespacenotex_html_abf1a6f5c58df614b2266a424c2eb2be3ad0749aaba8b833466dfcbb0428e4f89c"><div class="ttname"><a href="namespacenotex.html#abf1a6f5c58df614b2266a424c2eb2be3ad0749aaba8b833466dfcbb0428e4f89c">notex::ExitCode::SUCCESS</a></div><div class="ttdeci">@ SUCCESS</div><div class="ttdoc">The command completed successfully.</div><div class="ttdef"><b>Definition</b> <a href="errors_8hpp_source.html#l00022">errors.hpp:22</a></div></div>
+<div class="ttc" id="anamespacenotex_html_acedadcc2ce119cd13e1e6c1dd737a9e6"><div class="ttname"><a href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6">notex::InstallationType</a></div><div class="ttdeci">InstallationType</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00016">environment.hpp:16</a></div></div>
+<div class="ttc" id="anamespacenotex_html_acedadcc2ce119cd13e1e6c1dd737a9e6a54b4c4075463b2e02cd69f5cd139b5b2"><div class="ttname"><a href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6a54b4c4075463b2e02cd69f5cd139b5b2">notex::InstallationType::LOCAL</a></div><div class="ttdeci">@ LOCAL</div><div class="ttdoc">A local installation exists (takes precedence over global).</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00018">environment.hpp:18</a></div></div>
+<div class="ttc" id="anamespacenotex_html_acedadcc2ce119cd13e1e6c1dd737a9e6a6eecfba72d12922ee1dead07a0ef3334"><div class="ttname"><a href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6a6eecfba72d12922ee1dead07a0ef3334">notex::InstallationType::GLOBAL</a></div><div class="ttdeci">@ GLOBAL</div><div class="ttdoc">Only a global installation exists.</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00019">environment.hpp:19</a></div></div>
+<div class="ttc" id="anamespacenotex_html_acedadcc2ce119cd13e1e6c1dd737a9e6ab50339a10e1de285ac99d4c3990b8693"><div class="ttname"><a href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6ab50339a10e1de285ac99d4c3990b8693">notex::InstallationType::NONE</a></div><div class="ttdeci">@ NONE</div><div class="ttdoc">Neither a local nor a global installation was found.</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00017">environment.hpp:17</a></div></div>
+<div class="ttc" id="anamespacenotex_html_af485eee1a7625e78e49d778471499f1b"><div class="ttname"><a href="namespacenotex.html#af485eee1a7625e78e49d778471499f1b">notex::to_string</a></div><div class="ttdeci">std::string_view to_string(InstallationType type)</div><div class="ttdef"><b>Definition</b> <a href="environment_8cpp_source.html#l00018">environment.cpp:18</a></div></div>
+<div class="ttc" id="aorchestrator_8hpp_html"><div class="ttname"><a href="orchestrator_8hpp.html">orchestrator.hpp</a></div><div class="ttdoc">Declares Orchestrator, the application layer that turns command-line input into calls on the notex_co...</div></div>
+<div class="ttc" id="aoutput_8hpp_html"><div class="ttname"><a href="output_8hpp.html">output.hpp</a></div><div class="ttdoc">Styled terminal output and interactive confirmation prompts.</div></div>
+<div class="ttc" id="areference_8hpp_html"><div class="ttname"><a href="reference_8hpp.html">reference.hpp</a></div><div class="ttdoc">reference: the table of ready-to-paste snippets served by notex get.</div></div>
+<div class="ttc" id="asystem_8hpp_html"><div class="ttname"><a href="system_8hpp.html">system.hpp</a></div><div class="ttdoc">Process execution and environment-variable access.</div></div>
+<div class="ttc" id="atemplates_8hpp_html"><div class="ttname"><a href="templates_8hpp.html">templates.hpp</a></div><div class="ttdoc">templates: encoded skeletons used to scaffold new NoTeX projects.</div></div>
+</div><!-- fragment --></div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.17.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>
