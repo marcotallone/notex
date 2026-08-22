@@ -27,16 +27,10 @@
     <i>A modern noteworthy LaTeX template.</i>
     <br />
     <br />
-    <!-- <a href="./docs/NoTeX_Documentation.pdf"><strong>Explore the docs »</strong></a> -->
-    <!-- <a href="./examples/multi/main.tex">View Demo</a>
-    ·
-    <a href="https://github.com/marcotallone/notex/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/marcotallone/notex/issues">Request Feature</a> -->
     <table>
       <tr>
         <td><a href="https://marcotallone.github.io/notex/"><strong>Documentation</strong></a></td>
-        <td><a href="./examples/mono/main.tex"><strong>View Demo</strong></a></td>
+        <td><a href="./docs/NoTeX_Documentation.pdf"><strong>View Demo</strong></a></td>
         <td><a href="https://github.com/marcotallone/notex/issues"><strong>Report Bug</strong></a></td>
         <td><a href="https://github.com/marcotallone/notex/issues"><strong>Request Feature</strong></a></td>
       </tr>
