@@ -1,0 +1,170 @@
+\documentclass[../main.tex]{subfiles}
+\graphicspath{{\subfix{../../images/}}}
+
+\begin{document}
+
+\section{Callout Blocks}
+
+The NoTeX template provides a set of callout blocks that can be used to highlight important information, warnings, definitions, theorems, and more. These blocks are designed to improve the readability and organization of your document.
+
+This section briefly shows how to use the various callout blocks available in the NoTeX template. You can look at the documentation source code that generated this file to see how each callout block is invoked.
+
+\subsubsection{Boxes}
+
+The most basic callout blocks are the boxes, which can be used to highlight text or separate content from the main body of the document. The following examples demonstrate different types of boxes.
+
+\oline
+
+\bft{Colored Box:} A simple box with no additional formatting.
+
+% Simple colored box
+\begin{cbox}
+    \blindtext
+\end{cbox}
+
+This (and all the other callouts) also allow to have \bft{upper and lower parts}, separated by a dashed line.
+
+% Box with lower and upper parts
+\begin{cbox}
+    \bft{Upper section}
+
+    \blindtext
+
+    \tcblower % divide lower and upper parts
+
+    \bft{Lower section}
+\end{cbox}
+
+Of course in colored boxes there is an option to change the background color easily.
+
+% Box with background color
+\begin{cbox}[azure!50!boxcolor]
+    \blindtext
+\end{cbox}
+
+\oline 
+
+\bft{Empty Box}: A box with empty background but colored border. Where the color of the border can of course be changed via the optional argument.
+
+% Empty box with border color
+\begin{ebox}[blue]
+    \blindtext
+\end{ebox}
+
+\oline 
+
+\bft{Warnings}: These can be used to state information that requires special attention. Warnings can be used to highlight potential issues, important notes, or any other information that the reader should be aware of.
+
+% Warning box
+\begin{warning}
+    \blindtext
+\end{warning}
+
+You can also change the background color of the warning box to make it more visually distinct.
+
+% Warning box with background color
+\begin{warning}[darkred!50!boxcolor]
+    \blindtext
+\end{warning}
+
+\oline
+
+\bft{Info Boxes}: Classical information boxes for notes or tips.
+
+% Info blocks
+\begin{info}
+    \blindtext
+\end{info}
+
+For very important information, you can use the \blue{``blueinfo box''}, which is a more visually distinct version of the info box.
+
+% Blueinfo box
+\begin{blueinfo}
+    \blindtext
+\end{blueinfo}
+
+\oline
+
+\bft{Note Boxes}: A note box is identical to an info box. It has been implemented exclusively for ease of use and to provide a more intuitive name for the box. 
+
+% Note block
+\begin{note}
+    \blindtext
+\end{note}
+
+\oline
+
+\bft{Tip Boxes}: A useful callout to provide tips or suggestions to the reader. It can be used to highlight best practices, shortcuts, or any other helpful information.
+
+% Tip block
+\begin{tip}
+    \blindtext
+\end{tip}
+
+\oline
+
+\bft{Important Boxes}: An alternative way to highlight important information.
+
+% Important block
+\begin{important}
+    \blindtext
+\end{important}
+
+\oline
+
+\bft{Caution Boxes}: These are similar to the warning boxes and simply provide an alternative different way to convey warnings and alert the reader to potential issues or important information. 
+
+% Caution block
+\begin{caution}
+    \blindtext
+\end{caution}
+
+\oline
+
+\bft{Example Boxes}: These can be used to provide examples or illustrations of concepts discussed in the text, but that are less relevant in the main body of the document.
+
+% Example box
+\begin{example}
+    \blindtext
+\end{example}
+
+\oline 
+
+\bft{Math Blocks}: For mathematical definitions, theorems, corollaries and propositions of various kind, the template implements dedicated blocks that clearly state the importance and the category of their content.
+
+% Definitions
+\begin{definition}[Triangle][triangle]
+    A triangle is a polygon with three edges and three vertices. Triangles are classified in:
+	\begin{itemize}
+		\item Equilateral: all sides are equal.
+		\item Isosceles: two sides are equal.
+		\item Scalene: no sides are equal.
+	\end{itemize}
+\end{definition}
+
+% Theorem
+\begin{theorem}[Pythagorean Theorem][pythagorean]
+    In a right triangle, the square of the length of the hypotenuse is equal to the sum of the squares of the lengths of the other two sides.
+    \begin{equation*}
+        a^2 + b^2 = c^2
+    \end{equation*}
+\end{theorem}
+
+% Corollary
+\begin{corollary}[Converse of the Pythagorean Theorem][converse]
+    If the square of the length of one side of a triangle is equal to the sum of the squares of the lengths of the other two sides, then the triangle is a right triangle.
+\end{corollary}
+
+% Proposition
+\begin{proposition}[Sum of angles in a triangle][sum-angles]
+    The sum of the interior angles of a triangle is always equal to 180 degrees.
+\end{proposition}
+
+% Lemma
+\begin{lemma}[Triangle Inequality][triangle-inequality]
+    In any triangle, the length of any side must be less than the sum of the lengths of the other two sides.
+\end{lemma}
+
+
+\end{document}
+

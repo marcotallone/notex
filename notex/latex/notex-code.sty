@@ -1,0 +1,498 @@
+%┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓%
+%┃                                   CODE                                     ┃%
+%┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛%
+% Code blocks for the NoTeX template.
+%
+% Everything here is built on ONE engine: `minted`, which syntax-highlights
+% through `pygments`. The single exception is `pseudocode`, which `pygments`
+% has no lexer for and which therefore keeps running on `listings`.
+%
+% NOTE: `pygments` must be installed and the document compiled with
+%       -shell-escape. More info at:
+%       ------------->      https://pygments.org/       <--------------
+%       For the language name to use in \begin{code}{...} check:
+%       ------------->  https://pygments.org/languages/ <--------------
+%
+% USER-FACING SURFACE
+% -------------------
+%   \begin{code}[keys]{language} ... \end{code}   any pygments language
+%   \begin{cpp}[keys] ... \end{cpp}               one shorthand per language
+%   \begin{pseudocode}[keys] ... \end{pseudocode} listings-based, math-aware
+%   \cc{text}                                     plain inline mono, no colors
+%   \inline[language]{text}                       highlighted inline code
+%   \notexcodeset{keys}                           document-wide key defaults
+%
+% The optional `keys` are documented in the "Code block options" block below;
+% the short version is `caption`, `label`, `linenos`, `options` and `tcb`.
+%
+% NOTE: minted is a hard requirement of this package, not an option. Making it
+%       optional was attempted four separate times and abandoned every time --
+%       the blocker is that a `\newif` flag set in notex.cls cannot be read
+%       from a .sty (the @ catcode does not carry over), and every workaround
+%       (\makeatletter wrappers, etoolbox string comparison, expl3 booleans)
+%       ends up feeding tcolorbox's pgfkeys parser syntax it cannot handle,
+%       typically surfacing as "I do not know the key '/tcb/input/.store in'".
+%       Now that minted is the sole highlighting engine the option is moot:
+%       a build without pygments has no code blocks to speak of. Use the
+%       class-level `nocode` option to drop this package entirely instead.
+
+\ProvidesPackage{notex-code}[A package providing nice coding utilities]
+
+% Import required packages
+\RequirePackage{fontspec}
+\RequirePackage[breakable]{tcolorbox}
+\RequirePackage{listings}
+\tcbuselibrary{listings}
+\tcbuselibrary{skins}
+\RequirePackage{xparse}
+\RequirePackage{etoolbox}
+\RequirePackage{xpatch}
+\RequirePackage{ifthen}
+\RequirePackage{float}
+\RequirePackage{newtxtt}
+\RequirePackage{newfloat}
+\RequirePackage{pgfkeys}
+\RequirePackage{caption}
+
+%┌────────────────────────────────────────────────────────────────────────────┐%
+%│                            Common Settings                                 │%
+%└────────────────────────────────────────────────────────────────────────────┘%
+
+% Set mono font for code.
+% Assumes JetBrainsMono is installed in the TeX tree during installation.
+\setmonofont{JetBrainsMono}[
+    Scale=0.85,
+    UprightFont=*-Regular,
+    BoldFont=*-Bold,
+    ItalicFont=*-Italic,
+    BoldItalicFont=*-BoldItalic
+]
+
+%┌────────────────────────────────────────────────────────────────────────────┐%
+%│                                   Minted                                   │%
+%└────────────────────────────────────────────────────────────────────────────┘%
+
+% NOTE: notex-toc.tex loads tocloft with its `subfigure` option, and under that
+% option tocloft skips defining the `lofdepth` / `lotdepth` counters. newfloat
+% builds the \l@listing entry macro for the list of code blocks below out of
+% the same pieces tocloft's own list entries use, \c@lofdepth among them, so
+% without this guard \listoflistings dies with an "Undefined control sequence"
+% while reading the .lol file. Providing the counter is enough, and doing it
+% here -- before minted declares the float -- also lets newfloat give the
+% listing list a depth counter of its own.
+\makeatletter
+\@ifundefined{c@lofdepth}{\newcounter{lofdepth}\setcounter{lofdepth}{1}}{}
+\@ifundefined{c@lotdepth}{\newcounter{lotdepth}\setcounter{lotdepth}{1}}{}
+\makeatother
+
+% Import minted.
+% `newfloat` gives us the floating environment `listing` (and with it the
+% `listing` counter and \listoflistings) built on the newfloat package rather
+% than the older float one, so the caption package can style it like any other
+% caption; `section` numbers that counter within the current section, matching
+% what notex-math.tex does for figures, tables and equations.
+\RequirePackage[newfloat, section]{minted}
+\tcbuselibrary{minted}
+
+% Patch for the red boxes problem in minted
+% see https://tex.stackexchange.com/a/401250/
+\makeatletter
+\AtBeginEnvironment{minted}{\dontdofcolorbox}
+\def\dontdofcolorbox{\renewcommand\fcolorbox[4][]{##4}}
+\xpatchcmd{\inputminted}{\minted@fvset}{\minted@fvset\dontdofcolorbox}{}{}
+\xpatchcmd{\mintinline}{\minted@fvset}{\minted@fvset\dontdofcolorbox}{}{}
+\makeatother
+
+% Common minted style dependent on the theme.
+% \setminted applies to every minted environment AND to \mintinline, so the
+% inline command below needs no per-theme special casing of its own.
+\pgfkeys{
+  /themes/.cd,
+  light/.code = \setminted{style=default},
+  dark/.code  = \setminted{style=github-dark},
+  tokyo/.code = \setminted{style=dracula},
+  bw/.code    = \setminted{style=bw},
+  % Add more themes here...
+}
+\pgfkeys{/themes/\notextheme}
+
+% Line numbers style and color (used when the `linenos` key is given)
+\renewcommand{\theFancyVerbLine}{\sffamily
+\textcolor{numerscolor}{\arabic{FancyVerbLine}}}
+
+%┌────────────────────────────────────────────────────────────────────────────┐%
+%│                              Code Captions                                 │%
+%└────────────────────────────────────────────────────────────────────────────┘%
+% Code blocks are captioned like figures and tables: a `caption` key puts a
+% numbered caption under the box and a `label` key makes it referenceable with
+% \ref, \cref or \nameref. The counter is minted's own `listing` counter,
+% declared just above via the package options, so numbering reads 1.1, 1.2,
+% 2.1, ... and resets at every section.
+%
+% NOTE: an uncaptioned block is NOT numbered, exactly like an uncaptioned
+%       figure. Numbers exist to be referenced.
+
+\SetupFloatingEnvironment{listing}{
+  name      = Code,
+  listname  = {List of Code Blocks},
+}
+
+% `position=bottom` pins the caption package to "caption comes after the
+% content", which is what a figure gets by default and what \notex@code@stop
+% actually does (\captionof always runs after \endtcblisting, never before).
+% Without it, caption's own `position=auto` default guesses top-vs-bottom
+% from \prevdepth at the moment \captionof runs, and closing a tcolorbox is
+% exactly the kind of thing that can make that guess land on the wrong side --
+% when it does, `skip` (which only sets \abovecaptionskip, the gap BEFORE the
+% caption, under position=bottom) stops touching the box-to-caption gap at
+% all and \belowcaptionskip, the gap AFTER the caption, ends up dominating
+% instead. Forcing `bottom` here removes that guess entirely.
+%
+% `skip` is that box-to-caption gap. Figures and tables never override
+% caption's own default (10pt); adjust the \dimexpr operand directly to taste.
+% `hypcap` is switched off because these captions are attached with \captionof
+% to a tcolorbox rather than to a real float, so there is no float box for
+% hyperref to anchor to -- left on, caption warns about it once per block.
+\captionsetup[listing]{position=bottom, skip=\dimexpr9pt\relax, hypcap=false}
+
+% Nicer \cref/\Cref names (cleveref is loaded by notex-math.tex; guarded so
+% that this package still loads if it ever is not)
+\ifdef{\crefname}{
+  \crefname{listing}{code}{codes}
+  \Crefname{listing}{Code}{Codes}
+}{}
+
+%┌────────────────────────────────────────────────────────────────────────────┐%
+%│                            Code block options                              │%
+%└────────────────────────────────────────────────────────────────────────────┘%
+% Every code environment takes the same optional key list:
+%
+%   caption = {...}   adds a numbered caption below the block
+%   label   = {...}   \label for that caption (needs a caption to point at)
+%   linenos           show line numbers, off by default (`linenos=false` to
+%                     be explicit, or set it document-wide with \notexcodeset)
+%   options = {...}   extra raw minted options (raw listings options for
+%                     pseudocode), e.g. options={firstnumber=10}
+%   tcb     = {...}   extra raw tcolorbox options, e.g. tcb={colback=red!5}
+%
+% `options` and `tcb` are deliberate escape hatches: anything minted or
+% tcolorbox can do stays reachable without editing this file.
+%
+% \notexcodeset{...} takes the same keys and applies them to every code block
+% in the document, e.g. \notexcodeset{linenos} to number every block.
+
+\makeatletter
+
+\newif\ifnotex@code@linenos
+\newif\ifnotex@code@captioned
+\def\notex@code@caption{}
+\def\notex@code@label{}
+\def\notex@code@extra{}
+\def\notex@code@tcb{}
+\def\notex@code@defaults{}
+
+\pgfkeys{
+  /notex/code/.cd,
+  caption/.store in  = \notex@code@caption,
+  label/.store in    = \notex@code@label,
+  linenos/.is if     = notex@code@linenos,
+  linenos/.default   = true,
+  options/.store in  = \notex@code@extra,
+  tcb/.store in      = \notex@code@tcb,
+}
+
+\newcommand{\notexcodeset}[1]{\def\notex@code@defaults{#1}}
+\def\notex@code@dokeys#1{\pgfkeys{/notex/code/.cd,#1}}
+
+% Minted options shared by every language.
+% \noexpand protects \small from the \edef in \notex@code@start below.
+\def\notex@code@baseminted{%
+  breaklines,                   % break long lines
+  autogobble,                   % remove leading spaces
+  fontsize = \noexpand\small,   % font size
+  obeytabs = true,              % obey tabs in code
+  tabsize  = 4,                 % tab size
+  mathescape = true,            % math mode inside '$'
+  % WARNING: with minted, math escape works only in code comments!
+}
+
+%┌────────────────────────────────────────────────────────────────────────────┐%
+%│                              Code box style                                │%
+%└────────────────────────────────────────────────────────────────────────────┘%
+% One style for every code block, whatever the engine behind it, so a minted
+% block and a pseudocode block are visually indistinguishable.
+
+\tcbset{
+  notexcodestyle/.style = {
+    enhanced,
+    breakable,                  % allow page breaks inside a long block
+    listing only,               % no "text" part, just the code
+    colback  = boxcolor,        % background color
+    colframe = boxcolor,        % frame color
+    boxrule  = 0pt,             % frame thickness
+    arc      = 2mm,             % corner radius
+    left     = 3mm,             % left margin
+    top      = 1mm,             % top margin
+    bottom   = 1mm,             % bottom margin
+  }
+}
+
+%┌────────────────────────────────────────────────────────────────────────────┐%
+%│                          Code block machinery                              │%
+%└────────────────────────────────────────────────────────────────────────────┘%
+% #1 = the user's key list, #2 = the engine-specific tcolorbox options.
+% The whole option list has to be \edef'd before it reaches \tcblisting:
+% tcolorbox stores `minted options` / `listing options` verbatim and only
+% splits them on commas much later, so a macro still sitting in there would be
+% read as one single (undefined) key.
+\newcommand{\notex@code@start}[2]{%
+  \def\notex@code@caption{}\def\notex@code@label{}%
+  \def\notex@code@extra{}\def\notex@code@tcb{}%
+  \notex@code@linenosfalse
+  \edef\notex@code@keys{%
+    \unexpanded\expandafter{\notex@code@defaults},\unexpanded{#1}}%
+  \expandafter\notex@code@dokeys\expandafter{\notex@code@keys}%
+  \ifdefempty{\notex@code@caption}%
+    {\notex@code@captionedfalse}{\notex@code@captionedtrue}%
+  \edef\notex@code@all{%
+    notexcodestyle,%
+    \ifnotex@code@captioned after skip = 0pt,\fi
+    #2,%
+    \unexpanded\expandafter{\notex@code@tcb}}%
+  \expandafter\tcblisting\expandafter{\notex@code@all}%
+}
+
+% \captionof is fed the caption text itself rather than the macro holding it,
+% so that \nameref picks up this block's caption and not the last one set.
+\def\notex@code@makecaption#1{\captionof{listing}{#1}}
+
+\newcommand{\notex@code@stop}{%
+  \endtcblisting
+  \ifnotex@code@captioned
+    \expandafter\notex@code@makecaption\expandafter{\notex@code@caption}%
+    \ifdefempty{\notex@code@label}{}%
+      {\expandafter\label\expandafter{\notex@code@label}}%
+    \par\addvspace{0.5\baselineskip}% restore tcolorbox's usual trailing gap
+  \fi
+}
+
+%┌────────────────────────────────────────────────────────────────────────────┐%
+%│                              Minted Code Boxes                             │%
+%└────────────────────────────────────────────────────────────────────────────┘%
+
+% The generic environment: \begin{code}[keys]{language} ... \end{code}
+% `language` is the language's own name as registered by pygments, so this
+% covers every language pygments knows without touching this file. Its
+% mandatory argument is also what makes the optional one safe here (see the
+% NOTE on \notexnewcodeenv below).
+\NewDocumentEnvironment{code}{ O{} m }
+  {\notex@code@start{#1}{%
+     listing engine  = minted,
+     minted language = #2,
+     minted options  = {\notex@code@baseminted
+       \ifnotex@code@linenos linenos,\fi
+       \unexpanded\expandafter{\notex@code@extra}}}}
+  {\notex@code@stop}
+
+% Per-language shorthands: \notexnewcodeenv[extra minted options]{env}{lexer}
+%
+% NOTE: the `!` in the `!O{}` signature is load-bearing, not decoration. A
+%       plain `O{}` makes \begin{cpp} skip over the end of the line while
+%       looking for a `[`, which drags the first token of the body in before
+%       minted has switched catcodes -- so a body starting with a LaTeX
+%       special character (C/C++'s `#include`, a shebang, ...) died with
+%       "Illegal parameter number in definition of \next". `!` refuses to look
+%       past a space, and the newline after \begin{cpp} is one, so the
+%       lookahead can never reach the body.
+%       The flip side: the `[` must sit on the SAME line as \begin{cpp}, with
+%       no space between them, or it is treated as part of the code. Never put
+%       a stray `%` after \begin{cpp} either -- that hides the newline and
+%       brings the bug straight back.
+%       LaTeX only allows `!` on an environment's LAST argument, which is why
+%       \begin{code} above uses a plain `O{}`: its mandatory {language}
+%       absorbs the lookahead instead.
+\newcommand{\notexnewcodeenv}[3][]{%
+  \NewDocumentEnvironment{#2}{ !O{} }
+    {\notex@code@start{##1}{%
+       listing engine  = minted,
+       minted language = #3,
+       minted options  = {\notex@code@baseminted #1,%
+         \ifnotex@code@linenos linenos,\fi
+         \unexpanded\expandafter{\notex@code@extra}}}}
+    {\notex@code@stop}%
+}
+
+% You can ADD A NEW LANGUAGE by copying one of the lines below, or skip that
+% entirely and use \begin{code}{yourlanguage} directly.
+% Systems / compiled ----------------------------------------------------------
+\notexnewcodeenv{C}{c}
+\notexnewcodeenv{cpp}{cpp}
+\notexnewcodeenv{rust}{rust}
+\notexnewcodeenv{go}{go}
+\notexnewcodeenv{swift}{swift}
+\notexnewcodeenv{csharp}{csharp}
+\notexnewcodeenv{objectivec}{objectivec}
+% JVM -------------------------------------------------------------------------
+\notexnewcodeenv{java}{java}
+\notexnewcodeenv{kotlin}{kotlin}
+\notexnewcodeenv{scala}{scala}
+% Scripting -------------------------------------------------------------------
+\notexnewcodeenv{python}{python}
+\notexnewcodeenv{bash}{bash}
+\notexnewcodeenv{javascript}{javascript}
+\notexnewcodeenv{typescript}{typescript}
+\notexnewcodeenv{ruby}{ruby}
+\notexnewcodeenv{php}{php}
+\notexnewcodeenv{perl}{perl}
+\notexnewcodeenv{lua}{lua}
+% Functional ------------------------------------------------------------------
+\notexnewcodeenv{haskell}{haskell}
+\notexnewcodeenv{ocaml}{ocaml}
+\notexnewcodeenv{fsharp}{fsharp}
+\notexnewcodeenv{clojure}{clojure}
+\notexnewcodeenv{elixir}{elixir}
+\notexnewcodeenv{erlang}{erlang}
+% Data science / scientific ---------------------------------------------------
+% NOTE: named `rlang`, not `r`: an environment named `r` would redefine
+% \r, the pre-existing ring-accent command (e.g. \r{a} for a), and break it.
+\notexnewcodeenv{rlang}{r}
+\notexnewcodeenv{matlab}{matlab}
+\notexnewcodeenv{julia}{julia}
+\notexnewcodeenv{sql}{sql}
+% Markup / data formats -------------------------------------------------------
+\notexnewcodeenv{html}{html}
+\notexnewcodeenv{css}{css}
+\notexnewcodeenv{xml}{xml}
+\notexnewcodeenv{json}{json}
+\notexnewcodeenv[tabsize=2]{yaml}{yaml}
+\notexnewcodeenv{toml}{toml}
+\notexnewcodeenv{ini}{ini}
+\notexnewcodeenv{markdown}{markdown}
+% Build / infra / misc --------------------------------------------------------
+\notexnewcodeenv{dart}{dart}
+\notexnewcodeenv{docker}{docker}
+\notexnewcodeenv{cmake}{cmake}
+\notexnewcodeenv{makefile}{make}
+\notexnewcodeenv{latex}{latex}
+
+%┌────────────────────────────────────────────────────────────────────────────┐%
+%│                                 Pseudocode                                 │%
+%└────────────────────────────────────────────────────────────────────────────┘%
+% pygments has no pseudocode lexer, so this one block keeps running on
+% `listings`. That also buys the thing pseudocode actually needs and minted
+% cannot give: real math mode anywhere in the body, not just in comments.
+%
+%   \begin{pseudocode}[caption = {Random shuffle}, label = {lst:shuffle}]
+%   function shuffle(A):
+%       N $\leftarrow$ length(A)
+%       swap A[i] and A[j]
+%   \end{pseudocode}
+%
+% Line numbers are off by default here, same as everywhere else; turn them on
+% per block with [linenos] (or [linenos=true]).
+
+\lstdefinelanguage{notexpseudo}{
+  % Control flow and structure
+  morekeywords = {
+    algorithm, procedure, function, method, routine,
+    begin, end, endif, endwhile, endfor, endfunction, endprocedure,
+    if, then, else, elif, elseif, otherwise,
+    for, foreach, each, while, do, repeat, until, loop,
+    to, downto, step, in, of,
+    return, yield, break, continue, exit, goto,
+    and, or, not, xor, mod, div,
+    let, set, new, define, declare, assign,
+    input, output, print, read, write, error, assert,
+    true, false, nil, null, none, empty
+  },
+  % Common pseudocode "builtins"
+  morekeywords = [2]{
+    length, size, count, min, max, abs, floor, ceil, round, sqrt, sum,
+    append, insert, delete, remove, push, pop, top, front, back,
+    swap, exchange, sort, reverse, merge, partition, search
+  },
+  sensitive    = false,           % `IF` and `if` are the same keyword
+  morecomment  = [l]{//},         % line comment
+  morecomment  = [l]{\#},         % line comment, alternative marker
+  morestring   = [b]",
+}
+
+% The static half of the styling lives in a listings style of its own rather
+% than in `listing options` below.
+% NOTE: this is not just tidiness. A listings key that takes a bracketed class
+% index -- `keywordstyle = [2]...`, needed for the second keyword class -- runs
+% away and dies with "File ended while scanning use of \lstKV@OptArg@@" when it
+% is routed through tcolorbox's `listing options`, while working perfectly in a
+% plain \lstset. Keeping every bracketed key inside \lstdefinestyle, where
+% \lstset sees it directly, sidesteps that entirely.
+\lstdefinestyle{notexpseudostyle}{
+  language        = notexpseudo,
+  mathescape      = true,                         % math mode inside '$'
+  basicstyle      = \ttfamily\small,
+  keywordstyle    = \color{red}\bfseries,         % control flow / structure
+  keywordstyle    = [2]\color{purple},            % common "builtins"
+  commentstyle    = \color{commentscolor}\itshape,
+  stringstyle     = \color{azure},
+  numberstyle     = \color{numerscolor}\ttfamily\scriptsize,
+  numbersep       = 1.3mm,
+  breaklines      = true,
+  breakatwhitespace = false,
+  keepspaces      = true,
+  showspaces      = false,
+  showstringspaces = false,
+  showtabs        = false,
+  tabsize         = 4,
+  xleftmargin     = 0mm,
+  aboveskip       = -0.5mm,
+  belowskip       = -0.5mm,
+}
+
+% Only the parts that vary per block are left dynamic here. Kept in a macro for
+% the same \edef reason as the minted options above.
+\def\notex@code@lstopts{%
+  listing engine  = listings,     % NOT minted -- see the NOTE below
+  listing options = {
+    style = notexpseudostyle,
+    \ifnotex@code@linenos numbers = left,\else numbers = none,\fi
+    \unexpanded\expandafter{\notex@code@extra}}}
+
+% NOTE: `listing engine` MUST be stated explicitly. Both \tcbuselibrary{listings}
+% and \tcbuselibrary{minted} install a reset style that sets it, and the one
+% loaded LAST wins as the global default. Since this package loads the minted
+% library after the listings one, a box that does not set the engine itself
+% silently renders through minted, which ignores every `listing options` key
+% above (`language`, `mathescape`, `commentstyle`, ...).
+\NewDocumentEnvironment{pseudocode}{ !O{} }
+  {\notex@code@start{#1}{\notex@code@lstopts}}
+  {\notex@code@stop}
+
+\makeatother
+
+%┌────────────────────────────────────────────────────────────────────────────┐%
+%│                                Inline Code                                 │%
+%└────────────────────────────────────────────────────────────────────────────┘%
+
+% Markdown-style inline code with a colored background and no highlighting.
+% Reference: look at pag. 21 of the tcolorbox manual for inline boxes
+\newcommand{\cc}[1]{
+  \kern-1ex                       % negative space
+  \tcbox[
+    on line,                      % inline
+    colback   = boxcolor,         % background color
+    coltext   = textcolor!60,     % text color
+    colframe  = boxcolor,         % frame color
+    boxrule   = 0pt,              % frame thickness
+    boxsep    = 0.5pt,            % frame separation
+    top       = 0.5mm,            % top margin
+    bottom    = 0.5mm,            % bottom margin
+    left      = 0.5mm,            % left margin
+    right     = 0.5mm             % right margin
+  ]
+  {\texttt{#1}}                   % code text
+  \kern-1ex                       % negative space
+}
+
+% Syntax-highlighted inline code.
+% The theme's style comes from the \setminted call further up, which applies
+% to \mintinline too, so there is nothing per-theme to do here.
+\NewDocumentCommand{\inline}{ O{bash} m }{\mintinline{#1}{#2}}

@@ -1,0 +1,80 @@
+OVERALL FEEDBACK
+Review of the current state.
+Terrible, must be completely rewritted.
+
+WHAT I'VE DONE SO FAR and WHAT TO DO IN SHORT
+I've read the documentation for implementation/.
+Don't touch the IMPLEMENTATION.md file that I've already rewritten. It just needs the final introductory paragraphs to be rewritten better.
+I've reorganized the Architecture.md section, titles, don't modify the #Software Structure paragrpah, and the file organization, as well as the fixed subtitle note under the classes tutles with the ">" but all the rest, the content of the text itself must be rewritten.
+All the other files must be revisited and completely rewritten
+
+WHAT IS WRONG IN SHORT
+Complete disorganization. Bad writing and poor text cohesion.
+The content of the current documentation doesn't introduce the reader gradually to the classes and the mechanics of the library, it just states radom things with no logic and in a very verbose way...
+It keeps stating that here is explained the "how" and "why" (just because I had written it in the last prompt, but it's not something you generally find in a documentation, come on!) instead of going straight to the point...
+It doesn't feel like a REAL documentation.
+Moreover, it references cmake for no reason (who cares how it's built! I care about the logic and understanding the implementation) and other radom technical things in a disconnected way: it's not bad by itself to mention or show a code snippet to explain something but there must be a readon behinf that!
+Poor paragraphs and phrases organization: I just see big chunks of text without pauses.
+Graphs seems disconnected from text, titles are too long and sometimes misleading, should bee only some words not a complete phrase.
+
+TASK
+Review and rwrite everything as a real documentation following proper writing directives.
+
+=== IMPORTANT ===
+Before you write your answer, please follow these guidelines:
+
+STYLE AND TONE
+Write in a conversational, informal tone, as if you were writing an actual software docuemntation for general online user and have to be as clear as possible. Avoid short, clipped, or heavily abbreviated phrasing. Favor fuller, more fluent sentences that read naturally when spoken aloud.
+
+Do not oversimplify complex ideas just to make them sound easier. It's fine and often necessary to use precise technical terminology, but when you do, briefly clarify what the term means either in the same sentence or in parentheses right after it. The goal is clarity without dumbing things down.
+
+PUNCTUATION
+Do not use em dashes under any circumstances. If a sentence feels like it needs one, that's a sign the sentence is doing too much at once. Split it into two separate sentences instead, or restructure it so the thought flows without needing that punctuation mark. Use commas, periods, and colons properly and naturally where they belong.
+
+PLANNING AND STRUCTURE
+Before writing anything, stop and plan the structure of the whole piece: what needs to come first to set up context, what builds on what, where a section break actually helps versus where it would fragment a continuous thought, and how the piece should conclude so it feels complete rather than trailing off. Only start writing once you have that structure clear in your head. The final result should read as one coherent piece with a clear thread from start to finish, not a pile of nicely formatted but disconnected fragments. Formatting should serve the structure, not substitute for it.
+
+Keep heading levels consistent and logical (don't jump from an H2 straight to an H4, for instance), and don't create a new section for something that's only a sentence or two long. If a section under a heading would be extremely short, it probably belongs folded into the surrounding text instead.
+
+MARKDOWN FORMATTING
+Use proper markdown throughout:
+- **Bold** for genuinely important terms or warnings, not for every other phrase. If everything is bold, nothing stands out.
+- _Italics_ for emphasis or for introducing a term for the first time.
+- `inline code` for variable names, commands, file names, or short literal expressions.
+- Fenced code blocks with the correct language tag (```python, ```cpp, ```bash, ```plaintext, and so on) for anything longer than a single inline snippet.
+- [Descriptive hyperlinks](https://example.com) where a URL is relevant, and [in-document links](#section-name) when referring to another section of the same piece. Link text should describe the destination rather than just saying "here" or "this link."
+- Tables when comparing several items across the same set of attributes; this is usually clearer than describing the same comparison in prose.
+- Ordered lists for sequential steps, unordered lists for non-sequential items, and avoid nesting lists more than one level deep if it can be helped.
+
+CALLOUTS
+Use GitHub-style markdown callouts where they add real signal, not decoration:
+> [!NOTE]
+> Extra context worth knowing but not essential to the main point.
+
+> [!TIP]
+> A helpful suggestion or shortcut.
+
+> [!IMPORTANT]
+> Something the reader needs to know to avoid misunderstanding the rest of the piece.
+
+> [!WARNING]
+> Something that could cause a real mistake or problem if missed.
+
+> [!CAUTION]
+> A more serious risk than a warning, where the consequences are harder to undo.
+
+A plain `>` blockquote without a tag is fine for a simple side note or a quoted line that doesn't need special emphasis.
+
+MATH
+Any mathematical expression must be written in proper LaTeX math syntax: inline between single dollar signs (for example, $x^{2} + y^{2} = 1$) and in a dedicated block between double dollar signs for anything standalone or multi-line. Never write math as plain text approximations (like x^2 or sqrt(x)) when LaTeX is available.
+
+DIAGRAMS
+When a concept has a structure, flow, sequence, or set of relationships that would genuinely be clearer as a picture, include a ```mermaid block to illustrate it (flowcharts, sequence diagrams, state diagrams, and so on, whichever fits best). Don't force a diagram where a sentence would do. Always accompany the diagram with a short text explanation of what it shows, since not every reader's markdown viewer renders mermaid correctly.
+
+OVERALL QUALITY
+Where it's helpful, use a concrete example, analogy, or a brief "in other words" restatement to reinforce a difficult point, especially right after introducing something technical or abstract.
+If a concept has a common misconception attached to it, briefly flag it so I don't walk away with the wrong idea.
+Prefer showing why something works or matters over just stating that it does.
+If the topic has some nuance, trade-off, or exception worth knowing, mention it briefly rather than presenting things as more clear-cut than they are.
+Keep terminology consistent throughout: if you name something a certain way early on, don't switch to a different name for the same thing later without saying so.
+Keep paragraphs reasonably short so the piece stays easy to follow, even though individual sentences can be longer and more fluent.

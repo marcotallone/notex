@@ -1,0 +1,162 @@
+\documentclass[../main.tex]{subfiles}
+\graphicspath{{\subfix{../../images/}}}
+
+\begin{document}
+
+\section{Code Blocks}
+
+The NoTeX template provides a clean way to write code snippets in your documents. Everything is built on \bft{minted}, which highlights code automatically through the \cc{pygments} library, so you get proper syntax colouring for free in any of the languages \cc{pygments} knows. The only exception is \bft{pseudocode}, which \cc{pygments} has no lexer for and which therefore gets an environment of its own.
+
+\subsection{Inline Code}
+
+There are two ways to write code inline. The \cc{\textbackslash cc} command gives you plain, markdown-style monospaced text with a coloured background and no highlighting at all: \cc{print("Hello, World!")}. The \cc{\textbackslash inline} command instead runs the text through minted, so it comes out highlighted like any other block: \inline[python]{print("Hello, World!")}. The language goes in the optional argument.
+
+\subsection{Code Blocks}
+
+Every language has an environment named after it. Just open it and write, no arguments needed.
+
+% Simple code block
+\begin{python}
+def hello(name):
+    """Greets the user by name."""
+    print(f"Hello, {name}!")
+\end{python}
+
+% C++ code block
+\begin{cpp}
+#include <iostream>
+void hello(const std::string& name) {
+    std::cout << "Hello, " << name << "!" << std::endl;
+}
+\end{cpp}
+
+If the language you need has no environment of its own, use the generic \cc{code} environment and name the language yourself. Any name \cc{pygments} recognises works.
+
+% Generic environment with an explicit language
+\begin{code}{rust}
+fn hello(name: &str) {
+    println!("Hello, {name}!");
+}
+\end{code}
+
+Some code languages have different default settings than others. For instance, \cc{YAML} blocks have tabs replaced with two spaces, following stardard \cc{YAML} style. 
+
+% Escape hatches in action
+\begin{yaml}[caption = {A \cc{YAML} code block}]
+name: "Pippo"
+surname: "Pallo"
+age: 24
+list:
+  - item1
+  - item2
+
+# This is a comment
+nested:
+  key1: value1
+  key2: value2
+\end{yaml}
+
+
+\subsection{Captions and References}
+
+Code blocks are captioned exactly like figures and tables. Add a \cc{caption} key and the block gets a numbered caption underneath; add a \cc{label} key too and you can point at it from anywhere in the text. Numbering follows the section, so the blocks below are \ref{lst:greet} and \ref{lst:square}, and it resets at every new section.
+
+% Captioned and labelled block
+\begin{python}[caption = {A function greeting the user by name}, label = {lst:greet}]
+def hello(name):
+    """Greets the user by name."""
+    print(f"Hello, {name}!")
+\end{python}
+
+A block without a caption is not numbered, just like a figure without one. Math mode works inside comments through the usual \cc{\$...\$} delimiters.
+
+% Line numbers and math inside a comment
+\begin{python}[caption = {Squaring a number}, label = {lst:square}]
+def square(x):
+    """Returns the square of a number."""
+    return x**2 # returns $x^2$, the square of $x$
+\end{python}
+
+Referencing works with every mechanism you would expect: \cref{lst:greet} and \Cref{lst:square} both resolve, and \cc{\textbackslash listoflistings} prints a list of every captioned block in the document.
+
+\subsection{Pseudocode}
+
+Pseudocode gets its own environment. It runs on \bft{listings} rather than minted, which buys the one thing pseudocode really needs and minted cannot offer: real math mode anywhere in the body, not only inside comments. Keywords common to pseudocode are automatically highlighted with some predefined words.
+
+% Pseudocode with math and a caption
+\begin{pseudocode}[caption = {Shuffling a list in place}, label = {lst:shuffle}]
+function shuffle(A):
+    // Fisher-Yates shuffle
+    N $\leftarrow$ length(A)
+    for i = 0 to N-1 do
+        j $\leftarrow$ $\text{random integer between } 0 \text{ and } N-1$
+        swap A[i] and A[j]
+    return A
+\end{pseudocode}
+
+You can also write pseudocode with line numbers. By default, line numbers are hidden, but you can show them with the \cc{linenos = true} key as in the following example:
+
+% Pseudocode without line numbers
+\begin{pseudocode}[linenos = true]
+if x > 0 then
+    return $\sqrt{x}$
+else 
+    error "negative input"
+\end{pseudocode}
+
+% You can also specify at which line number the block should start with the \cc{firstnumber} key, passed as an extra option to the listings package. The following example starts at line 10:
+
+% % Pseudocode with line numbers starting at 10
+% \begin{pseudocode}[linenos = true, options = {firstnumber=10}]
+% if x > 0 then
+%     return $\sqrt{x}$
+% else 
+%     error "negative input"
+% \end{pseudocode}
+
+\pagebreak 
+
+\subsection{Options}
+
+All the code environments take the same optional keys, which you can mix freely.
+
+\begin{table}[htb]
+  \renewcommand{\arraystretch}{1.5}
+  \centering
+  \begin{tabularx}{\textwidth}{|l|X|}
+    \hline
+    \rowcolor{boxcolor}
+    \textbf{Key} & \textbf{What it does} \\
+    \hline
+    \cc{caption} & Adds a numbered caption below the block \\
+    \hline
+    \cc{label} & Makes the block referenceable with \cc{\textbackslash ref} or \cc{\textbackslash cref} \\
+    \hline
+    \cc{linenos} & Shows line numbers (\cc{linenos=false} hides them) \\
+    \hline
+    \cc{options} & Extra raw minted options, or listings options for pseudocode \\
+    \hline
+    \cc{tcb} & Extra raw tcolorbox options, to restyle the box itself \\
+    \hline
+  \end{tabularx}
+  \caption{The optional keys accepted by every code environment}
+  \label{tab:codekeys}
+  \renewcommand{\arraystretch}{1}
+\end{table}
+
+As an example, consider the pseudocode language above with active line numbers. In that case, you could optionally make line numbers start at 10, increase left margin and change the box color to the background document color by passing the required keys to the \cc{options} and \cc{tcb} keys respectively:
+
+\begin{pseudocode}[caption = {An example of custom code block with different options.}, linenos = true, options = {firstnumber=10, numbersep=2.5mm}, tcb = {colback=background, left=5mm}]
+if x > 0 then
+    return $\sqrt{x}$
+else 
+    error "negative input"
+\end{pseudocode}
+
+If you want any specific setting applied to every block in the document, set it once in the preamble with \cc{\textbackslash notexcodeset}, which takes the same keys. For instance \cc{\textbackslash notexcodeset\{linenos\}} numbers every code block you write.
+
+\begin{note}
+    The opening bracket of the optional argument must sit on the same line as \cc{\textbackslash begin\{...\}}, with no space in between, and nothing else may follow the environment name on that line. This is what lets a block start with a character LaTeX would normally choke on, like the \cc{\#include} in the C\texttt{++} example above.
+\end{note}
+
+\end{document}

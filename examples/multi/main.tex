@@ -1,0 +1,56 @@
+\documentclass[light]{notex}
+
+% PREAMBLE ─────────────────────────────────────────────────────────────────────
+\graphicspath{{../../images/}} % Set the path for images to the "images" folder
+% NOTE: later the C++ framework will take care of this automatically, so you won't need to set the path manually.
+
+% Additional packages here
+\usepackage{blindtext} % Dummy text generator
+% \usepackage{svg} % SVG support (requires InkScape installed)
+\usepackage{subfiles} % Modular document structure (best loaded last)
+
+% Title, Author and Date
+\title{
+    \bft{NoTeX}\\
+    \emph{\large A modern noteworthy LaTeX template}\\
+    {\small Multi File Example}
+}
+\author{Copyright \copyright\ 2026 Marco Tallone}
+\date{MIT License}
+
+% Acronyms
+\newacronym{CLI}{CLI}{\emph{command line interface}}
+
+% DOCUMENT ─────────────────────────────────────────────────────────────────────
+\begin{document}
+
+% Title page
+\maketitle
+\begin{center}
+\includegraphics[width=0.25\textwidth]{notex-logo.png}
+\end{center}
+\tableofcontents
+
+% Document settings (place after title page)
+\glsdisablehyper\ % disable hyperlinks for acronyms (if using hyperref package)
+
+% Sections
+\pagebreak
+\subfile{sections/1_introduction}
+\pagebreak
+\subfile{sections/2_installation}
+\pagebreak
+\subfile{sections/3_usage}
+\pagebreak
+\subfile{sections/4_callouts}
+\pagebreak
+\subfile{sections/5_code}
+
+% Bibliography
+\pagebreak
+% \bibliographystyle{plainurl}  % references in alphabetical order
+\bibliographystyle{unsrturl}  % references in order of appearance
+\bibliography{bibliography}
+
+\end{document}
+

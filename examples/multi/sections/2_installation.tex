@@ -1,0 +1,189 @@
+\documentclass[../main.tex]{subfiles}
+\graphicspath{{\subfix{../../images/}}}
+
+\begin{document}
+
+\section{Installation}
+
+This section will guide you through the installation process of NoTeX and its companion utility.
+
+\subsection{Requirements}
+
+The project requires the following dependencies installed in your system:
+
+\begin{itemize}
+    \item CMake (>= 3.20)
+    \item C++ compiler (C++20)
+    \item \href{https://www.latex-project.org/get/}{LaTeX distribution}, with the following packages:
+    \begin{itemize}
+        \item \cc{texlive-latex-base}
+        \item \cc{texlive-latex-extra}
+        \item \cc{texlive-fonts-recommended}
+        \item \cc{texlive-fonts-extra}
+        \item \cc{texlive-luatex}
+        \item \cc{texlive-lang-english}
+        \item \cc{texlive-bibtex-extra}
+        \item \cc{texlive-science}
+        \item \cc{biber}
+        \item \cc{latexmk}
+    \end{itemize}
+    \item \href{https://www.luatex.org/}{LuaLaTeX} compiler: this can be installed with the above \cc{texlive-luatex} package
+    \item \href{https://pygments.org/}{Pygments} python package: can be installed with \cc{pip install Pygments} in your preferred environment
+\end{itemize}
+
+\subsection{CLI Utility Installation}
+
+\subsubsection{Building from source}
+
+The NoTeX software can be built from source following these steps:
+
+\begin{enumerate}
+    \item Clone the repository:
+    
+        \begin{bash}
+            git clone https://github.com/marcotallone/notex.git
+        \end{bash}
+
+    \item Go to the project's root:
+    
+        \begin{bash}
+            cd notex
+        \end{bash}
+
+    \item Compile using cmake:
+    
+        \begin{bash}
+            mkdir -p build \
+            && cmake -S . -B build  -DCMAKE_BUILD_TYPE=Release \
+            && cmake --build build --parallel 4
+        \end{bash}
+
+        This will produce a unique binary in \cc{./bin/notex}, containing the CLI utility with embedded LaTeX template.
+
+        
+    \item \itt{Optionally}, you can install the software system-wise for easier usage:
+    
+        \begin{bash}
+            sudo cmake --install build
+        \end{bash}
+
+        This will allow to use \cc{notex} as a normal binary everywhere in your system.
+
+        \begin{warning}
+            The system-wise installation might require \cc{sudo} priviledges!
+        \end{warning}
+
+    \item Check if your installation was successful by running:
+
+        \begin{bash}
+            notex info
+            # or, if you skipped step 3:
+            # ./bin/notex info
+        \end{bash}
+
+        The [`install.sh`](../../install.sh) script provided in the project's repository helps to automate these steps with:
+
+        \begin{bash}
+            ./install.sh # for local compilation only
+        \end{bash}
+
+        or:
+
+        \begin{bash}
+            sudo ./install.sh global # for system-wise installation
+        \end{bash}
+
+        \begin{blueinfo}
+            Mind that the latter option also installs the LaTeX template system-wise, see below for further details.
+        \end{blueinfo}
+\end{enumerate}
+
+\subsubsection{Build Options}
+
+When building from source, the CMake compilation offers multiple options that are not set by default:
+
+\begin{itemize}
+    \item \cc{DEBUG}: enables debug mode, with extended logging reporting.
+    \item \cc{VERBOSE}: enables verbose mode.
+    \item \cc{LOGGING}: enables logging reporting. Logs are always stored in the\\ \cc{./log/notex.log} file in the project where \cc{notex} is used.
+    \item \cc{TESTS}: enables tests. See [Testing](./Testing.md) for details.
+    \item \cc{COVERAGE}: enables coverage report. See [Testing](./Testing.md) for details.
+    \item \cc{DOCS}: allows to build project documentation providing the \cc{docs} target. After setting this option with \cc{-DDOCS=ON}, documentation can be built in \cc{./build/docs/} with:
+    
+    \begin{bash}
+        cmake --build build --target docs
+    \end{bash}
+\end{itemize}
+
+\subsubsection{Uninstall}
+
+You can uninstall a global \cc{notex} installation with the command:
+
+\begin{bash}
+    notex uninstall
+\end{bash}
+
+Or, equivalently:
+
+\begin{bash}
+    notex prune
+\end{bash}
+
+A local installation can be analogously uninstalled by providing the path to the project installation:
+
+\begin{bash}
+    notex uninstall <path>
+\end{bash}
+
+\subsection{LaTeX Template Installation}
+
+After installing the \cc{notex} CLI utility, the LaTeX template can be installed either \bft{globally} (system-wise available) or \bft{locally} (for the single LaTeX project).
+
+\subsubsection{Global Installation}
+
+The template can be globally installed with:
+
+\begin{bash}
+    notex install
+\end{bash}
+
+Which will install the LaTeX classes and styles, as well as required fonts, into your TeX distribution's \cc{TEXMFHOME} directory. To check which directory this is in your own system, you can run:
+
+\begin{bash}
+    kpsewhich -var-value=TEXMFHOME
+\end{bash}
+
+\begin{info}
+    Pass \cc{--force} to overwrite an existing installation without being asked to confirm.
+\end{info}
+
+After a global installation the template can be loaded as:
+
+\begin{latex}
+\documentclass[OPTIONS]{notex}
+\end{latex}
+
+
+\subsubsection{Local Installation}
+
+You can install the template locally, for your project only, by running:
+
+\begin{bash}
+    notex install <path>
+\end{bash}
+
+where \cc{<path>} is the path to your LaTeX project root directory. For instance if the root directory of your project is the current one run:
+
+\begin{bash}
+    notex install .
+\end{bash}
+
+The local installation will install the template and its classes in the \cc{<path>/settings/} directory, while fonts will be placed in \cc{<path>/fonts/}.
+
+After a local installation the template can be loaded as:
+
+\begin{latex}
+\documentclass[OPTIONS]{settings/notex}
+\end{latex}
+
+\end{document}

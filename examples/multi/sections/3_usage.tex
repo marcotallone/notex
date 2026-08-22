@@ -1,0 +1,198 @@
+\documentclass[../main.tex]{subfiles}
+\graphicspath{{\subfix{../../images/}}}
+
+\begin{document}
+
+\section{Usage}
+
+Once the \cc{notex} CLI utility is installed, it offers a set of commands to facilitate managing and working with your \LaTeX{} projects.
+The following table summarizes the main commands and their purpose. Further details can be obtained by running \cc{notex help} (or \cc{notex -h}).
+
+\vspace{4mm}
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{lp{0.53\textwidth}}
+    \toprule
+    \textbf{Command} & \textbf{Description} \\
+    \midrule
+    \cc{notex help}             & Shows \cc{notex} binary options and help guide. \\
+    \cc{notex version}          & Shows current binary version. \\
+    \cc{notex info}             & Displays installation and current project information. \\
+    \cc{notex init .}           & Initializes a project in the current working directory. \\
+    \cc{notex clean <path>}     & Cleans recursively temporary files from the provided \cc{<path>}. \\
+    \cc{notex get <snippet>}    & Provides a ready-to-use \LaTeX{} snippet template. \\
+    \cc{notex theme <theme>}    & Changes the current project theme. \\
+    \cc{notex add <what>}       & Adds a new section or bibliography to the current project. \\
+    \cc{notex remove <what>}    & Removes a section or bibliography from the current project. \\
+    \cc{notex ls}               & Lists the files that belong to the current project. \\
+    \cc{notex checkhealth}      & Checks the \TeX{} environment, installation, and project state. \\
+    \cc{notex set <key> <what>} & Changes a whitelisted \cc{notex.json} key directly. \\
+    \cc{notex reset}            & Regenerates \cc{main.tex} from the template. \\
+    \cc{notex delete}           & Removes notex files and build artefacts, keeps your documents. \\
+    \bottomrule
+\end{tabular}
+\end{center}
+\vspace{2mm}
+
+\begin{info}
+    This guide assumes that the \cc{notex} utility has been installed as a globally available binary.
+\end{info}
+
+\subsection{Initialization}
+
+You can quickly set up a \LaTeX{} project in the current directory (\itt{or in one of its sub-paths}) via the \bft{init command}:
+
+\begin{bash}
+    notex init .
+    # or equivalent:
+    # notex init multi .
+\end{bash}
+
+The default initialization starts a \bft{multi-file} project: a \cc{main.tex} using the \cc{subfiles} package is created together with a \cc{./sections/} folder for individual section files.
+An example of this layout can be found in the \cc{examples/multi/} directory.
+
+For smaller projects, a \bft{mono-file} project with a single \cc{main.tex} can be initialized instead:
+
+\begin{bash}
+    notex init mono .
+\end{bash}
+
+An example can be found in the \cc{examples/mono/} directory.
+
+Both commands also create a \cc{.notex/} directory at the project root containing NoTeX configuration.
+
+\begin{info}
+    \cc{notex init} refuses to overwrite an existing \cc{main.tex} or \cc{.notex/} directory.
+    Pass \cc{--force} to overwrite anyway.
+\end{info}
+
+In both cases, the generated \cc{main.tex} automatically uses\\
+ \cc{\textbackslash documentclass\{settings/notex\}} when a local installation is detected in the target directory, and \cc{\textbackslash documentclass\{notex\}} otherwise.
+
+\subsection{Management}
+
+Once you have a working project, \cc{notex} provides a series of management commands to facilitate common operations.
+
+\subsubsection{Change Theme}
+
+You can change the theme used by the \LaTeX{} template with:
+
+\begin{bash}
+    notex theme <theme_name>
+\end{bash}
+
+where \cc{<theme\_name>} can be one of the available themes:
+
+\begin{itemize}
+    \item \cc{light} (\itt{default})
+    \item \cc{dark}
+    \item \cc{tokyo}
+    \item \cc{bw}
+\end{itemize}
+
+\subsubsection{Manage Sections and Bibliography}
+
+You can add a new section with:
+
+\begin{bash}
+    notex add section "My Title"
+\end{bash}
+
+This adds a section directly to \cc{main.tex} for a mono-file project, or creates a new section file under \cc{sections/} for a multi-file project.
+
+You can remove a section by its number \cc{<N>}:
+
+\begin{bash}
+    notex remove section <N>
+\end{bash}
+
+Two analogous commands exist for bibliography management.\\
+To create \cc{bibliography.bib} and wire it into \cc{main.tex}:
+
+\begin{bash}
+    notex add bib
+\end{bash}
+
+To remove the bibliography:
+
+\begin{bash}
+    notex remove bib
+\end{bash}
+
+\subsubsection{Cleaning}
+
+\LaTeX{} projects accumulate temporary files and build artefacts. \cc{notex} provides a command to clean them up recursively:
+
+\begin{bash}
+    notex clean <path>
+\end{bash}
+
+\begin{warning}
+    Cleaned files are \bft{lost forever} once the command runs. To preview which files would be removed \bft{before actually deleting them}, run a \itt{dry run}:
+
+    \begin{bash}
+        notex clean --dry-run
+    \end{bash}
+
+    This lists the files that would be removed by an actual clean operation.
+\end{warning}
+
+\subsubsection{References and Snippets}
+
+To recall the \LaTeX{} environments provided by the NoTeX template, the \cc{get} command prints ready-to-paste snippet templates:
+
+\begin{bash}
+    notex get
+\end{bash}
+
+Lists every available snippet name (\itt{info, warning, cbox, ebox, code, \ldots}).
+To fetch a specific snippet, pass its name:
+
+\begin{bash}
+    notex get box       # displays a template for the "box" environment
+    notex get warning   # displays a template for the warning callout
+    notex get code      # displays a template for the code environment
+\end{bash}
+
+\subsection{State and Info}
+
+Several commands allow inspecting and modifying the current project state.
+
+\begin{bash}
+    notex ls
+\end{bash}
+
+Lists the files that belong to the project (\itt{main file, sections, bibliography}).
+
+\begin{bash}
+    notex checkhealth
+\end{bash}
+
+Checks the \TeX{} environment, the installation, and the project's state.
+
+\begin{bash}
+    notex set main_file alt.tex
+\end{bash}
+
+Changes a whitelisted \cc{notex.json} key directly (\itt{e.g.} \cc{main\_file}, \cc{theme},\\ \cc{bibliography\_file}).
+
+\begin{bash}
+    notex reset
+\end{bash}
+
+Regenerates \cc{main.tex} from the template, backing up the existing file to \cc{main.tex.bak}.
+
+\begin{bash}
+    notex delete
+\end{bash}
+
+Removes \cc{.notex/}, \cc{settings/}, \cc{fonts/}, and build artefacts while keeping your documents untouched.
+To remove the entire project scaffolding destructively:
+
+\begin{bash}
+    notex delete --all
+\end{bash}
+
+\end{document}
+
+

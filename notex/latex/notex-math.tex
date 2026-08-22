@@ -1,0 +1,54 @@
+%┌────────────────────────────────────────────────────────────────────────────┐%
+%│                                   Math                                     │%
+%└────────────────────────────────────────────────────────────────────────────┘%
+% Math related packages and settings
+
+\RequirePackage{mathtools}
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+\RequirePackage{amsfonts}
+
+% To display nice fractions in text mode
+\RequirePackage{nicefrac}
+
+% To use \mathbbm{1} to display the identity matrix
+\RequirePackage{bbm}
+
+% To use \mathcal{O} to display big O notation
+% \RequirePackage{mathrsfs}
+
+% To represent simplifications with the \cancel{} command
+\RequirePackage{cancel}
+
+% To reset environments counters at every section
+% (amsmath package required)
+\numberwithin{figure}{section}
+\numberwithin{equation}{section}
+\numberwithin{table}{section}
+
+% To deal with quantities and units of measure
+\RequirePackage{siunitx}
+\sisetup{
+  detect-weight=true,
+  detect-inline-weight=math,
+  exponent-product=\cdot
+}
+
+% Bold math symbols in tables
+% \newrobustcmd\B{\DeclareFontSeriesDefault[rm]{bf}{b}\bfseries} 
+\newrobustcmd{\B}{\bfseries}
+
+% Better references formatting
+% NOTE: must be loaded after amsmath and hyperref packages
+\RequirePackage{cleveref}
+\crefname{equation}{equation}{equations}    % write 'equation' instead of 'eq.'
+\Crefname{equation}{Equation}{Equations}    % write 'Equation' instead of 'Eq.'
+\crefformat{equation}{equation~#2#1#3}      % no parenthesis in lowercase 
+\Crefformat{equation}{Equation~#2#1#3}      % no parenthesis in capitalized
+\crefrangeformat{equation}{equations~#3#1#4--#5#2#6} % Range of equations
+\Crefrangeformat{equation}{Equations~#3#1#4--#5#2#6} % Range of equations (capitalized)
+\crefmultiformat{equation}{equations~#2#1#3}{ and~#2#1#3}{, #2#1#3}{ and~#2#1#3} % Multiple equations
+\Crefmultiformat{equation}{Equations~#2#1#3}{ and~#2#1#3}{, #2#1#3}{ and~#2#1#3} % Multiple equations (capitalized)
+
+% For importing some pgf plots generated in Python
+\newcommand{\mathdefault}[1]{#1}

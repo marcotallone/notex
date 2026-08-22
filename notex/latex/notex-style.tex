@@ -1,0 +1,31 @@
+%┌────────────────────────────────────────────────────────────────────────────┐%
+%│                                   Style                                    │%
+%└────────────────────────────────────────────────────────────────────────────┘%
+% Styling settings
+
+% No indentation
+\setlength{\parindent}{0pt}
+
+%------------------------------------------------------------------------------%
+% NOTE: This is a quick set-up I use to print my name, the section and date
+%       on all pages.
+%       To use it uncomment it and define the commands:
+%       \newcommand{\pastetitle}{MyTitle}
+%       \newcommand{\pasteauthor}{MyName}
+%       \newcommand{\pastedate}{\today}
+%       in the preamble of your document, possibly before the \maketitle.
+%------------------------------------------------------------------------------%
+
+% Headers and footers
+% \RequirePackage{fancyhdr}
+% \pagestyle{fancy}
+% \fancyhf{}
+% \fancyhead[L]{\nouppercase{\footnotesize{\gray{\leftmark}}}}
+% \fancyhead[C]{\nouppercase{\footnotesize{\gray{\pastetitle}}}}
+% \fancyhead[R]{\nouppercase{\footnotesize{\gray{\pasteauthor\ | \pastedate}}}}
+% \renewcommand{\headrulewidth}{0pt} % No horizontal line
+% \fancyfoot[C]{\thepage} % Page number in the center
+
+% Section titles
+\RequirePackage{titlesec}
+\titleformat*{\section}{\fontsize{18}{16}\selectfont\bfseries}
