@@ -1,0 +1,1056 @@
+<!-- Custom Doxygen HTML_HEADER for NoTeX. Rationale for every choice
+     here: docs/plan/CHANGELOG.md, entries 26-29. Keep every comment in
+     this file to 1-3 lines; longer ones have repeatedly broken rendering. -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.17.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>NoTeX: notex::Manager Class Reference</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="codefolding.js"></script>
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="doxygen-awesome-interactive-toc.js"></script>
+<script type="text/javascript" src="doxygen-awesome-tabs.js"></script>
+<script type="text/javascript" src="mermaid.min.js"></script>
+<script type="text/javascript">
+    // Guarded so one extension failing degrades to a console message
+    // instead of aborting this whole block (CHANGELOG entry 34).
+    function notexInit(name, extension) {
+        try {
+            if (extension && typeof extension.init === 'function') {
+                extension.init();
+            } else {
+                console.error('NoTeX: ' + name + '.init() unavailable, skipped');
+            }
+        } catch (error) {
+            console.error('NoTeX: ' + name + '.init() threw', error);
+        }
+    }
+    notexInit('DoxygenAwesomeFragmentCopyButton', typeof DoxygenAwesomeFragmentCopyButton !== 'undefined' ? DoxygenAwesomeFragmentCopyButton : null);
+    notexInit('DoxygenAwesomeDarkModeToggle', typeof DoxygenAwesomeDarkModeToggle !== 'undefined' ? DoxygenAwesomeDarkModeToggle : null);
+    notexInit('DoxygenAwesomeParagraphLink', typeof DoxygenAwesomeParagraphLink !== 'undefined' ? DoxygenAwesomeParagraphLink : null);
+    notexInit('DoxygenAwesomeInteractiveToc', typeof DoxygenAwesomeInteractiveToc !== 'undefined' ? DoxygenAwesomeInteractiveToc : null);
+    notexInit('DoxygenAwesomeTabs', typeof DoxygenAwesomeTabs !== 'undefined' ? DoxygenAwesomeTabs : null);
+</script>
+<script type="text/javascript">
+    // Deliberately its own <script>: a throw in another block cannot
+    // abort this one, which is what silently killed mermaid before.
+    (function() {
+        if (typeof mermaid === 'undefined') { return; }
+        var toggle = typeof DoxygenAwesomeDarkModeToggle !== 'undefined' ? DoxygenAwesomeDarkModeToggle : null;
+        var counter = 0;
+        // Must run here, before DOMContentLoaded: mermaid's own autorun
+        // would otherwise overwrite each diagram's source with its SVG.
+        mermaid.initialize({ startOnLoad: false });
+        // darkMode is a separate themeVariable; theme 'dark' alone leaves
+        // most computed colors on their light-mode branch.
+        function config(dark) {
+            return dark
+                ? { startOnLoad: false, theme: 'dark', themeVariables: { darkMode: true } }
+                : { startOnLoad: false, theme: 'neutral' };
+        }
+        // Source captured once, up front, so every re-render redraws from
+        // it rather than from a previous render's own output.
+        function saveSource() {
+            document.querySelectorAll('.mermaid').forEach(function(el) {
+                if (!el.hasAttribute('data-notex-source')) {
+                    el.setAttribute('data-notex-source', el.textContent);
+                }
+            });
+        }
+        // The third argument matters: without it mermaid measures label
+        // text against <body>'s font, so nodes size wrong and text crops.
+        function render(dark) {
+            mermaid.initialize(config(dark));
+            document.querySelectorAll('.mermaid').forEach(function(el) {
+                var source = el.getAttribute('data-notex-source');
+                if (!source) { return; }
+                mermaid.render('notex-mermaid-' + (counter++), source, el).then(function(result) {
+                    el.innerHTML = result.svg;
+                }).catch(function(error) {
+                    // mermaid empties the element first, so restore the
+                    // source rather than leave the diagram blank.
+                    el.textContent = source;
+                    console.error('NoTeX: mermaid render failed', error);
+                });
+            });
+        }
+        // userPreference is a getter over localStorage and the system
+        // setting, so it reads correctly even if init() never ran.
+        function darkNow() {
+            return toggle ? toggle.userPreference : false;
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            saveSource();
+            render(darkNow());
+        });
+        // Every mode-change path dispatches through this one property,
+        // so replacing it re-renders on toggle, system change and restore.
+        if (toggle) {
+            var originalEnableDarkMode = toggle.enableDarkMode;
+            toggle.enableDarkMode = function(enable) {
+                originalEnableDarkMode(enable);
+                render(enable);
+            };
+        }
+    })();
+</script>
+<script type="text/javascript">
+    // Moves the toggle button before the search box; MutationObserver
+    // since the extension re-appends it after on every resize.
+    document.addEventListener('DOMContentLoaded', function() {
+        function moveToggleBeforeSearch() {
+            var searchBox = document.getElementById("MSearchBox");
+            var toggle = document.querySelector("doxygen-awesome-dark-mode-toggle");
+            if (searchBox && toggle && searchBox.previousElementSibling !== toggle) {
+                searchBox.parentNode.insertBefore(toggle, searchBox);
+            }
+        }
+        new MutationObserver(moveToggleBeforeSearch).observe(document.body, {childList: true, subtree: true});
+        moveToggleBeforeSearch();
+    });
+</script>
+<script type="text/javascript">
+    // Publishes the sticky bar's measured height, which CSS cannot read
+    // on its own, so anchor targets can offset by it.
+    document.addEventListener('DOMContentLoaded', function() {
+        var topBar = document.getElementById('top');
+        if (!topBar) { return; }
+        function publishHeight() {
+            document.documentElement.style.setProperty('--notex-topbar-height', topBar.offsetHeight + 'px');
+        }
+        publishHeight();
+        if (typeof ResizeObserver !== 'undefined') {
+            new ResizeObserver(publishHeight).observe(topBar);
+        }
+    });
+</script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<style>
+/* Sticky, blurred top bar. Colours mirror the theme's own light/dark
+   custom-property pattern so the toggle keeps driving them. */
+:root {
+    --notex-topbar-background: rgba(255, 255, 255, 0.50);
+    --notex-topbar-height: 0px;
+}
+@media (prefers-color-scheme: dark) {
+    html:not(.light-mode) {
+        --notex-topbar-background: rgba(28, 29, 31, 0.50);
+    }
+}
+html.dark-mode {
+    --notex-topbar-background: rgba(28, 29, 31, 0.50);
+}
+#top {
+    position: sticky;
+    top: 0;
+    background: var(--notex-topbar-background);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    backdrop-filter: saturate(180%) blur(12px);
+}
+/* Without blur support the bar must stay opaque to stay readable. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    #top {
+        background: var(--header-background);
+    }
+}
+/* Anchor targets would otherwise land underneath the sticky bar. */
+a.anchor {
+    scroll-margin-top: calc(var(--notex-topbar-height) + var(--spacing-large));
+}
+/* Space before the search box, now that the toggle sits there. */
+doxygen-awesome-dark-mode-toggle {
+    margin-right: 0.5em;
+}
+/* Circular GitHub icon, replacing the theme's corner ribbon. */
+#notex-github-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    color: var(--page-secondary-foreground-color, #52606d);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+#notex-github-icon:hover {
+    background-color: var(--separator-color, rgba(0, 0, 0, 0.08));
+    color: var(--page-foreground-color, #14181d);
+}
+</style>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectalign">
+   <div id="projectname">NoTeX<span id="projectnumber">&#160;1.0.0</span>
+   </div>
+   <div id="projectbrief">A modern noteworthy LaTeX template</div>
+  </td>
+  <td style="padding-left: 0.5em; vertical-align: middle;">
+   <a id="notex-github-icon" href="https://github.com/marcotallone/notex" title="View source on GitHub" target="_blank" rel="noopener noreferrer">
+    <svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+   </a>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.17.0 -->
+<script type="text/javascript">
+let searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', codefold.init);
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', () => {
+  initMenu('',false);
+  init_search();
+});
+</script>
+<div id="main-nav-mobile">
+<div class="sm sm-dox"><input id="main-menu-state" type="checkbox"/>
+<label class="main-menu-btn" for="main-menu-state">
+<span class="main-menu-btn-icon"></span> Toggle main menu visibility</label>
+<span id="searchBoxPos1" style="position:absolute;right:8px;top:8px;height:36px;"></span>
+</div>
+</div><!-- main-nav-mobile -->
+<div id="main-nav">
+  <ul class="sm sm-dox" id="main-menu">
+    <li id="searchBoxPos2" style="float:right">
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+    </li>
+  </ul>
+</div><!-- main-nav -->
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a href="namespacenotex.html">notex</a></li><li class="navelem"><a href="classnotex_1_1Manager.html">Manager</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="classnotex_1_1Manager-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">notex::Manager Class Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Represents a single NoTeX project: its location and metadata.  
+ <a href="#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="manager_8hpp_source.html">notex/manager.hpp</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:aaa39ea90785c2179e5ddd92f6092c1ec" id="r_aaa39ea90785c2179e5ddd92f6092c1ec"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#aaa39ea90785c2179e5ddd92f6092c1ec">Manager</a> (std::filesystem::path start_dir=std::filesystem::current_path())</td></tr>
+<tr class="memdesc:aaa39ea90785c2179e5ddd92f6092c1ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Locates and loads the project that contains <code class="param">start_dir</code>.  <br /></td></tr>
+<tr class="memitem:a0b515475f43b38497055863731c5418d" id="r_a0b515475f43b38497055863731c5418d"><td class="memItemLeft">const std::filesystem::path &amp;&#160;</td><td class="memItemRight"><a class="el" href="#a0b515475f43b38497055863731c5418d">root_dir</a> () const noexcept</td></tr>
+<tr class="memitem:ae914ccea770095594c154403b450499d" id="r_ae914ccea770095594c154403b450499d"><td class="memItemLeft">const <a class="el" href="structnotex_1_1ProjectConfig.html">ProjectConfig</a> &amp;&#160;</td><td class="memItemRight"><a class="el" href="#ae914ccea770095594c154403b450499d">config</a> () const noexcept</td></tr>
+<tr class="memitem:ac8f8855c5d711b78aefef9785d6787bf" id="r_ac8f8855c5d711b78aefef9785d6787bf"><td class="memItemLeft"><a class="el" href="structnotex_1_1ProjectConfig.html">ProjectConfig</a> &amp;&#160;</td><td class="memItemRight"><a class="el" href="#ac8f8855c5d711b78aefef9785d6787bf">config</a> () noexcept</td></tr>
+<tr class="memitem:a9ba928a8e5404561c8a67b26065b40b0" id="r_a9ba928a8e5404561c8a67b26065b40b0"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a9ba928a8e5404561c8a67b26065b40b0">save</a> () const</td></tr>
+<tr class="memdesc:a9ba928a8e5404561c8a67b26065b40b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Persists the current metadata back to <span class="tt">.notex/notex.json</span>.  <br /></td></tr>
+<tr class="memitem:aa8b75c199256417e1d5f3f7f1677f119" id="r_aa8b75c199256417e1d5f3f7f1677f119"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aa8b75c199256417e1d5f3f7f1677f119">set_theme</a> (std::string_view theme)</td></tr>
+<tr class="memdesc:aa8b75c199256417e1d5f3f7f1677f119"><td class="mdescLeft">&#160;</td><td class="mdescRight">Switches the project's theme.  <br /></td></tr>
+<tr class="memitem:a9d745646477f0ad4238e5296964370ba" id="r_a9d745646477f0ad4238e5296964370ba"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a9d745646477f0ad4238e5296964370ba">add_section</a> (std::string_view title)</td></tr>
+<tr class="memdesc:a9d745646477f0ad4238e5296964370ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a new section titled <code class="param">title</code>.  <br /></td></tr>
+<tr class="memitem:aea8e6b34f14916b348465475f14aecd9" id="r_aea8e6b34f14916b348465475f14aecd9"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#aea8e6b34f14916b348465475f14aecd9">remove_section</a> (int number)</td></tr>
+<tr class="memdesc:aea8e6b34f14916b348465475f14aecd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the section numbered <code class="param">number</code>.  <br /></td></tr>
+<tr class="memitem:a16de252c06f6426e1f1528b0d46fcfa9" id="r_a16de252c06f6426e1f1528b0d46fcfa9"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a16de252c06f6426e1f1528b0d46fcfa9">add_bibliography</a> ()</td></tr>
+<tr class="memdesc:a16de252c06f6426e1f1528b0d46fcfa9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a bibliography.  <br /></td></tr>
+<tr class="memitem:aa3c6a208a1adcfcd255d966b3853e3b8" id="r_aa3c6a208a1adcfcd255d966b3853e3b8"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aa3c6a208a1adcfcd255d966b3853e3b8">remove_bibliography</a> ()</td></tr>
+<tr class="memdesc:aa3c6a208a1adcfcd255d966b3853e3b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the bibliography commands added by <a class="el" href="#a16de252c06f6426e1f1528b0d46fcfa9" title="Adds a bibliography.">add_bibliography()</a> from the main file.  <br /></td></tr>
+<tr class="memitem:a698e118b3c792c3fecd328a9e898ae59" id="r_a698e118b3c792c3fecd328a9e898ae59"><td class="memItemLeft">std::vector&lt; std::filesystem::path &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a698e118b3c792c3fecd328a9e898ae59">project_files</a> () const</td></tr>
+<tr class="memitem:a405045f6291ca3a3a1f8d05620d0f716" id="r_a405045f6291ca3a3a1f8d05620d0f716"><td class="memItemLeft">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a405045f6291ca3a3a1f8d05620d0f716">orphan_sections</a> () const</td></tr>
+<tr class="memitem:ac53404dc474424019a925305f5f88873" id="r_ac53404dc474424019a925305f5f88873"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#ac53404dc474424019a925305f5f88873">reset</a> (bool force=false)</td></tr>
+<tr class="memdesc:ac53404dc474424019a925305f5f88873"><td class="mdescLeft">&#160;</td><td class="mdescRight">Regenerates the main file from the template, after backing up the previous one to <span class="tt">&lt;main_file&gt;.bak</span>.  <br /></td></tr>
+<tr class="memitem:a07ab49119bbdf99508c3c35c4bff0ff7" id="r_a07ab49119bbdf99508c3c35c4bff0ff7"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a07ab49119bbdf99508c3c35c4bff0ff7">delete_scaffolding</a> (bool remove_all=false, bool force=false)</td></tr>
+<tr class="memdesc:a07ab49119bbdf99508c3c35c4bff0ff7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes NoTeX's own scaffolding from the project.  <br /></td></tr>
+<tr class="memitem:a8058b0ff081b84337a8af9415fe6744d" id="r_a8058b0ff081b84337a8af9415fe6744d"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a8058b0ff081b84337a8af9415fe6744d">set_config_value</a> (std::string_view key, std::string_view value)</td></tr>
+<tr class="memdesc:a8058b0ff081b84337a8af9415fe6744d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets a single whitelisted metadata key directly.  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a875c5c99bf002939eb34945b936eba21" id="r_a875c5c99bf002939eb34945b936eba21"><td class="memItemLeft">static std::optional&lt; std::filesystem::path &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a875c5c99bf002939eb34945b936eba21">find_project_root</a> (const std::filesystem::path &amp;start_dir)</td></tr>
+<tr class="memdesc:a875c5c99bf002939eb34945b936eba21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Searches upward from <code class="param">start_dir</code> for a <span class="tt">.notex/</span> directory, without requiring one to exist.  <br /></td></tr>
+<tr class="memitem:ae2daa9191329ede25d5dfd57cfc3095c" id="r_ae2daa9191329ede25d5dfd57cfc3095c"><td class="memItemLeft">static <a class="el" href="#aaa39ea90785c2179e5ddd92f6092c1ec">Manager</a>&#160;</td><td class="memItemRight"><a class="el" href="#ae2daa9191329ede25d5dfd57cfc3095c">init</a> (const std::filesystem::path &amp;target_dir, <a class="el" href="namespacenotex_1_1templates.html#a977697e38a355c48e450e1dadeb0b2fb">templates::ProjectType</a> project_type=<a class="el" href="namespacenotex_1_1templates.html#a977697e38a355c48e450e1dadeb0b2fbaf26be970aac1b06fa62b87562bc73deb">templates::ProjectType::MULTI</a>, bool force=false)</td></tr>
+<tr class="memdesc:ae2daa9191329ede25d5dfd57cfc3095c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new NoTeX project inside <code class="param">target_dir</code>.  <br /></td></tr>
+<tr class="memitem:ac50c737e1e1fabb244989fb860a96c02" id="r_ac50c737e1e1fabb244989fb860a96c02"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ac50c737e1e1fabb244989fb860a96c02">write_config</a> (const std::filesystem::path &amp;root_dir, const <a class="el" href="structnotex_1_1ProjectConfig.html">ProjectConfig</a> &amp;config)</td></tr>
+<tr class="memdesc:ac50c737e1e1fabb244989fb860a96c02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes <code class="param">config</code> as <span class="tt">&lt;<a class="el" href="#a0b515475f43b38497055863731c5418d">root_dir</a>&gt;/.notex/notex.json</span>, creating <span class="tt">&lt;<a class="el" href="#a0b515475f43b38497055863731c5418d">root_dir</a>&gt;/.notex/</span> first if it does not already exist.  <br /></td></tr>
+<tr class="memitem:a5a175da830271adbb4f4f06644d281ef" id="r_a5a175da830271adbb4f4f06644d281ef"><td class="memItemLeft">static <a class="el" href="structnotex_1_1CleanReport.html">CleanReport</a>&#160;</td><td class="memItemRight"><a class="el" href="#a5a175da830271adbb4f4f06644d281ef">clean</a> (const std::filesystem::path &amp;start_dir, bool dry_run=false)</td></tr>
+<tr class="memdesc:a5a175da830271adbb4f4f06644d281ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Recursively removes known LaTeX build artefacts from <code class="param">start_dir</code>.  <br /></td></tr>
+<tr class="memitem:ac537ba1b18bff0711d28df820a767ab3" id="r_ac537ba1b18bff0711d28df820a767ab3"><td class="memItemLeft">static std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight"><a class="el" href="#ac537ba1b18bff0711d28df820a767ab3">available_themes</a> ()</td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Represents a single NoTeX project: its location and metadata. </p>
+<p>A <a class="el" href="classnotex_1_1Manager.html" title="Represents a single NoTeX project: its location and metadata.">Manager</a> locates its project the way <span class="tt">git</span> locates a repository: it starts from a given directory and walks upward until it finds the hidden <span class="tt">.notex/</span> directory that marks the project root, then loads the project's metadata from <span class="tt">.notex/notex.json</span>. </p>
+
+<p class="definition">Definition at line <a class="el" href="manager_8hpp_source.html#l00074">74</a> of file <a class="el" href="manager_8hpp_source.html">manager.hpp</a>.</p>
+</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="aaa39ea90785c2179e5ddd92f6092c1ec" name="aaa39ea90785c2179e5ddd92f6092c1ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaa39ea90785c2179e5ddd92f6092c1ec">&#9670;&#160;</a></span>Manager()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">notex::Manager::Manager </td>
+          <td>(</td>
+          <td class="paramtype">std::filesystem::path</td>          <td class="paramname"><span class="paramname"><em>start_dir</em></span><span class="paramdefsep"> = </span><span class="paramdefval">std::filesystem::current_path()</span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Locates and loads the project that contains <code class="param">start_dir</code>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">start_dir</td><td>Directory to start the upward search from; defaults to the current working directory. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">ProjectNotFoundError</td><td>if no <span class="tt">.notex/</span> directory is found between <code class="param">start_dir</code> and the filesystem root. </td></tr>
+    <tr><td class="paramname">ConfigError</td><td>if <span class="tt">.notex/notex.json</span> exists but cannot be parsed. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="manager_8cpp_source.html#l00337">337</a> of file <a class="el" href="manager_8cpp_source.html">manager.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="manager_8cpp_source.html#l00279">find_project_root()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="manager_8cpp_source.html#l00374">init()</a>.</p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
+<a id="a16de252c06f6426e1f1528b0d46fcfa9" name="a16de252c06f6426e1f1528b0d46fcfa9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a16de252c06f6426e1f1528b0d46fcfa9">&#9670;&#160;</a></span>add_bibliography()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void notex::Manager::add_bibliography </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a bibliography. </p>
+<p>Creates <span class="tt">bibliography_file</span> (defaulting to "bibliography.bib") from <a class="el" href="namespacenotex_1_1templates.html#a4f52c0c41d92269f11586c738f3c5ee3">templates::bibliography_starter()</a> if it does not already exist, then inserts the bibliography commands appropriate to the document: <span class="tt">\addbibresource</span>/<span class="tt">\printbibliography</span> if a <span class="tt">biblatex</span> <span class="tt">\usepackage</span> line is detected in the main file, or the classic <span class="tt">\bibliographystyle</span>/<span class="tt">\bibliography</span> pair otherwise. Idempotent: a command already present is left untouched.</p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">DocumentError</td><td>if the main file has no unique <span class="tt">\documentclass</span> or <span class="tt">\end{document}</span> line to anchor the insertion on. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="manager_8cpp_source.html#l00571">571</a> of file <a class="el" href="manager_8cpp_source.html">manager.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="templates_8cpp_source.html#l00167">notex::templates::bibliography_starter()</a>, <a class="el" href="document_8cpp_source.html#l00048">notex::Document::find_all()</a>, <a class="el" href="document_8cpp_source.html#l00035">notex::Document::load()</a>, <a class="el" href="document_8cpp_source.html#l00169">notex::Document::save()</a>, and <a class="el" href="manager_8cpp_source.html#l00350">save()</a>.</p>
+
+</div>
+</div>
+<a id="a9d745646477f0ad4238e5296964370ba" name="a9d745646477f0ad4238e5296964370ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d745646477f0ad4238e5296964370ba">&#9670;&#160;</a></span>add_section()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void notex::Manager::add_section </td>
+          <td>(</td>
+          <td class="paramtype">std::string_view</td>          <td class="paramname"><span class="paramname"><em>title</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a new section titled <code class="param">title</code>. </p>
+<p>In a single-file project, inserts a <span class="tt">\section{}</span> heading before the unique <span class="tt">\end{document}</span>. In a multi-file project, determines the next section number by scanning <span class="tt">sections/</span> (never tracked in the metadata, so sections added or removed by hand are always respected), writes a new numbered subfile from <a class="el" href="namespacenotex_1_1templates.html#a22809fc01f657982a4819caf997424e9" title="Generates a numbered section subfile.">templates::section()</a>, and inserts the corresponding <span class="tt">\subfile</span> line after the last one already in the main file.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">title</td><td>Section title. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">DocumentError</td><td>if the expected anchor (<span class="tt">\end{document}</span> for a single-file project, the last <span class="tt">\subfile{sections/...}</span> line for a multi-file one) is missing or ambiguous. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="manager_8cpp_source.html#l00488">488</a> of file <a class="el" href="manager_8cpp_source.html">manager.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="document_8cpp_source.html#l00080">notex::Document::find_last()</a>, <a class="el" href="document_8cpp_source.html#l00057">notex::Document::find_unique()</a>, <a class="el" href="document_8cpp_source.html#l00087">notex::Document::insert_line()</a>, <a class="el" href="document_8cpp_source.html#l00092">notex::Document::insert_lines()</a>, <a class="el" href="document_8cpp_source.html#l00035">notex::Document::load()</a>, <a class="el" href="document_8cpp_source.html#l00169">notex::Document::save()</a>, <a class="el" href="templates_8cpp_source.html#l00161">notex::templates::section()</a>, and <a class="el" href="templates_8cpp_source.html#l00157">notex::templates::section_stem()</a>.</p>
+
+</div>
+</div>
+<a id="ac537ba1b18bff0711d28df820a767ab3" name="ac537ba1b18bff0711d28df820a767ab3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac537ba1b18bff0711d28df820a767ab3">&#9670;&#160;</a></span>available_themes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; std::string &gt; notex::Manager::available_themes </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The theme names available, derived from the embedded <span class="tt">notex-theme-*.tex</span> files (e.g. "bw", "dark", "light", "tokyo"). </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="manager_8cpp_source.html#l00451">451</a> of file <a class="el" href="manager_8cpp_source.html">manager.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="assets_8cpp_source.html#l00056">notex::assets::latex_files()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="manager_8cpp_source.html#l00466">set_theme()</a>.</p>
+
+</div>
+</div>
+<a id="a5a175da830271adbb4f4f06644d281ef" name="a5a175da830271adbb4f4f06644d281ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a175da830271adbb4f4f06644d281ef">&#9670;&#160;</a></span>clean()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structnotex_1_1CleanReport.html">CleanReport</a> notex::Manager::clean </td>
+          <td>(</td>
+          <td class="paramtype">const std::filesystem::path &amp;</td>          <td class="paramname"><span class="paramname"><em>start_dir</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>dry_run</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Recursively removes known LaTeX build artefacts from <code class="param">start_dir</code>. </p>
+<p>Operates on an arbitrary path and needs no project, which is why this is a static operation rather than an instance method. Files are matched by filename suffix rather than by std::filesystem::path::extension(), because several artefacts, such as <span class="tt">.synctex.gz</span> and <span class="tt">-blx.bib</span>, are not true extensions; directories generated by the <span class="tt">minted</span> package are matched by the <span class="tt">_minted-</span> prefix that package always uses, regardless of the project's file names. A <code class="param">start_dir</code> that does not exist, or is not a directory, yields an empty report rather than an error, so that the command works the same way whether or not it happens to be run inside a project.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">start_dir</td><td>Directory to clean, recursively. </td></tr>
+    <tr><td class="paramname">dry_run</td><td>When true, nothing is deleted; the report describes what would have been removed. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A report of every file and directory removed (or that would have been, under a dry run). </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="manager_8cpp_source.html#l00410">410</a> of file <a class="el" href="manager_8cpp_source.html">manager.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="manager_8hpp_source.html#l00061">notex::CleanReport::total_removed()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="manager_8cpp_source.html#l00707">delete_scaffolding()</a>.</p>
+
+</div>
+</div>
+<a id="ae914ccea770095594c154403b450499d" name="ae914ccea770095594c154403b450499d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae914ccea770095594c154403b450499d">&#9670;&#160;</a></span>config() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="structnotex_1_1ProjectConfig.html">ProjectConfig</a> &amp; notex::Manager::config </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The project's current metadata. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="manager_8hpp_source.html#l00105">105</a> of file <a class="el" href="manager_8hpp_source.html">manager.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="manager_8cpp_source.html#l00374">init()</a>, <a class="el" href="installer_8cpp_source.html#l00117">notex::Installer::install_local()</a>, <a class="el" href="installer_8cpp_source.html#l00174">notex::Installer::uninstall_local()</a>, and <a class="el" href="manager_8cpp_source.html#l00352">write_config()</a>.</p>
+
+</div>
+</div>
+<a id="ac8f8855c5d711b78aefef9785d6787bf" name="ac8f8855c5d711b78aefef9785d6787bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac8f8855c5d711b78aefef9785d6787bf">&#9670;&#160;</a></span>config() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structnotex_1_1ProjectConfig.html">ProjectConfig</a> &amp; notex::Manager::config </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The project's current metadata, mutable so that later phases can update it before calling <a class="el" href="#a9ba928a8e5404561c8a67b26065b40b0" title="Persists the current metadata back to .notex/notex.json.">save()</a>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="manager_8hpp_source.html#l00109">109</a> of file <a class="el" href="manager_8hpp_source.html">manager.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a07ab49119bbdf99508c3c35c4bff0ff7" name="a07ab49119bbdf99508c3c35c4bff0ff7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a07ab49119bbdf99508c3c35c4bff0ff7">&#9670;&#160;</a></span>delete_scaffolding()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool notex::Manager::delete_scaffolding </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>remove_all</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>force</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Removes NoTeX's own scaffolding from the project. </p>
+<p>Removes <span class="tt">.notex/</span>, <span class="tt">settings/</span>, <span class="tt">fonts/</span>, and any build artefacts (via <a class="el" href="#a5a175da830271adbb4f4f06644d281ef" title="Recursively removes known LaTeX build artefacts from start_dir.">clean()</a>), but preserves every user-authored file — the main file, sections, the bibliography, and anything else — unless <code class="param">remove_all</code> is set, in which case the entire project directory is removed. Asks for confirmation first.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">remove_all</td><td>Also remove every user-authored file (the whole project directory), not just NoTeX's own. </td></tr>
+    <tr><td class="paramname">force</td><td>Skip the confirmation prompt. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the deletion was performed; false if the user declined the confirmation prompt. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="manager_8cpp_source.html#l00707">707</a> of file <a class="el" href="manager_8cpp_source.html">manager.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="manager_8cpp_source.html#l00410">clean()</a>, <a class="el" href="output_8cpp_source.html#l00068">notex::ui::confirm()</a>, and <a class="el" href="output_8cpp_source.html#l00054">notex::ui::warning()</a>.</p>
+
+</div>
+</div>
+<a id="a875c5c99bf002939eb34945b936eba21" name="a875c5c99bf002939eb34945b936eba21"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a875c5c99bf002939eb34945b936eba21">&#9670;&#160;</a></span>find_project_root()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt; std::filesystem::path &gt; notex::Manager::find_project_root </td>
+          <td>(</td>
+          <td class="paramtype">const std::filesystem::path &amp;</td>          <td class="paramname"><span class="paramname"><em>start_dir</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Searches upward from <code class="param">start_dir</code> for a <span class="tt">.notex/</span> directory, without requiring one to exist. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">start_dir</td><td>Directory to start the search from. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The project root directory, or std::nullopt if none is found before reaching the filesystem root. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="manager_8cpp_source.html#l00279">279</a> of file <a class="el" href="manager_8cpp_source.html">manager.cpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="manager_8cpp_source.html#l00337">Manager()</a>.</p>
+
+</div>
+</div>
+<a id="ae2daa9191329ede25d5dfd57cfc3095c" name="ae2daa9191329ede25d5dfd57cfc3095c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2daa9191329ede25d5dfd57cfc3095c">&#9670;&#160;</a></span>init()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#aaa39ea90785c2179e5ddd92f6092c1ec">Manager</a> notex::Manager::init </td>
+          <td>(</td>
+          <td class="paramtype">const std::filesystem::path &amp;</td>          <td class="paramname"><span class="paramname"><em>target_dir</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacenotex_1_1templates.html#a977697e38a355c48e450e1dadeb0b2fb">templates::ProjectType</a></td>          <td class="paramname"><span class="paramname"><em>project_type</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="namespacenotex_1_1templates.html#a977697e38a355c48e450e1dadeb0b2fbaf26be970aac1b06fa62b87562bc73deb">templates::ProjectType::MULTI</a></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>force</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a new NoTeX project inside <code class="param">target_dir</code>. </p>
+<p>Writes a fresh <span class="tt">main.tex</span> — a single file for <a class="el" href="namespacenotex_1_1templates.html#a977697e38a355c48e450e1dadeb0b2fbaf5f75f1b95652443e4398974b82c3f7c" title="A single main.tex file.">templates::ProjectType::MONO</a>, or a <span class="tt">main.tex</span> plus a <span class="tt">sections/</span> directory holding one introductory section for <a class="el" href="namespacenotex_1_1templates.html#a977697e38a355c48e450e1dadeb0b2fbaf26be970aac1b06fa62b87562bc73deb" title="main.tex plus a sections/ directory of subfiles.">templates::ProjectType::MULTI</a> — and records the project's metadata in a newly created <span class="tt">.notex/notex.json</span>. The generated <span class="tt">main.tex</span> refers to <span class="tt">\documentclass{settings/notex}</span> when <code class="param">target_dir</code> already holds a local installation, and to plain <span class="tt"><a class="el" href="namespacenotex.html">notex</a></span> otherwise, warning when no installation at all can be found.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">target_dir</td><td>Directory to create the project in; created if it does not already exist. </td></tr>
+    <tr><td class="paramname">project_type</td><td>Whether to scaffold a single-file or a multi-file project. </td></tr>
+    <tr><td class="paramname">force</td><td>Overwrite an existing <span class="tt">main.tex</span> or <span class="tt">.notex/</span> directory instead of refusing to. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">FilesystemError</td><td>if <code class="param">target_dir</code> already looks like a project and <code class="param">force</code> is not set, or if a file cannot be written. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classnotex_1_1Manager.html" title="Represents a single NoTeX project: its location and metadata.">Manager</a> for the newly created project. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="manager_8cpp_source.html#l00374">374</a> of file <a class="el" href="manager_8cpp_source.html">manager.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="manager_8hpp_source.html#l00105">config()</a>, <a class="el" href="manager_8cpp_source.html#l00337">Manager()</a>, <a class="el" href="templates_8hpp_source.html#l00023">notex::templates::MONO</a>, <a class="el" href="templates_8cpp_source.html#l00140">notex::templates::mono_main()</a>, <a class="el" href="templates_8cpp_source.html#l00144">notex::templates::multi_main()</a>, <a class="el" href="templates_8cpp_source.html#l00161">notex::templates::section()</a>, <a class="el" href="templates_8cpp_source.html#l00157">notex::templates::section_stem()</a>, <a class="el" href="templates_8cpp_source.html#l00124">notex::templates::to_string()</a>, and <a class="el" href="manager_8cpp_source.html#l00352">write_config()</a>.</p>
+
+</div>
+</div>
+<a id="a405045f6291ca3a3a1f8d05620d0f716" name="a405045f6291ca3a3a1f8d05620d0f716"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a405045f6291ca3a3a1f8d05620d0f716">&#9670;&#160;</a></span>orphan_sections()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; std::string &gt; notex::Manager::orphan_sections </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The filename stems (see <a class="el" href="namespacenotex_1_1templates.html#a6fee6b77da1b9ce69944338f10fde141" title="Computes the filename stem (no directory, no extension) for a numbered section.">templates::section_stem()</a>) of every section file present under <span class="tt">sections/</span> that is not referenced by any <span class="tt">\subfile</span> line in the main file. Always empty for a single-file project, or if the main file does not exist. Used by <span class="tt">checkhealth</span>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="manager_8cpp_source.html#l00649">649</a> of file <a class="el" href="manager_8cpp_source.html">manager.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="document_8hpp_source.html#l00045">notex::Document::lines()</a>, and <a class="el" href="document_8cpp_source.html#l00035">notex::Document::load()</a>.</p>
+
+</div>
+</div>
+<a id="a698e118b3c792c3fecd328a9e898ae59" name="a698e118b3c792c3fecd328a9e898ae59"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a698e118b3c792c3fecd328a9e898ae59">&#9670;&#160;</a></span>project_files()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; std::filesystem::path &gt; notex::Manager::project_files </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Every file this project is considered to genuinely own: the main file, every file under <span class="tt">sections/</span> (for a multi-file project), and the bibliography file — each only if it actually exists on disk. Used by <span class="tt">ls</span>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="manager_8cpp_source.html#l00623">623</a> of file <a class="el" href="manager_8cpp_source.html">manager.cpp</a>.</p>
+
+</div>
+</div>
+<a id="aa3c6a208a1adcfcd255d966b3853e3b8" name="aa3c6a208a1adcfcd255d966b3853e3b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3c6a208a1adcfcd255d966b3853e3b8">&#9670;&#160;</a></span>remove_bibliography()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void notex::Manager::remove_bibliography </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Removes the bibliography commands added by <a class="el" href="#a16de252c06f6426e1f1528b0d46fcfa9" title="Adds a bibliography.">add_bibliography()</a> from the main file. </p>
+<p>Always strips the commands themselves, which is non-destructive to any content; separately asks for confirmation before deleting the <span class="tt">.bib</span> file itself, since that step is not reversible. </p>
+
+<p class="definition">Definition at line <a class="el" href="manager_8cpp_source.html#l00602">602</a> of file <a class="el" href="manager_8cpp_source.html">manager.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="output_8cpp_source.html#l00068">notex::ui::confirm()</a>, <a class="el" href="document_8cpp_source.html#l00035">notex::Document::load()</a>, <a class="el" href="document_8cpp_source.html#l00169">notex::Document::save()</a>, and <a class="el" href="manager_8cpp_source.html#l00350">save()</a>.</p>
+
+</div>
+</div>
+<a id="aea8e6b34f14916b348465475f14aecd9" name="aea8e6b34f14916b348465475f14aecd9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea8e6b34f14916b348465475f14aecd9">&#9670;&#160;</a></span>remove_section()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool notex::Manager::remove_section </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>number</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Removes the section numbered <code class="param">number</code>. </p>
+<p>Only supported in a multi-file project, since a single-file project has no single section body that could be removed unambiguously. Asks for confirmation before deleting anything.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">number</td><td>Section number, as scanned from <span class="tt">sections/</span>. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">UsageError</td><td>if this is a single-file project, or if no section numbered <code class="param">number</code> exists. </td></tr>
+    <tr><td class="paramname">DocumentError</td><td>if more than one <span class="tt">\subfile</span> line references the section being removed. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the section was removed; false if the user declined the confirmation prompt. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="manager_8cpp_source.html#l00519">519</a> of file <a class="el" href="manager_8cpp_source.html">manager.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="output_8cpp_source.html#l00068">notex::ui::confirm()</a>, <a class="el" href="document_8cpp_source.html#l00048">notex::Document::find_all()</a>, <a class="el" href="document_8cpp_source.html#l00035">notex::Document::load()</a>, <a class="el" href="document_8cpp_source.html#l00099">notex::Document::remove_line()</a>, <a class="el" href="document_8cpp_source.html#l00169">notex::Document::save()</a>, and <a class="el" href="output_8cpp_source.html#l00054">notex::ui::warning()</a>.</p>
+
+</div>
+</div>
+<a id="ac53404dc474424019a925305f5f88873" name="ac53404dc474424019a925305f5f88873"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac53404dc474424019a925305f5f88873">&#9670;&#160;</a></span>reset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool notex::Manager::reset </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>force</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Regenerates the main file from the template, after backing up the previous one to <span class="tt">&lt;main_file&gt;.bak</span>. </p>
+<p>A multi-file project's regenerated main file references every section currently present under <span class="tt">sections/</span>, in number order, not just the first — sections and the bibliography file themselves are left untouched. Asks for confirmation first.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">force</td><td>Skip the confirmation prompt. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the reset was performed; false if the user declined the confirmation prompt. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="manager_8cpp_source.html#l00674">674</a> of file <a class="el" href="manager_8cpp_source.html">manager.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="output_8cpp_source.html#l00068">notex::ui::confirm()</a>, <a class="el" href="templates_8cpp_source.html#l00140">notex::templates::mono_main()</a>, <a class="el" href="templates_8cpp_source.html#l00144">notex::templates::multi_main()</a>, and <a class="el" href="output_8cpp_source.html#l00054">notex::ui::warning()</a>.</p>
+
+</div>
+</div>
+<a id="a0b515475f43b38497055863731c5418d" name="a0b515475f43b38497055863731c5418d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b515475f43b38497055863731c5418d">&#9670;&#160;</a></span>root_dir()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::filesystem::path &amp; notex::Manager::root_dir </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The project's root directory (the one containing <span class="tt">.notex/</span>). </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="manager_8hpp_source.html#l00100">100</a> of file <a class="el" href="manager_8hpp_source.html">manager.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="manager_8cpp_source.html#l00352">write_config()</a>.</p>
+
+</div>
+</div>
+<a id="a9ba928a8e5404561c8a67b26065b40b0" name="a9ba928a8e5404561c8a67b26065b40b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ba928a8e5404561c8a67b26065b40b0">&#9670;&#160;</a></span>save()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void notex::Manager::save </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Persists the current metadata back to <span class="tt">.notex/notex.json</span>. </p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">ConfigError</td><td>if the file cannot be written. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="manager_8cpp_source.html#l00350">350</a> of file <a class="el" href="manager_8cpp_source.html">manager.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="manager_8cpp_source.html#l00352">write_config()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="manager_8cpp_source.html#l00571">add_bibliography()</a>, <a class="el" href="manager_8cpp_source.html#l00602">remove_bibliography()</a>, <a class="el" href="manager_8cpp_source.html#l00737">set_config_value()</a>, <a class="el" href="manager_8cpp_source.html#l00466">set_theme()</a>, and <a class="el" href="installer_8cpp_source.html#l00174">notex::Installer::uninstall_local()</a>.</p>
+
+</div>
+</div>
+<a id="a8058b0ff081b84337a8af9415fe6744d" name="a8058b0ff081b84337a8af9415fe6744d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8058b0ff081b84337a8af9415fe6744d">&#9670;&#160;</a></span>set_config_value()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void notex::Manager::set_config_value </td>
+          <td>(</td>
+          <td class="paramtype">std::string_view</td>          <td class="paramname"><span class="paramname"><em>key</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string_view</td>          <td class="paramname"><span class="paramname"><em>value</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sets a single whitelisted metadata key directly. </p>
+<p>A low-level escape hatch for the fields the higher-level commands (theme, add/remove section/bib) don't cover the raw editing of; unlike <a class="el" href="#aa8b75c199256417e1d5f3f7f1677f119" title="Switches the project&#39;s theme.">set_theme()</a>, this does not touch the main file's content at all, only the recorded metadata.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>One of "main_file", "theme", "bibliography_file". </td></tr>
+    <tr><td class="paramname">value</td><td>New value for <code class="param">key</code>. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">UsageError</td><td>if <code class="param">key</code> is not one of the whitelisted keys. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="manager_8cpp_source.html#l00737">737</a> of file <a class="el" href="manager_8cpp_source.html">manager.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="manager_8cpp_source.html#l00350">save()</a>.</p>
+
+</div>
+</div>
+<a id="aa8b75c199256417e1d5f3f7f1677f119" name="aa8b75c199256417e1d5f3f7f1677f119"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa8b75c199256417e1d5f3f7f1677f119">&#9670;&#160;</a></span>set_theme()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void notex::Manager::set_theme </td>
+          <td>(</td>
+          <td class="paramtype">std::string_view</td>          <td class="paramname"><span class="paramname"><em>theme</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Switches the project's theme. </p>
+<p>Rewrites the <span class="tt">\documentclass</span> options of the project's main file to select <code class="param">theme</code> instead of whichever other theme was there, and records it in the project's metadata.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">theme</td><td>Theme name; must be one of <a class="el" href="#ac537ba1b18bff0711d28df820a767ab3">available_themes()</a>. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">UsageError</td><td>if <code class="param">theme</code> is not a known theme. </td></tr>
+    <tr><td class="paramname">DocumentError</td><td>if the main file's <span class="tt">\documentclass</span> line is missing, ambiguous, or malformed. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="manager_8cpp_source.html#l00466">466</a> of file <a class="el" href="manager_8cpp_source.html">manager.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="manager_8cpp_source.html#l00451">available_themes()</a>, <a class="el" href="document_8cpp_source.html#l00035">notex::Document::load()</a>, <a class="el" href="document_8cpp_source.html#l00169">notex::Document::save()</a>, <a class="el" href="manager_8cpp_source.html#l00350">save()</a>, and <a class="el" href="document_8cpp_source.html#l00103">notex::Document::set_documentclass_option()</a>.</p>
+
+</div>
+</div>
+<a id="ac50c737e1e1fabb244989fb860a96c02" name="ac50c737e1e1fabb244989fb860a96c02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac50c737e1e1fabb244989fb860a96c02">&#9670;&#160;</a></span>write_config()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void notex::Manager::write_config </td>
+          <td>(</td>
+          <td class="paramtype">const std::filesystem::path &amp;</td>          <td class="paramname"><span class="paramname"><em>root_dir</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structnotex_1_1ProjectConfig.html">ProjectConfig</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>config</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Writes <code class="param">config</code> as <span class="tt">&lt;<a class="el" href="#a0b515475f43b38497055863731c5418d">root_dir</a>&gt;/.notex/notex.json</span>, creating <span class="tt">&lt;<a class="el" href="#a0b515475f43b38497055863731c5418d">root_dir</a>&gt;/.notex/</span> first if it does not already exist. </p>
+<p>Unlike the constructor, this does not require <code class="param">root_dir</code> to already be a NoTeX project: it is the mechanical write operation that both <a class="el" href="#a9ba928a8e5404561c8a67b26065b40b0" title="Persists the current metadata back to .notex/notex.json.">save()</a> and a fresh install use, the latter to bootstrap <span class="tt">.notex/</span> for a directory that is not a project yet.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">root_dir</td><td>Directory whose <span class="tt">.notex/</span> should hold the config. </td></tr>
+    <tr><td class="paramname">config</td><td>Metadata to write. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">ConfigError</td><td>if the file cannot be written. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="manager_8cpp_source.html#l00352">352</a> of file <a class="el" href="manager_8cpp_source.html">manager.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="manager_8hpp_source.html#l00105">config()</a>, and <a class="el" href="manager_8hpp_source.html#l00100">root_dir()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="manager_8cpp_source.html#l00374">init()</a>, <a class="el" href="installer_8cpp_source.html#l00117">notex::Installer::install_local()</a>, and <a class="el" href="manager_8cpp_source.html#l00350">save()</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following files:<ul>
+<li>notex/include/notex/<a class="el" href="manager_8hpp_source.html">manager.hpp</a></li>
+<li>notex/src/notex/<a class="el" href="manager_8cpp_source.html">manager.cpp</a></li>
+</ul>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.17.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

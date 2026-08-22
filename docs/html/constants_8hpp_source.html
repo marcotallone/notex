@@ -1,0 +1,441 @@
+<!-- Custom Doxygen HTML_HEADER for NoTeX. Rationale for every choice
+     here: docs/plan/CHANGELOG.md, entries 26-29. Keep every comment in
+     this file to 1-3 lines; longer ones have repeatedly broken rendering. -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.17.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>NoTeX: notex/include/notex/constants.hpp Source File</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="codefolding.js"></script>
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="doxygen-awesome-interactive-toc.js"></script>
+<script type="text/javascript" src="doxygen-awesome-tabs.js"></script>
+<script type="text/javascript" src="mermaid.min.js"></script>
+<script type="text/javascript">
+    // Guarded so one extension failing degrades to a console message
+    // instead of aborting this whole block (CHANGELOG entry 34).
+    function notexInit(name, extension) {
+        try {
+            if (extension && typeof extension.init === 'function') {
+                extension.init();
+            } else {
+                console.error('NoTeX: ' + name + '.init() unavailable, skipped');
+            }
+        } catch (error) {
+            console.error('NoTeX: ' + name + '.init() threw', error);
+        }
+    }
+    notexInit('DoxygenAwesomeFragmentCopyButton', typeof DoxygenAwesomeFragmentCopyButton !== 'undefined' ? DoxygenAwesomeFragmentCopyButton : null);
+    notexInit('DoxygenAwesomeDarkModeToggle', typeof DoxygenAwesomeDarkModeToggle !== 'undefined' ? DoxygenAwesomeDarkModeToggle : null);
+    notexInit('DoxygenAwesomeParagraphLink', typeof DoxygenAwesomeParagraphLink !== 'undefined' ? DoxygenAwesomeParagraphLink : null);
+    notexInit('DoxygenAwesomeInteractiveToc', typeof DoxygenAwesomeInteractiveToc !== 'undefined' ? DoxygenAwesomeInteractiveToc : null);
+    notexInit('DoxygenAwesomeTabs', typeof DoxygenAwesomeTabs !== 'undefined' ? DoxygenAwesomeTabs : null);
+</script>
+<script type="text/javascript">
+    // Deliberately its own <script>: a throw in another block cannot
+    // abort this one, which is what silently killed mermaid before.
+    (function() {
+        if (typeof mermaid === 'undefined') { return; }
+        var toggle = typeof DoxygenAwesomeDarkModeToggle !== 'undefined' ? DoxygenAwesomeDarkModeToggle : null;
+        var counter = 0;
+        // Must run here, before DOMContentLoaded: mermaid's own autorun
+        // would otherwise overwrite each diagram's source with its SVG.
+        mermaid.initialize({ startOnLoad: false });
+        // darkMode is a separate themeVariable; theme 'dark' alone leaves
+        // most computed colors on their light-mode branch.
+        function config(dark) {
+            return dark
+                ? { startOnLoad: false, theme: 'dark', themeVariables: { darkMode: true } }
+                : { startOnLoad: false, theme: 'neutral' };
+        }
+        // Source captured once, up front, so every re-render redraws from
+        // it rather than from a previous render's own output.
+        function saveSource() {
+            document.querySelectorAll('.mermaid').forEach(function(el) {
+                if (!el.hasAttribute('data-notex-source')) {
+                    el.setAttribute('data-notex-source', el.textContent);
+                }
+            });
+        }
+        // The third argument matters: without it mermaid measures label
+        // text against <body>'s font, so nodes size wrong and text crops.
+        function render(dark) {
+            mermaid.initialize(config(dark));
+            document.querySelectorAll('.mermaid').forEach(function(el) {
+                var source = el.getAttribute('data-notex-source');
+                if (!source) { return; }
+                mermaid.render('notex-mermaid-' + (counter++), source, el).then(function(result) {
+                    el.innerHTML = result.svg;
+                }).catch(function(error) {
+                    // mermaid empties the element first, so restore the
+                    // source rather than leave the diagram blank.
+                    el.textContent = source;
+                    console.error('NoTeX: mermaid render failed', error);
+                });
+            });
+        }
+        // userPreference is a getter over localStorage and the system
+        // setting, so it reads correctly even if init() never ran.
+        function darkNow() {
+            return toggle ? toggle.userPreference : false;
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            saveSource();
+            render(darkNow());
+        });
+        // Every mode-change path dispatches through this one property,
+        // so replacing it re-renders on toggle, system change and restore.
+        if (toggle) {
+            var originalEnableDarkMode = toggle.enableDarkMode;
+            toggle.enableDarkMode = function(enable) {
+                originalEnableDarkMode(enable);
+                render(enable);
+            };
+        }
+    })();
+</script>
+<script type="text/javascript">
+    // Moves the toggle button before the search box; MutationObserver
+    // since the extension re-appends it after on every resize.
+    document.addEventListener('DOMContentLoaded', function() {
+        function moveToggleBeforeSearch() {
+            var searchBox = document.getElementById("MSearchBox");
+            var toggle = document.querySelector("doxygen-awesome-dark-mode-toggle");
+            if (searchBox && toggle && searchBox.previousElementSibling !== toggle) {
+                searchBox.parentNode.insertBefore(toggle, searchBox);
+            }
+        }
+        new MutationObserver(moveToggleBeforeSearch).observe(document.body, {childList: true, subtree: true});
+        moveToggleBeforeSearch();
+    });
+</script>
+<script type="text/javascript">
+    // Publishes the sticky bar's measured height, which CSS cannot read
+    // on its own, so anchor targets can offset by it.
+    document.addEventListener('DOMContentLoaded', function() {
+        var topBar = document.getElementById('top');
+        if (!topBar) { return; }
+        function publishHeight() {
+            document.documentElement.style.setProperty('--notex-topbar-height', topBar.offsetHeight + 'px');
+        }
+        publishHeight();
+        if (typeof ResizeObserver !== 'undefined') {
+            new ResizeObserver(publishHeight).observe(topBar);
+        }
+    });
+</script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<style>
+/* Sticky, blurred top bar. Colours mirror the theme's own light/dark
+   custom-property pattern so the toggle keeps driving them. */
+:root {
+    --notex-topbar-background: rgba(255, 255, 255, 0.50);
+    --notex-topbar-height: 0px;
+}
+@media (prefers-color-scheme: dark) {
+    html:not(.light-mode) {
+        --notex-topbar-background: rgba(28, 29, 31, 0.50);
+    }
+}
+html.dark-mode {
+    --notex-topbar-background: rgba(28, 29, 31, 0.50);
+}
+#top {
+    position: sticky;
+    top: 0;
+    background: var(--notex-topbar-background);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    backdrop-filter: saturate(180%) blur(12px);
+}
+/* Without blur support the bar must stay opaque to stay readable. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    #top {
+        background: var(--header-background);
+    }
+}
+/* Anchor targets would otherwise land underneath the sticky bar. */
+a.anchor {
+    scroll-margin-top: calc(var(--notex-topbar-height) + var(--spacing-large));
+}
+/* Space before the search box, now that the toggle sits there. */
+doxygen-awesome-dark-mode-toggle {
+    margin-right: 0.5em;
+}
+/* Circular GitHub icon, replacing the theme's corner ribbon. */
+#notex-github-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    color: var(--page-secondary-foreground-color, #52606d);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+#notex-github-icon:hover {
+    background-color: var(--separator-color, rgba(0, 0, 0, 0.08));
+    color: var(--page-foreground-color, #14181d);
+}
+</style>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectalign">
+   <div id="projectname">NoTeX<span id="projectnumber">&#160;1.0.0</span>
+   </div>
+   <div id="projectbrief">A modern noteworthy LaTeX template</div>
+  </td>
+  <td style="padding-left: 0.5em; vertical-align: middle;">
+   <a id="notex-github-icon" href="https://github.com/marcotallone/notex" title="View source on GitHub" target="_blank" rel="noopener noreferrer">
+    <svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+   </a>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.17.0 -->
+<script type="text/javascript">
+let searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', codefold.init);
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', () => {
+  initMenu('',false);
+  init_search();
+});
+</script>
+<div id="main-nav-mobile">
+<div class="sm sm-dox"><input id="main-menu-state" type="checkbox"/>
+<label class="main-menu-btn" for="main-menu-state">
+<span class="main-menu-btn-icon"></span> Toggle main menu visibility</label>
+<span id="searchBoxPos1" style="position:absolute;right:8px;top:8px;height:36px;"></span>
+</div>
+</div><!-- main-nav-mobile -->
+<div id="main-nav">
+  <ul class="sm sm-dox" id="main-menu">
+    <li id="searchBoxPos2" style="float:right">
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+    </li>
+  </ul>
+</div><!-- main-nav -->
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><b>notex</b></li><li class="navelem"><b>include</b></li><li class="navelem"><b>notex</b></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="headertitle"><div class="title">constants.hpp</div></div>
+</div><!--header-->
+<div class="contents">
+<a href="constants_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &lt;string_view&gt;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span></div>
+<div class="foldopen" id="foldopen00027" data-start="{" data-end="}">
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno"><a class="line" href="namespaceansi.html">   27</a></span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceansi.html">ansi</a> {</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="namespaceansi.html#aefd3f042ef499b25205ed31e4258d1c1">   30</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi.html#aefd3f042ef499b25205ed31e4258d1c1">reset</a> = <span class="stringliteral">&quot;\033[0m&quot;</span>;</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span></div>
+<div class="foldopen" id="foldopen00038" data-start="{" data-end="}">
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="namespaceansi_1_1text.html">   38</a></span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceansi_1_1text.html">text</a> {</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno"><a class="line" href="namespaceansi_1_1text.html#a8c87a70aa3a5ae999e2559021b8ceafa">   40</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1text.html#a8c87a70aa3a5ae999e2559021b8ceafa">bold</a> = <span class="stringliteral">&quot;\033[1m&quot;</span>;</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno"><a class="line" href="namespaceansi_1_1text.html#a409807fa04b8995feb1f540e20084b0f">   42</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1text.html#a409807fa04b8995feb1f540e20084b0f">dim</a> = <span class="stringliteral">&quot;\033[2m&quot;</span>;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="namespaceansi_1_1text.html#acc3a771d6a59fa369534e49d96b044a4">   44</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1text.html#acc3a771d6a59fa369534e49d96b044a4">italic</a> = <span class="stringliteral">&quot;\033[3m&quot;</span>;</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno"><a class="line" href="namespaceansi_1_1text.html#abfc20e0139d84ca362545d39e0bb2d21">   46</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1text.html#abfc20e0139d84ca362545d39e0bb2d21">underline</a> = <span class="stringliteral">&quot;\033[4m&quot;</span>;</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno"><a class="line" href="namespaceansi_1_1text.html#a99ab74ef98c97aa23df945349a93eb71">   48</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1text.html#a99ab74ef98c97aa23df945349a93eb71">blink</a> = <span class="stringliteral">&quot;\033[5m&quot;</span>;</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="namespaceansi_1_1text.html#afb1293a4d4b32adb645f53eaf9149b17">   50</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1text.html#afb1293a4d4b32adb645f53eaf9149b17">reverse</a> = <span class="stringliteral">&quot;\033[7m&quot;</span>;</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno"><a class="line" href="namespaceansi_1_1text.html#af0661c7bf61f17c49cdb17b5e6f6947a">   52</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1text.html#af0661c7bf61f17c49cdb17b5e6f6947a">hidden</a> = <span class="stringliteral">&quot;\033[8m&quot;</span>;</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno"><a class="line" href="namespaceansi_1_1text.html#a0e927a8190d40978359368d929627e14">   54</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1text.html#a0e927a8190d40978359368d929627e14">strikethrough</a> = <span class="stringliteral">&quot;\033[9m&quot;</span>;</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>}  <span class="comment">// namespace text</span></div>
+</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span></div>
+<div class="foldopen" id="foldopen00064" data-start="{" data-end="}">
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno"><a class="line" href="namespaceansi_1_1color.html">   64</a></span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceansi_1_1color.html">color</a> {</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span></div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno"><a class="line" href="namespaceansi_1_1color.html#aa7c6ed1764bcff50614ac6bbd2384d34">   67</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1color.html#aa7c6ed1764bcff50614ac6bbd2384d34">black</a> = <span class="stringliteral">&quot;\033[30m&quot;</span>;</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno"><a class="line" href="namespaceansi_1_1color.html#ad56418bc81402e073df11384776f3007">   69</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1color.html#ad56418bc81402e073df11384776f3007">red</a> = <span class="stringliteral">&quot;\033[31m&quot;</span>;</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno"><a class="line" href="namespaceansi_1_1color.html#ae758f1a6e283d527d4771b2578878ccc">   71</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1color.html#ae758f1a6e283d527d4771b2578878ccc">green</a> = <span class="stringliteral">&quot;\033[32m&quot;</span>;</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno"><a class="line" href="namespaceansi_1_1color.html#a8df243ab95dce69ee53bde309641c9f3">   73</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1color.html#a8df243ab95dce69ee53bde309641c9f3">yellow</a> = <span class="stringliteral">&quot;\033[33m&quot;</span>;</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno"><a class="line" href="namespaceansi_1_1color.html#aa1982b5d9237d4f5f74386a33ddcedc8">   75</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1color.html#aa1982b5d9237d4f5f74386a33ddcedc8">blue</a> = <span class="stringliteral">&quot;\033[34m&quot;</span>;</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno"><a class="line" href="namespaceansi_1_1color.html#a6974ca67b6120a221315f3315cfe2857">   77</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1color.html#a6974ca67b6120a221315f3315cfe2857">magenta</a> = <span class="stringliteral">&quot;\033[35m&quot;</span>;</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno"><a class="line" href="namespaceansi_1_1color.html#a1481e3b9eaf51857a9a792700c20bdb8">   79</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1color.html#a1481e3b9eaf51857a9a792700c20bdb8">cyan</a> = <span class="stringliteral">&quot;\033[36m&quot;</span>;</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno"><a class="line" href="namespaceansi_1_1color.html#aa0842fd60eff23e6042b27ecf93ef28a">   81</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1color.html#aa0842fd60eff23e6042b27ecf93ef28a">white</a> = <span class="stringliteral">&quot;\033[37m&quot;</span>;</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span></div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno"><a class="line" href="namespaceansi_1_1color.html#a4b8c7ad106758ef4ac6c46239f644064">   84</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1color.html#a4b8c7ad106758ef4ac6c46239f644064">bright_black</a> = <span class="stringliteral">&quot;\033[90m&quot;</span>;</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno"><a class="line" href="namespaceansi_1_1color.html#a07540b7636d3a4c97fe3a8e5a9c4052d">   86</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1color.html#a07540b7636d3a4c97fe3a8e5a9c4052d">bright_red</a> = <span class="stringliteral">&quot;\033[91m&quot;</span>;</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno"><a class="line" href="namespaceansi_1_1color.html#a0e8a41323bc53f33089efc0228a069d4">   88</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1color.html#a0e8a41323bc53f33089efc0228a069d4">bright_green</a> = <span class="stringliteral">&quot;\033[92m&quot;</span>;</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno"><a class="line" href="namespaceansi_1_1color.html#afb8026a5c5ce0ee7c978cf67cdf2aa89">   90</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1color.html#afb8026a5c5ce0ee7c978cf67cdf2aa89">bright_yellow</a> = <span class="stringliteral">&quot;\033[93m&quot;</span>;</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno"><a class="line" href="namespaceansi_1_1color.html#a4800991ee59741caf7bc3e902d865078">   92</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1color.html#a4800991ee59741caf7bc3e902d865078">bright_blue</a> = <span class="stringliteral">&quot;\033[94m&quot;</span>;</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno"><a class="line" href="namespaceansi_1_1color.html#ab670f8294a53e49eb76c490d74c3da74">   94</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1color.html#ab670f8294a53e49eb76c490d74c3da74">bright_magenta</a> = <span class="stringliteral">&quot;\033[95m&quot;</span>;</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno"><a class="line" href="namespaceansi_1_1color.html#aea2ae414d27fba8c71960d8935a9c47c">   96</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1color.html#aea2ae414d27fba8c71960d8935a9c47c">bright_cyan</a> = <span class="stringliteral">&quot;\033[96m&quot;</span>;</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno"><a class="line" href="namespaceansi_1_1color.html#ab8d8fe66db7b6a97e76146845e3b0ab4">   98</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1color.html#ab8d8fe66db7b6a97e76146845e3b0ab4">bright_white</a> = <span class="stringliteral">&quot;\033[97m&quot;</span>;</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>}  <span class="comment">// namespace color</span></div>
+</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span></div>
+<div class="foldopen" id="foldopen00108" data-start="{" data-end="}">
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno"><a class="line" href="namespaceansi_1_1bg.html">  108</a></span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceansi_1_1bg.html">bg</a> {</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span></div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno"><a class="line" href="namespaceansi_1_1bg.html#adf096d013814b13b27474dc0d6c19c8e">  111</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1bg.html#adf096d013814b13b27474dc0d6c19c8e">black</a> = <span class="stringliteral">&quot;\033[40m&quot;</span>;</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno"><a class="line" href="namespaceansi_1_1bg.html#a9b5b9ff28342a7b8063a38097ee99b59">  113</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1bg.html#a9b5b9ff28342a7b8063a38097ee99b59">red</a> = <span class="stringliteral">&quot;\033[41m&quot;</span>;</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno"><a class="line" href="namespaceansi_1_1bg.html#a5b3076881a6ea39cbbf09add92c2e3f1">  115</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1bg.html#a5b3076881a6ea39cbbf09add92c2e3f1">green</a> = <span class="stringliteral">&quot;\033[42m&quot;</span>;</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno"><a class="line" href="namespaceansi_1_1bg.html#a31ce77dbaff20cde22a818b7e1dd9016">  117</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1bg.html#a31ce77dbaff20cde22a818b7e1dd9016">yellow</a> = <span class="stringliteral">&quot;\033[43m&quot;</span>;</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno"><a class="line" href="namespaceansi_1_1bg.html#a5dc579753c9bc7789cccea3d546d97b0">  119</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1bg.html#a5dc579753c9bc7789cccea3d546d97b0">blue</a> = <span class="stringliteral">&quot;\033[44m&quot;</span>;</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno"><a class="line" href="namespaceansi_1_1bg.html#ac3a318deadd64d7f3622b082626b6000">  121</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1bg.html#ac3a318deadd64d7f3622b082626b6000">magenta</a> = <span class="stringliteral">&quot;\033[45m&quot;</span>;</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno"><a class="line" href="namespaceansi_1_1bg.html#aa995652cc8a6d73a234e89482fe7bae9">  123</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1bg.html#aa995652cc8a6d73a234e89482fe7bae9">cyan</a> = <span class="stringliteral">&quot;\033[46m&quot;</span>;</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno"><a class="line" href="namespaceansi_1_1bg.html#ab066124aa41ee6d4dc279360640f4562">  125</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1bg.html#ab066124aa41ee6d4dc279360640f4562">white</a> = <span class="stringliteral">&quot;\033[47m&quot;</span>;</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span></div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno"><a class="line" href="namespaceansi_1_1bg.html#a8bab362c07abb3f129f60290a76ef7c5">  128</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1bg.html#a8bab362c07abb3f129f60290a76ef7c5">bright_black</a> = <span class="stringliteral">&quot;\033[100m&quot;</span>;</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno"><a class="line" href="namespaceansi_1_1bg.html#ac0e460eb217fc57a82bd025fe2ec1a30">  130</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1bg.html#ac0e460eb217fc57a82bd025fe2ec1a30">bright_red</a> = <span class="stringliteral">&quot;\033[101m&quot;</span>;</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno"><a class="line" href="namespaceansi_1_1bg.html#a4b88c81a217883e8b181cd4a49eb0e94">  132</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1bg.html#a4b88c81a217883e8b181cd4a49eb0e94">bright_green</a> = <span class="stringliteral">&quot;\033[102m&quot;</span>;</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno"><a class="line" href="namespaceansi_1_1bg.html#a3cd1668be039fbdb264dadcfc7863a3c">  134</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1bg.html#a3cd1668be039fbdb264dadcfc7863a3c">bright_yellow</a> = <span class="stringliteral">&quot;\033[103m&quot;</span>;</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno"><a class="line" href="namespaceansi_1_1bg.html#a0d20a7cc40938b31b3e9c0de37978c77">  136</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1bg.html#a0d20a7cc40938b31b3e9c0de37978c77">bright_blue</a> = <span class="stringliteral">&quot;\033[104m&quot;</span>;</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno"><a class="line" href="namespaceansi_1_1bg.html#a770d8a32c7207e999c807bc69e0655ba">  138</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1bg.html#a770d8a32c7207e999c807bc69e0655ba">bright_magenta</a> = <span class="stringliteral">&quot;\033[105m&quot;</span>;</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno"><a class="line" href="namespaceansi_1_1bg.html#ada11b3e656e9cb16ab06f284fab89c5d">  140</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1bg.html#ada11b3e656e9cb16ab06f284fab89c5d">bright_cyan</a> = <span class="stringliteral">&quot;\033[106m&quot;</span>;</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno"><a class="line" href="namespaceansi_1_1bg.html#a7975871c5e5ee3b13daec323abdcd8c9">  142</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1bg.html#a7975871c5e5ee3b13daec323abdcd8c9">bright_white</a> = <span class="stringliteral">&quot;\033[107m&quot;</span>;</div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>}  <span class="comment">// namespace bg</span></div>
+</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span></div>
+<div class="foldopen" id="foldopen00152" data-start="{" data-end="}">
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno"><a class="line" href="namespaceansi_1_1cursor.html">  152</a></span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceansi_1_1cursor.html">cursor</a> {</div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno"><a class="line" href="namespaceansi_1_1cursor.html#a585786fe8ad760e415663cbda78d7965">  154</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1cursor.html#a585786fe8ad760e415663cbda78d7965">home</a> = <span class="stringliteral">&quot;\033[H&quot;</span>;</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno"><a class="line" href="namespaceansi_1_1cursor.html#aeb2f69830c7a8fc971a36886c41c448e">  156</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1cursor.html#aeb2f69830c7a8fc971a36886c41c448e">up</a> = <span class="stringliteral">&quot;\033[A&quot;</span>;</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno"><a class="line" href="namespaceansi_1_1cursor.html#adddb8841eac32eea5c44e95d4d007541">  158</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1cursor.html#adddb8841eac32eea5c44e95d4d007541">down</a> = <span class="stringliteral">&quot;\033[B&quot;</span>;</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno"><a class="line" href="namespaceansi_1_1cursor.html#ac636b03b5432185d3a50c13ad5f0393d">  160</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1cursor.html#ac636b03b5432185d3a50c13ad5f0393d">right</a> = <span class="stringliteral">&quot;\033[C&quot;</span>;</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno"><a class="line" href="namespaceansi_1_1cursor.html#a1ea7913e237a45b75794faf3f8bd8f7d">  162</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1cursor.html#a1ea7913e237a45b75794faf3f8bd8f7d">left</a> = <span class="stringliteral">&quot;\033[D&quot;</span>;</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno"><a class="line" href="namespaceansi_1_1cursor.html#ab3d72237aca3102ec479deb1d6092952">  164</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1cursor.html#ab3d72237aca3102ec479deb1d6092952">save</a> = <span class="stringliteral">&quot;\033[s&quot;</span>;</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno"><a class="line" href="namespaceansi_1_1cursor.html#a6f0325ff145cbda8400f06fd6a007c51">  166</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1cursor.html#a6f0325ff145cbda8400f06fd6a007c51">restore</a> = <span class="stringliteral">&quot;\033[u&quot;</span>;</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>}  <span class="comment">// namespace cursor</span></div>
+</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span></div>
+<div class="foldopen" id="foldopen00175" data-start="{" data-end="}">
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno"><a class="line" href="namespaceansi_1_1clear.html">  175</a></span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceansi_1_1clear.html">clear</a> {</div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno"><a class="line" href="namespaceansi_1_1clear.html#a35ecfe3412c70ca19ec9686f99de71d7">  177</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1clear.html#a35ecfe3412c70ca19ec9686f99de71d7">screen</a> = <span class="stringliteral">&quot;\033[2J&quot;</span>;</div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno"><a class="line" href="namespaceansi_1_1clear.html#a17b434ef7b3e4f4d722106bdec5c79d9">  179</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1clear.html#a17b434ef7b3e4f4d722106bdec5c79d9">line</a> = <span class="stringliteral">&quot;\033[K&quot;</span>;</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno"><a class="line" href="namespaceansi_1_1clear.html#abc2e7c8383f211ed52f6796e961590ff">  181</a></span><span class="keyword">constexpr</span> std::string_view <a class="code hl_variable" href="namespaceansi_1_1clear.html#abc2e7c8383f211ed52f6796e961590ff">to_end</a> = <span class="stringliteral">&quot;\033[0J&quot;</span>;</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>}  <span class="comment">// namespace clear</span></div>
+</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span> </div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>}  <span class="comment">// namespace ansi</span></div>
+</div>
+<div class="ttc" id="anamespaceansi_1_1bg_html"><div class="ttname"><a href="namespaceansi_1_1bg.html">ansi::bg</a></div><div class="ttdoc">Namespace containing background color escape sequences.</div><div class="ttdef"><b>Definition</b> <a href="#l00108">constants.hpp:108</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1bg_html_a0d20a7cc40938b31b3e9c0de37978c77"><div class="ttname"><a href="namespaceansi_1_1bg.html#a0d20a7cc40938b31b3e9c0de37978c77">ansi::bg::bright_blue</a></div><div class="ttdeci">constexpr std::string_view bright_blue</div><div class="ttdoc">Background color: bright blue.</div><div class="ttdef"><b>Definition</b> <a href="#l00136">constants.hpp:136</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1bg_html_a31ce77dbaff20cde22a818b7e1dd9016"><div class="ttname"><a href="namespaceansi_1_1bg.html#a31ce77dbaff20cde22a818b7e1dd9016">ansi::bg::yellow</a></div><div class="ttdeci">constexpr std::string_view yellow</div><div class="ttdoc">Background color: yellow.</div><div class="ttdef"><b>Definition</b> <a href="#l00117">constants.hpp:117</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1bg_html_a3cd1668be039fbdb264dadcfc7863a3c"><div class="ttname"><a href="namespaceansi_1_1bg.html#a3cd1668be039fbdb264dadcfc7863a3c">ansi::bg::bright_yellow</a></div><div class="ttdeci">constexpr std::string_view bright_yellow</div><div class="ttdoc">Background color: bright yellow.</div><div class="ttdef"><b>Definition</b> <a href="#l00134">constants.hpp:134</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1bg_html_a4b88c81a217883e8b181cd4a49eb0e94"><div class="ttname"><a href="namespaceansi_1_1bg.html#a4b88c81a217883e8b181cd4a49eb0e94">ansi::bg::bright_green</a></div><div class="ttdeci">constexpr std::string_view bright_green</div><div class="ttdoc">Background color: bright green.</div><div class="ttdef"><b>Definition</b> <a href="#l00132">constants.hpp:132</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1bg_html_a5b3076881a6ea39cbbf09add92c2e3f1"><div class="ttname"><a href="namespaceansi_1_1bg.html#a5b3076881a6ea39cbbf09add92c2e3f1">ansi::bg::green</a></div><div class="ttdeci">constexpr std::string_view green</div><div class="ttdoc">Background color: green.</div><div class="ttdef"><b>Definition</b> <a href="#l00115">constants.hpp:115</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1bg_html_a5dc579753c9bc7789cccea3d546d97b0"><div class="ttname"><a href="namespaceansi_1_1bg.html#a5dc579753c9bc7789cccea3d546d97b0">ansi::bg::blue</a></div><div class="ttdeci">constexpr std::string_view blue</div><div class="ttdoc">Background color: blue.</div><div class="ttdef"><b>Definition</b> <a href="#l00119">constants.hpp:119</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1bg_html_a770d8a32c7207e999c807bc69e0655ba"><div class="ttname"><a href="namespaceansi_1_1bg.html#a770d8a32c7207e999c807bc69e0655ba">ansi::bg::bright_magenta</a></div><div class="ttdeci">constexpr std::string_view bright_magenta</div><div class="ttdoc">Background color: bright magenta.</div><div class="ttdef"><b>Definition</b> <a href="#l00138">constants.hpp:138</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1bg_html_a7975871c5e5ee3b13daec323abdcd8c9"><div class="ttname"><a href="namespaceansi_1_1bg.html#a7975871c5e5ee3b13daec323abdcd8c9">ansi::bg::bright_white</a></div><div class="ttdeci">constexpr std::string_view bright_white</div><div class="ttdoc">Background color: bright white.</div><div class="ttdef"><b>Definition</b> <a href="#l00142">constants.hpp:142</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1bg_html_a8bab362c07abb3f129f60290a76ef7c5"><div class="ttname"><a href="namespaceansi_1_1bg.html#a8bab362c07abb3f129f60290a76ef7c5">ansi::bg::bright_black</a></div><div class="ttdeci">constexpr std::string_view bright_black</div><div class="ttdoc">Background color: bright black.</div><div class="ttdef"><b>Definition</b> <a href="#l00128">constants.hpp:128</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1bg_html_a9b5b9ff28342a7b8063a38097ee99b59"><div class="ttname"><a href="namespaceansi_1_1bg.html#a9b5b9ff28342a7b8063a38097ee99b59">ansi::bg::red</a></div><div class="ttdeci">constexpr std::string_view red</div><div class="ttdoc">Background color: red.</div><div class="ttdef"><b>Definition</b> <a href="#l00113">constants.hpp:113</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1bg_html_aa995652cc8a6d73a234e89482fe7bae9"><div class="ttname"><a href="namespaceansi_1_1bg.html#aa995652cc8a6d73a234e89482fe7bae9">ansi::bg::cyan</a></div><div class="ttdeci">constexpr std::string_view cyan</div><div class="ttdoc">Background color: cyan.</div><div class="ttdef"><b>Definition</b> <a href="#l00123">constants.hpp:123</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1bg_html_ab066124aa41ee6d4dc279360640f4562"><div class="ttname"><a href="namespaceansi_1_1bg.html#ab066124aa41ee6d4dc279360640f4562">ansi::bg::white</a></div><div class="ttdeci">constexpr std::string_view white</div><div class="ttdoc">Background color: white.</div><div class="ttdef"><b>Definition</b> <a href="#l00125">constants.hpp:125</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1bg_html_ac0e460eb217fc57a82bd025fe2ec1a30"><div class="ttname"><a href="namespaceansi_1_1bg.html#ac0e460eb217fc57a82bd025fe2ec1a30">ansi::bg::bright_red</a></div><div class="ttdeci">constexpr std::string_view bright_red</div><div class="ttdoc">Background color: bright red.</div><div class="ttdef"><b>Definition</b> <a href="#l00130">constants.hpp:130</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1bg_html_ac3a318deadd64d7f3622b082626b6000"><div class="ttname"><a href="namespaceansi_1_1bg.html#ac3a318deadd64d7f3622b082626b6000">ansi::bg::magenta</a></div><div class="ttdeci">constexpr std::string_view magenta</div><div class="ttdoc">Background color: magenta.</div><div class="ttdef"><b>Definition</b> <a href="#l00121">constants.hpp:121</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1bg_html_ada11b3e656e9cb16ab06f284fab89c5d"><div class="ttname"><a href="namespaceansi_1_1bg.html#ada11b3e656e9cb16ab06f284fab89c5d">ansi::bg::bright_cyan</a></div><div class="ttdeci">constexpr std::string_view bright_cyan</div><div class="ttdoc">Background color: bright cyan.</div><div class="ttdef"><b>Definition</b> <a href="#l00140">constants.hpp:140</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1bg_html_adf096d013814b13b27474dc0d6c19c8e"><div class="ttname"><a href="namespaceansi_1_1bg.html#adf096d013814b13b27474dc0d6c19c8e">ansi::bg::black</a></div><div class="ttdeci">constexpr std::string_view black</div><div class="ttdoc">Background color: black.</div><div class="ttdef"><b>Definition</b> <a href="#l00111">constants.hpp:111</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1clear_html"><div class="ttname"><a href="namespaceansi_1_1clear.html">ansi::clear</a></div><div class="ttdoc">Namespace containing screen clearing escape sequences.</div><div class="ttdef"><b>Definition</b> <a href="#l00175">constants.hpp:175</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1clear_html_a17b434ef7b3e4f4d722106bdec5c79d9"><div class="ttname"><a href="namespaceansi_1_1clear.html#a17b434ef7b3e4f4d722106bdec5c79d9">ansi::clear::line</a></div><div class="ttdeci">constexpr std::string_view line</div><div class="ttdoc">Clear from cursor to end of current line.</div><div class="ttdef"><b>Definition</b> <a href="#l00179">constants.hpp:179</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1clear_html_a35ecfe3412c70ca19ec9686f99de71d7"><div class="ttname"><a href="namespaceansi_1_1clear.html#a35ecfe3412c70ca19ec9686f99de71d7">ansi::clear::screen</a></div><div class="ttdeci">constexpr std::string_view screen</div><div class="ttdoc">Clear entire screen and move cursor to home position.</div><div class="ttdef"><b>Definition</b> <a href="#l00177">constants.hpp:177</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1clear_html_abc2e7c8383f211ed52f6796e961590ff"><div class="ttname"><a href="namespaceansi_1_1clear.html#abc2e7c8383f211ed52f6796e961590ff">ansi::clear::to_end</a></div><div class="ttdeci">constexpr std::string_view to_end</div><div class="ttdoc">Clear from cursor to end of screen.</div><div class="ttdef"><b>Definition</b> <a href="#l00181">constants.hpp:181</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1color_html"><div class="ttname"><a href="namespaceansi_1_1color.html">ansi::color</a></div><div class="ttdoc">Namespace containing text foreground color escape sequences.</div><div class="ttdef"><b>Definition</b> <a href="#l00064">constants.hpp:64</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1color_html_a07540b7636d3a4c97fe3a8e5a9c4052d"><div class="ttname"><a href="namespaceansi_1_1color.html#a07540b7636d3a4c97fe3a8e5a9c4052d">ansi::color::bright_red</a></div><div class="ttdeci">constexpr std::string_view bright_red</div><div class="ttdoc">Text foreground color: bright red.</div><div class="ttdef"><b>Definition</b> <a href="#l00086">constants.hpp:86</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1color_html_a0e8a41323bc53f33089efc0228a069d4"><div class="ttname"><a href="namespaceansi_1_1color.html#a0e8a41323bc53f33089efc0228a069d4">ansi::color::bright_green</a></div><div class="ttdeci">constexpr std::string_view bright_green</div><div class="ttdoc">Text foreground color: bright green.</div><div class="ttdef"><b>Definition</b> <a href="#l00088">constants.hpp:88</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1color_html_a1481e3b9eaf51857a9a792700c20bdb8"><div class="ttname"><a href="namespaceansi_1_1color.html#a1481e3b9eaf51857a9a792700c20bdb8">ansi::color::cyan</a></div><div class="ttdeci">constexpr std::string_view cyan</div><div class="ttdoc">Text foreground color: cyan.</div><div class="ttdef"><b>Definition</b> <a href="#l00079">constants.hpp:79</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1color_html_a4800991ee59741caf7bc3e902d865078"><div class="ttname"><a href="namespaceansi_1_1color.html#a4800991ee59741caf7bc3e902d865078">ansi::color::bright_blue</a></div><div class="ttdeci">constexpr std::string_view bright_blue</div><div class="ttdoc">Text foreground color: bright blue.</div><div class="ttdef"><b>Definition</b> <a href="#l00092">constants.hpp:92</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1color_html_a4b8c7ad106758ef4ac6c46239f644064"><div class="ttname"><a href="namespaceansi_1_1color.html#a4b8c7ad106758ef4ac6c46239f644064">ansi::color::bright_black</a></div><div class="ttdeci">constexpr std::string_view bright_black</div><div class="ttdoc">Text foreground color: bright black (gray).</div><div class="ttdef"><b>Definition</b> <a href="#l00084">constants.hpp:84</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1color_html_a6974ca67b6120a221315f3315cfe2857"><div class="ttname"><a href="namespaceansi_1_1color.html#a6974ca67b6120a221315f3315cfe2857">ansi::color::magenta</a></div><div class="ttdeci">constexpr std::string_view magenta</div><div class="ttdoc">Text foreground color: magenta.</div><div class="ttdef"><b>Definition</b> <a href="#l00077">constants.hpp:77</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1color_html_a8df243ab95dce69ee53bde309641c9f3"><div class="ttname"><a href="namespaceansi_1_1color.html#a8df243ab95dce69ee53bde309641c9f3">ansi::color::yellow</a></div><div class="ttdeci">constexpr std::string_view yellow</div><div class="ttdoc">Text foreground color: yellow.</div><div class="ttdef"><b>Definition</b> <a href="#l00073">constants.hpp:73</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1color_html_aa0842fd60eff23e6042b27ecf93ef28a"><div class="ttname"><a href="namespaceansi_1_1color.html#aa0842fd60eff23e6042b27ecf93ef28a">ansi::color::white</a></div><div class="ttdeci">constexpr std::string_view white</div><div class="ttdoc">Text foreground color: white.</div><div class="ttdef"><b>Definition</b> <a href="#l00081">constants.hpp:81</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1color_html_aa1982b5d9237d4f5f74386a33ddcedc8"><div class="ttname"><a href="namespaceansi_1_1color.html#aa1982b5d9237d4f5f74386a33ddcedc8">ansi::color::blue</a></div><div class="ttdeci">constexpr std::string_view blue</div><div class="ttdoc">Text foreground color: blue.</div><div class="ttdef"><b>Definition</b> <a href="#l00075">constants.hpp:75</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1color_html_aa7c6ed1764bcff50614ac6bbd2384d34"><div class="ttname"><a href="namespaceansi_1_1color.html#aa7c6ed1764bcff50614ac6bbd2384d34">ansi::color::black</a></div><div class="ttdeci">constexpr std::string_view black</div><div class="ttdoc">Text foreground color: black.</div><div class="ttdef"><b>Definition</b> <a href="#l00067">constants.hpp:67</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1color_html_ab670f8294a53e49eb76c490d74c3da74"><div class="ttname"><a href="namespaceansi_1_1color.html#ab670f8294a53e49eb76c490d74c3da74">ansi::color::bright_magenta</a></div><div class="ttdeci">constexpr std::string_view bright_magenta</div><div class="ttdoc">Text foreground color: bright magenta.</div><div class="ttdef"><b>Definition</b> <a href="#l00094">constants.hpp:94</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1color_html_ab8d8fe66db7b6a97e76146845e3b0ab4"><div class="ttname"><a href="namespaceansi_1_1color.html#ab8d8fe66db7b6a97e76146845e3b0ab4">ansi::color::bright_white</a></div><div class="ttdeci">constexpr std::string_view bright_white</div><div class="ttdoc">Text foreground color: bright white.</div><div class="ttdef"><b>Definition</b> <a href="#l00098">constants.hpp:98</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1color_html_ad56418bc81402e073df11384776f3007"><div class="ttname"><a href="namespaceansi_1_1color.html#ad56418bc81402e073df11384776f3007">ansi::color::red</a></div><div class="ttdeci">constexpr std::string_view red</div><div class="ttdoc">Text foreground color: red.</div><div class="ttdef"><b>Definition</b> <a href="#l00069">constants.hpp:69</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1color_html_ae758f1a6e283d527d4771b2578878ccc"><div class="ttname"><a href="namespaceansi_1_1color.html#ae758f1a6e283d527d4771b2578878ccc">ansi::color::green</a></div><div class="ttdeci">constexpr std::string_view green</div><div class="ttdoc">Text foreground color: green.</div><div class="ttdef"><b>Definition</b> <a href="#l00071">constants.hpp:71</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1color_html_aea2ae414d27fba8c71960d8935a9c47c"><div class="ttname"><a href="namespaceansi_1_1color.html#aea2ae414d27fba8c71960d8935a9c47c">ansi::color::bright_cyan</a></div><div class="ttdeci">constexpr std::string_view bright_cyan</div><div class="ttdoc">Text foreground color: bright cyan.</div><div class="ttdef"><b>Definition</b> <a href="#l00096">constants.hpp:96</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1color_html_afb8026a5c5ce0ee7c978cf67cdf2aa89"><div class="ttname"><a href="namespaceansi_1_1color.html#afb8026a5c5ce0ee7c978cf67cdf2aa89">ansi::color::bright_yellow</a></div><div class="ttdeci">constexpr std::string_view bright_yellow</div><div class="ttdoc">Text foreground color: bright yellow.</div><div class="ttdef"><b>Definition</b> <a href="#l00090">constants.hpp:90</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1cursor_html"><div class="ttname"><a href="namespaceansi_1_1cursor.html">ansi::cursor</a></div><div class="ttdoc">Namespace containing cursor movement escape sequences.</div><div class="ttdef"><b>Definition</b> <a href="#l00152">constants.hpp:152</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1cursor_html_a1ea7913e237a45b75794faf3f8bd8f7d"><div class="ttname"><a href="namespaceansi_1_1cursor.html#a1ea7913e237a45b75794faf3f8bd8f7d">ansi::cursor::left</a></div><div class="ttdeci">constexpr std::string_view left</div><div class="ttdoc">Move cursor left one column.</div><div class="ttdef"><b>Definition</b> <a href="#l00162">constants.hpp:162</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1cursor_html_a585786fe8ad760e415663cbda78d7965"><div class="ttname"><a href="namespaceansi_1_1cursor.html#a585786fe8ad760e415663cbda78d7965">ansi::cursor::home</a></div><div class="ttdeci">constexpr std::string_view home</div><div class="ttdoc">Move cursor to home position (top-left corner).</div><div class="ttdef"><b>Definition</b> <a href="#l00154">constants.hpp:154</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1cursor_html_a6f0325ff145cbda8400f06fd6a007c51"><div class="ttname"><a href="namespaceansi_1_1cursor.html#a6f0325ff145cbda8400f06fd6a007c51">ansi::cursor::restore</a></div><div class="ttdeci">constexpr std::string_view restore</div><div class="ttdoc">Restore previously saved cursor position.</div><div class="ttdef"><b>Definition</b> <a href="#l00166">constants.hpp:166</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1cursor_html_ab3d72237aca3102ec479deb1d6092952"><div class="ttname"><a href="namespaceansi_1_1cursor.html#ab3d72237aca3102ec479deb1d6092952">ansi::cursor::save</a></div><div class="ttdeci">constexpr std::string_view save</div><div class="ttdoc">Save current cursor position.</div><div class="ttdef"><b>Definition</b> <a href="#l00164">constants.hpp:164</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1cursor_html_ac636b03b5432185d3a50c13ad5f0393d"><div class="ttname"><a href="namespaceansi_1_1cursor.html#ac636b03b5432185d3a50c13ad5f0393d">ansi::cursor::right</a></div><div class="ttdeci">constexpr std::string_view right</div><div class="ttdoc">Move cursor right one column.</div><div class="ttdef"><b>Definition</b> <a href="#l00160">constants.hpp:160</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1cursor_html_adddb8841eac32eea5c44e95d4d007541"><div class="ttname"><a href="namespaceansi_1_1cursor.html#adddb8841eac32eea5c44e95d4d007541">ansi::cursor::down</a></div><div class="ttdeci">constexpr std::string_view down</div><div class="ttdoc">Move cursor down one line.</div><div class="ttdef"><b>Definition</b> <a href="#l00158">constants.hpp:158</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1cursor_html_aeb2f69830c7a8fc971a36886c41c448e"><div class="ttname"><a href="namespaceansi_1_1cursor.html#aeb2f69830c7a8fc971a36886c41c448e">ansi::cursor::up</a></div><div class="ttdeci">constexpr std::string_view up</div><div class="ttdoc">Move cursor up one line.</div><div class="ttdef"><b>Definition</b> <a href="#l00156">constants.hpp:156</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1text_html"><div class="ttname"><a href="namespaceansi_1_1text.html">ansi::text</a></div><div class="ttdoc">Namespace containing text styling escape sequences.</div><div class="ttdef"><b>Definition</b> <a href="#l00038">constants.hpp:38</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1text_html_a0e927a8190d40978359368d929627e14"><div class="ttname"><a href="namespaceansi_1_1text.html#a0e927a8190d40978359368d929627e14">ansi::text::strikethrough</a></div><div class="ttdeci">constexpr std::string_view strikethrough</div><div class="ttdoc">Cross out / strike through text.</div><div class="ttdef"><b>Definition</b> <a href="#l00054">constants.hpp:54</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1text_html_a409807fa04b8995feb1f540e20084b0f"><div class="ttname"><a href="namespaceansi_1_1text.html#a409807fa04b8995feb1f540e20084b0f">ansi::text::dim</a></div><div class="ttdeci">constexpr std::string_view dim</div><div class="ttdoc">Reduce text intensity (dim/faint).</div><div class="ttdef"><b>Definition</b> <a href="#l00042">constants.hpp:42</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1text_html_a8c87a70aa3a5ae999e2559021b8ceafa"><div class="ttname"><a href="namespaceansi_1_1text.html#a8c87a70aa3a5ae999e2559021b8ceafa">ansi::text::bold</a></div><div class="ttdeci">constexpr std::string_view bold</div><div class="ttdoc">Make text appear bold/bright.</div><div class="ttdef"><b>Definition</b> <a href="#l00040">constants.hpp:40</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1text_html_a99ab74ef98c97aa23df945349a93eb71"><div class="ttname"><a href="namespaceansi_1_1text.html#a99ab74ef98c97aa23df945349a93eb71">ansi::text::blink</a></div><div class="ttdeci">constexpr std::string_view blink</div><div class="ttdoc">Make text blink (if supported by terminal).</div><div class="ttdef"><b>Definition</b> <a href="#l00048">constants.hpp:48</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1text_html_abfc20e0139d84ca362545d39e0bb2d21"><div class="ttname"><a href="namespaceansi_1_1text.html#abfc20e0139d84ca362545d39e0bb2d21">ansi::text::underline</a></div><div class="ttdeci">constexpr std::string_view underline</div><div class="ttdoc">Underline text.</div><div class="ttdef"><b>Definition</b> <a href="#l00046">constants.hpp:46</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1text_html_acc3a771d6a59fa369534e49d96b044a4"><div class="ttname"><a href="namespaceansi_1_1text.html#acc3a771d6a59fa369534e49d96b044a4">ansi::text::italic</a></div><div class="ttdeci">constexpr std::string_view italic</div><div class="ttdoc">Display text in italic style.</div><div class="ttdef"><b>Definition</b> <a href="#l00044">constants.hpp:44</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1text_html_af0661c7bf61f17c49cdb17b5e6f6947a"><div class="ttname"><a href="namespaceansi_1_1text.html#af0661c7bf61f17c49cdb17b5e6f6947a">ansi::text::hidden</a></div><div class="ttdeci">constexpr std::string_view hidden</div><div class="ttdoc">Conceal text (useful for passwords).</div><div class="ttdef"><b>Definition</b> <a href="#l00052">constants.hpp:52</a></div></div>
+<div class="ttc" id="anamespaceansi_1_1text_html_afb1293a4d4b32adb645f53eaf9149b17"><div class="ttname"><a href="namespaceansi_1_1text.html#afb1293a4d4b32adb645f53eaf9149b17">ansi::text::reverse</a></div><div class="ttdeci">constexpr std::string_view reverse</div><div class="ttdoc">Reverse video: swap foreground and background colors.</div><div class="ttdef"><b>Definition</b> <a href="#l00050">constants.hpp:50</a></div></div>
+<div class="ttc" id="anamespaceansi_html"><div class="ttname"><a href="namespaceansi.html">ansi</a></div><div class="ttdoc">Namespace containing ANSI escape codes for terminal formatting.</div><div class="ttdef"><b>Definition</b> <a href="#l00027">constants.hpp:27</a></div></div>
+<div class="ttc" id="anamespaceansi_html_aefd3f042ef499b25205ed31e4258d1c1"><div class="ttname"><a href="namespaceansi.html#aefd3f042ef499b25205ed31e4258d1c1">ansi::reset</a></div><div class="ttdeci">constexpr std::string_view reset</div><div class="ttdoc">Reset all text formatting and colors to terminal default.</div><div class="ttdef"><b>Definition</b> <a href="#l00030">constants.hpp:30</a></div></div>
+</div><!-- fragment --></div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.17.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

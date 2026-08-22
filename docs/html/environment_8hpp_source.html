@@ -1,0 +1,379 @@
+<!-- Custom Doxygen HTML_HEADER for NoTeX. Rationale for every choice
+     here: docs/plan/CHANGELOG.md, entries 26-29. Keep every comment in
+     this file to 1-3 lines; longer ones have repeatedly broken rendering. -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.17.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>NoTeX: notex/include/notex/environment.hpp Source File</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="codefolding.js"></script>
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="doxygen-awesome-interactive-toc.js"></script>
+<script type="text/javascript" src="doxygen-awesome-tabs.js"></script>
+<script type="text/javascript" src="mermaid.min.js"></script>
+<script type="text/javascript">
+    // Guarded so one extension failing degrades to a console message
+    // instead of aborting this whole block (CHANGELOG entry 34).
+    function notexInit(name, extension) {
+        try {
+            if (extension && typeof extension.init === 'function') {
+                extension.init();
+            } else {
+                console.error('NoTeX: ' + name + '.init() unavailable, skipped');
+            }
+        } catch (error) {
+            console.error('NoTeX: ' + name + '.init() threw', error);
+        }
+    }
+    notexInit('DoxygenAwesomeFragmentCopyButton', typeof DoxygenAwesomeFragmentCopyButton !== 'undefined' ? DoxygenAwesomeFragmentCopyButton : null);
+    notexInit('DoxygenAwesomeDarkModeToggle', typeof DoxygenAwesomeDarkModeToggle !== 'undefined' ? DoxygenAwesomeDarkModeToggle : null);
+    notexInit('DoxygenAwesomeParagraphLink', typeof DoxygenAwesomeParagraphLink !== 'undefined' ? DoxygenAwesomeParagraphLink : null);
+    notexInit('DoxygenAwesomeInteractiveToc', typeof DoxygenAwesomeInteractiveToc !== 'undefined' ? DoxygenAwesomeInteractiveToc : null);
+    notexInit('DoxygenAwesomeTabs', typeof DoxygenAwesomeTabs !== 'undefined' ? DoxygenAwesomeTabs : null);
+</script>
+<script type="text/javascript">
+    // Deliberately its own <script>: a throw in another block cannot
+    // abort this one, which is what silently killed mermaid before.
+    (function() {
+        if (typeof mermaid === 'undefined') { return; }
+        var toggle = typeof DoxygenAwesomeDarkModeToggle !== 'undefined' ? DoxygenAwesomeDarkModeToggle : null;
+        var counter = 0;
+        // Must run here, before DOMContentLoaded: mermaid's own autorun
+        // would otherwise overwrite each diagram's source with its SVG.
+        mermaid.initialize({ startOnLoad: false });
+        // darkMode is a separate themeVariable; theme 'dark' alone leaves
+        // most computed colors on their light-mode branch.
+        function config(dark) {
+            return dark
+                ? { startOnLoad: false, theme: 'dark', themeVariables: { darkMode: true } }
+                : { startOnLoad: false, theme: 'neutral' };
+        }
+        // Source captured once, up front, so every re-render redraws from
+        // it rather than from a previous render's own output.
+        function saveSource() {
+            document.querySelectorAll('.mermaid').forEach(function(el) {
+                if (!el.hasAttribute('data-notex-source')) {
+                    el.setAttribute('data-notex-source', el.textContent);
+                }
+            });
+        }
+        // The third argument matters: without it mermaid measures label
+        // text against <body>'s font, so nodes size wrong and text crops.
+        function render(dark) {
+            mermaid.initialize(config(dark));
+            document.querySelectorAll('.mermaid').forEach(function(el) {
+                var source = el.getAttribute('data-notex-source');
+                if (!source) { return; }
+                mermaid.render('notex-mermaid-' + (counter++), source, el).then(function(result) {
+                    el.innerHTML = result.svg;
+                }).catch(function(error) {
+                    // mermaid empties the element first, so restore the
+                    // source rather than leave the diagram blank.
+                    el.textContent = source;
+                    console.error('NoTeX: mermaid render failed', error);
+                });
+            });
+        }
+        // userPreference is a getter over localStorage and the system
+        // setting, so it reads correctly even if init() never ran.
+        function darkNow() {
+            return toggle ? toggle.userPreference : false;
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            saveSource();
+            render(darkNow());
+        });
+        // Every mode-change path dispatches through this one property,
+        // so replacing it re-renders on toggle, system change and restore.
+        if (toggle) {
+            var originalEnableDarkMode = toggle.enableDarkMode;
+            toggle.enableDarkMode = function(enable) {
+                originalEnableDarkMode(enable);
+                render(enable);
+            };
+        }
+    })();
+</script>
+<script type="text/javascript">
+    // Moves the toggle button before the search box; MutationObserver
+    // since the extension re-appends it after on every resize.
+    document.addEventListener('DOMContentLoaded', function() {
+        function moveToggleBeforeSearch() {
+            var searchBox = document.getElementById("MSearchBox");
+            var toggle = document.querySelector("doxygen-awesome-dark-mode-toggle");
+            if (searchBox && toggle && searchBox.previousElementSibling !== toggle) {
+                searchBox.parentNode.insertBefore(toggle, searchBox);
+            }
+        }
+        new MutationObserver(moveToggleBeforeSearch).observe(document.body, {childList: true, subtree: true});
+        moveToggleBeforeSearch();
+    });
+</script>
+<script type="text/javascript">
+    // Publishes the sticky bar's measured height, which CSS cannot read
+    // on its own, so anchor targets can offset by it.
+    document.addEventListener('DOMContentLoaded', function() {
+        var topBar = document.getElementById('top');
+        if (!topBar) { return; }
+        function publishHeight() {
+            document.documentElement.style.setProperty('--notex-topbar-height', topBar.offsetHeight + 'px');
+        }
+        publishHeight();
+        if (typeof ResizeObserver !== 'undefined') {
+            new ResizeObserver(publishHeight).observe(topBar);
+        }
+    });
+</script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<style>
+/* Sticky, blurred top bar. Colours mirror the theme's own light/dark
+   custom-property pattern so the toggle keeps driving them. */
+:root {
+    --notex-topbar-background: rgba(255, 255, 255, 0.50);
+    --notex-topbar-height: 0px;
+}
+@media (prefers-color-scheme: dark) {
+    html:not(.light-mode) {
+        --notex-topbar-background: rgba(28, 29, 31, 0.50);
+    }
+}
+html.dark-mode {
+    --notex-topbar-background: rgba(28, 29, 31, 0.50);
+}
+#top {
+    position: sticky;
+    top: 0;
+    background: var(--notex-topbar-background);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    backdrop-filter: saturate(180%) blur(12px);
+}
+/* Without blur support the bar must stay opaque to stay readable. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    #top {
+        background: var(--header-background);
+    }
+}
+/* Anchor targets would otherwise land underneath the sticky bar. */
+a.anchor {
+    scroll-margin-top: calc(var(--notex-topbar-height) + var(--spacing-large));
+}
+/* Space before the search box, now that the toggle sits there. */
+doxygen-awesome-dark-mode-toggle {
+    margin-right: 0.5em;
+}
+/* Circular GitHub icon, replacing the theme's corner ribbon. */
+#notex-github-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    color: var(--page-secondary-foreground-color, #52606d);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+#notex-github-icon:hover {
+    background-color: var(--separator-color, rgba(0, 0, 0, 0.08));
+    color: var(--page-foreground-color, #14181d);
+}
+</style>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectalign">
+   <div id="projectname">NoTeX<span id="projectnumber">&#160;1.0.0</span>
+   </div>
+   <div id="projectbrief">A modern noteworthy LaTeX template</div>
+  </td>
+  <td style="padding-left: 0.5em; vertical-align: middle;">
+   <a id="notex-github-icon" href="https://github.com/marcotallone/notex" title="View source on GitHub" target="_blank" rel="noopener noreferrer">
+    <svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+   </a>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.17.0 -->
+<script type="text/javascript">
+let searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', codefold.init);
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', () => {
+  initMenu('',false);
+  init_search();
+});
+</script>
+<div id="main-nav-mobile">
+<div class="sm sm-dox"><input id="main-menu-state" type="checkbox"/>
+<label class="main-menu-btn" for="main-menu-state">
+<span class="main-menu-btn-icon"></span> Toggle main menu visibility</label>
+<span id="searchBoxPos1" style="position:absolute;right:8px;top:8px;height:36px;"></span>
+</div>
+</div><!-- main-nav-mobile -->
+<div id="main-nav">
+  <ul class="sm sm-dox" id="main-menu">
+    <li id="searchBoxPos2" style="float:right">
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+    </li>
+  </ul>
+</div><!-- main-nav -->
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><b>notex</b></li><li class="navelem"><b>include</b></li><li class="navelem"><b>notex</b></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="headertitle"><div class="title">environment.hpp</div></div>
+</div><!--header-->
+<div class="contents">
+<a href="environment_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;filesystem&gt;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;string_view&gt;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacenotex.html">notex</a> {</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span></div>
+<div class="foldopen" id="foldopen00016" data-start="{" data-end="};">
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6">   16</a></span><span class="keyword">enum class</span> <a class="code hl_enumeration" href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6">InstallationType</a> {</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6ab50339a10e1de285ac99d4c3990b8693">   17</a></span>    <a class="code hl_enumvalue" href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6ab50339a10e1de285ac99d4c3990b8693">NONE</a>,    </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6a54b4c4075463b2e02cd69f5cd139b5b2">   18</a></span>    <a class="code hl_enumvalue" href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6a54b4c4075463b2e02cd69f5cd139b5b2">LOCAL</a>,   </div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6a6eecfba72d12922ee1dead07a0ef3334">   19</a></span>    <a class="code hl_enumvalue" href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6a6eecfba72d12922ee1dead07a0ef3334">GLOBAL</a>,  </div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>};</div>
+</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>std::string_view <a class="code hl_function" href="namespacenotex.html#af485eee1a7625e78e49d778471499f1b">to_string</a>(<a class="code hl_enumeration" href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6">InstallationType</a> type);</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span></div>
+<div class="foldopen" id="foldopen00035" data-start="{" data-end="};">
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="classnotex_1_1Environment.html">   35</a></span><span class="keyword">class </span><a class="code hl_function" href="classnotex_1_1Environment.html#a41b0924d88bdf517338f908ef5072130">Environment</a> {</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="keyword">explicit</span> <a class="code hl_function" href="classnotex_1_1Environment.html#a41b0924d88bdf517338f908ef5072130">Environment</a>(</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>        std::filesystem::path start_dir = std::filesystem::current_path());</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span></div>
+<div class="foldopen" id="foldopen00050" data-start="{" data-end="}">
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="classnotex_1_1Environment.html#a7f7b108cfc0a03a9cf8e6dfcb6bc77c8">   50</a></span>    <span class="keyword">const</span> std::filesystem::path&amp; <a class="code hl_function" href="classnotex_1_1Environment.html#a7f7b108cfc0a03a9cf8e6dfcb6bc77c8">texmf_home</a>() const noexcept {</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        <span class="keywordflow">return</span> texmf_home_;</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    }</div>
+</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span></div>
+<div class="foldopen" id="foldopen00056" data-start="{" data-end="}">
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno"><a class="line" href="classnotex_1_1Environment.html#aea88f44d3a5ae5b44edd60e418d4dad8">   56</a></span>    <span class="keyword">const</span> std::filesystem::path&amp; <a class="code hl_function" href="classnotex_1_1Environment.html#aea88f44d3a5ae5b44edd60e418d4dad8">global_latex_dir</a>() const noexcept {</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>        <span class="keywordflow">return</span> global_latex_dir_;</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    }</div>
+</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span></div>
+<div class="foldopen" id="foldopen00062" data-start="{" data-end="}">
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno"><a class="line" href="classnotex_1_1Environment.html#a519781b374f4fb148834b4a2918d23eb">   62</a></span>    <span class="keyword">const</span> std::filesystem::path&amp; <a class="code hl_function" href="classnotex_1_1Environment.html#a519781b374f4fb148834b4a2918d23eb">global_fonts_dir</a>() const noexcept {</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>        <span class="keywordflow">return</span> global_fonts_dir_;</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    }</div>
+</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span></div>
+<div class="foldopen" id="foldopen00068" data-start="{" data-end="}">
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno"><a class="line" href="classnotex_1_1Environment.html#ad4f5e79080682049e23ced9efa289b38">   68</a></span>    <span class="keyword">const</span> std::filesystem::path&amp; <a class="code hl_function" href="classnotex_1_1Environment.html#ad4f5e79080682049e23ced9efa289b38">local_latex_dir</a>() const noexcept {</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>        <span class="keywordflow">return</span> local_latex_dir_;</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    }</div>
+</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span></div>
+<div class="foldopen" id="foldopen00074" data-start="{" data-end="}">
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno"><a class="line" href="classnotex_1_1Environment.html#a3ea4db1923b1eaab8db4c15a053ae9a7">   74</a></span>    <span class="keyword">const</span> std::filesystem::path&amp; <a class="code hl_function" href="classnotex_1_1Environment.html#a3ea4db1923b1eaab8db4c15a053ae9a7">local_fonts_dir</a>() const noexcept {</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>        <span class="keywordflow">return</span> local_fonts_dir_;</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    }</div>
+</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span></div>
+<div class="foldopen" id="foldopen00081" data-start="{" data-end="}">
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno"><a class="line" href="classnotex_1_1Environment.html#a009e965879b5eb8437878836dd744880">   81</a></span>    <a class="code hl_enumeration" href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6">InstallationType</a> <a class="code hl_function" href="classnotex_1_1Environment.html#a009e965879b5eb8437878836dd744880">installation_type</a>() const noexcept {</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>        <span class="keywordflow">return</span> installation_type_;</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    }</div>
+</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span> </div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    <span class="keyword">static</span> std::filesystem::path resolve_texmf_home();</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span> </div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    std::filesystem::path texmf_home_;</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    std::filesystem::path global_latex_dir_;</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    std::filesystem::path global_fonts_dir_;</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    std::filesystem::path local_latex_dir_;</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    std::filesystem::path local_fonts_dir_;</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    <a class="code hl_enumeration" href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6">InstallationType</a> installation_type_;</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>};</div>
+</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span> </div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>}  <span class="comment">// namespace notex</span></div>
+<div class="ttc" id="aclassnotex_1_1Environment_html_a009e965879b5eb8437878836dd744880"><div class="ttname"><a href="classnotex_1_1Environment.html#a009e965879b5eb8437878836dd744880">notex::Environment::installation_type</a></div><div class="ttdeci">InstallationType installation_type() const noexcept</div><div class="ttdef"><b>Definition</b> <a href="#l00081">environment.hpp:81</a></div></div>
+<div class="ttc" id="aclassnotex_1_1Environment_html_a3ea4db1923b1eaab8db4c15a053ae9a7"><div class="ttname"><a href="classnotex_1_1Environment.html#a3ea4db1923b1eaab8db4c15a053ae9a7">notex::Environment::local_fonts_dir</a></div><div class="ttdeci">const std::filesystem::path &amp; local_fonts_dir() const noexcept</div><div class="ttdef"><b>Definition</b> <a href="#l00074">environment.hpp:74</a></div></div>
+<div class="ttc" id="aclassnotex_1_1Environment_html_a41b0924d88bdf517338f908ef5072130"><div class="ttname"><a href="classnotex_1_1Environment.html#a41b0924d88bdf517338f908ef5072130">notex::Environment::Environment</a></div><div class="ttdeci">Environment(std::filesystem::path start_dir=std::filesystem::current_path())</div><div class="ttdoc">Resolves TEXMFHOME and checks start_dir for a local installation.</div><div class="ttdef"><b>Definition</b> <a href="environment_8cpp_source.html#l00061">environment.cpp:61</a></div></div>
+<div class="ttc" id="aclassnotex_1_1Environment_html_a519781b374f4fb148834b4a2918d23eb"><div class="ttname"><a href="classnotex_1_1Environment.html#a519781b374f4fb148834b4a2918d23eb">notex::Environment::global_fonts_dir</a></div><div class="ttdeci">const std::filesystem::path &amp; global_fonts_dir() const noexcept</div><div class="ttdef"><b>Definition</b> <a href="#l00062">environment.hpp:62</a></div></div>
+<div class="ttc" id="aclassnotex_1_1Environment_html_a7f7b108cfc0a03a9cf8e6dfcb6bc77c8"><div class="ttname"><a href="classnotex_1_1Environment.html#a7f7b108cfc0a03a9cf8e6dfcb6bc77c8">notex::Environment::texmf_home</a></div><div class="ttdeci">const std::filesystem::path &amp; texmf_home() const noexcept</div><div class="ttdef"><b>Definition</b> <a href="#l00050">environment.hpp:50</a></div></div>
+<div class="ttc" id="aclassnotex_1_1Environment_html_ad4f5e79080682049e23ced9efa289b38"><div class="ttname"><a href="classnotex_1_1Environment.html#ad4f5e79080682049e23ced9efa289b38">notex::Environment::local_latex_dir</a></div><div class="ttdeci">const std::filesystem::path &amp; local_latex_dir() const noexcept</div><div class="ttdef"><b>Definition</b> <a href="#l00068">environment.hpp:68</a></div></div>
+<div class="ttc" id="aclassnotex_1_1Environment_html_aea88f44d3a5ae5b44edd60e418d4dad8"><div class="ttname"><a href="classnotex_1_1Environment.html#aea88f44d3a5ae5b44edd60e418d4dad8">notex::Environment::global_latex_dir</a></div><div class="ttdeci">const std::filesystem::path &amp; global_latex_dir() const noexcept</div><div class="ttdef"><b>Definition</b> <a href="#l00056">environment.hpp:56</a></div></div>
+<div class="ttc" id="anamespacenotex_html"><div class="ttname"><a href="namespacenotex.html">notex</a></div><div class="ttdef"><b>Definition</b> <a href="assets_8hpp_source.html#l00020">assets.hpp:20</a></div></div>
+<div class="ttc" id="anamespacenotex_html_acedadcc2ce119cd13e1e6c1dd737a9e6"><div class="ttname"><a href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6">notex::InstallationType</a></div><div class="ttdeci">InstallationType</div><div class="ttdef"><b>Definition</b> <a href="#l00016">environment.hpp:16</a></div></div>
+<div class="ttc" id="anamespacenotex_html_acedadcc2ce119cd13e1e6c1dd737a9e6a54b4c4075463b2e02cd69f5cd139b5b2"><div class="ttname"><a href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6a54b4c4075463b2e02cd69f5cd139b5b2">notex::InstallationType::LOCAL</a></div><div class="ttdeci">@ LOCAL</div><div class="ttdoc">A local installation exists (takes precedence over global).</div><div class="ttdef"><b>Definition</b> <a href="#l00018">environment.hpp:18</a></div></div>
+<div class="ttc" id="anamespacenotex_html_acedadcc2ce119cd13e1e6c1dd737a9e6a6eecfba72d12922ee1dead07a0ef3334"><div class="ttname"><a href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6a6eecfba72d12922ee1dead07a0ef3334">notex::InstallationType::GLOBAL</a></div><div class="ttdeci">@ GLOBAL</div><div class="ttdoc">Only a global installation exists.</div><div class="ttdef"><b>Definition</b> <a href="#l00019">environment.hpp:19</a></div></div>
+<div class="ttc" id="anamespacenotex_html_acedadcc2ce119cd13e1e6c1dd737a9e6ab50339a10e1de285ac99d4c3990b8693"><div class="ttname"><a href="namespacenotex.html#acedadcc2ce119cd13e1e6c1dd737a9e6ab50339a10e1de285ac99d4c3990b8693">notex::InstallationType::NONE</a></div><div class="ttdeci">@ NONE</div><div class="ttdoc">Neither a local nor a global installation was found.</div><div class="ttdef"><b>Definition</b> <a href="#l00017">environment.hpp:17</a></div></div>
+<div class="ttc" id="anamespacenotex_html_af485eee1a7625e78e49d778471499f1b"><div class="ttname"><a href="namespacenotex.html#af485eee1a7625e78e49d778471499f1b">notex::to_string</a></div><div class="ttdeci">std::string_view to_string(InstallationType type)</div><div class="ttdef"><b>Definition</b> <a href="environment_8cpp_source.html#l00018">environment.cpp:18</a></div></div>
+</div><!-- fragment --></div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.17.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>
