@@ -1,0 +1,164 @@
+## Doxyfile for NoTeX ──────────────────────────────────────────────────────────
+#
+# This file is a template processed by CMake's `configure_file(... @ONLY)`
+# (see the DOCS block in the root CMakeLists.txt): every `@VAR@` below is
+# substituted with the matching CMake variable at configure time and the
+# result is written to `<build>/Doxyfile`, which the `docs` target then
+# invokes doxygen on directly. Only a curated subset of doxygen's options is
+# listed here — anything omitted falls back to doxygen's own built-in
+# default, so this file stays short and easy to scan rather than mirroring
+# the full (600+ option) template `doxygen -g` would produce.
+#
+# Build with:
+#   cmake -B build -DDOCS=ON && cmake --build build --target docs
+# Output lands at:
+#   <build>/docs/html/index.html
+
+# PROJECT ──────────────────────────────────────────────────────────────────────
+
+PROJECT_NAME           = "@PROJECT_NAME@"
+PROJECT_NUMBER         = "@PROJECT_VERSION@"
+PROJECT_BRIEF          = "@PROJECT_DESCRIPTION@"
+# PROJECT_LOGO           = @PROJECT_ROOT_DIR@/images/notex-logo.png (# FIXME: too large)
+OUTPUT_DIRECTORY       = @DOXYGEN_OUTPUT_DIRECTORY@
+OUTPUT_LANGUAGE        = English
+USE_MDFILE_AS_MAINPAGE = @DOXYGEN_MAINPAGE@
+
+# BUILD ────────────────────────────────────────────────────────────────────────
+
+# Only members actually carrying a doc comment are extracted (matches this
+# project's convention of documenting every public member — see
+# docs/guidelines/C++Guidelines.md); private, trailing-underscore members
+# are deliberately left undocumented and shouldn't clutter the output.
+EXTRACT_ALL            = NO
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+EXTRACT_LOCAL_CLASSES  = YES
+CASE_SENSE_NAMES       = YES
+SORT_MEMBER_DOCS       = YES
+SORT_BRIEF_DOCS        = NO
+MARKDOWN_SUPPORT       = YES
+# GITHUB, not the Doxygen default, so that a hand-written TOC's "#slug"
+# anchors (matching GitHub's own heading-to-id algorithm) actually resolve
+# instead of every heading getting an opaque "autotoc_mdN" id.
+MARKDOWN_ID_STYLE      = GITHUB
+# 0, not the Doxygen default: every docs/*.md page already hand-maintains
+# its own TOC as a plain bullet list (for GitHub, which has no automatic
+# per-page TOC of its own). Doxygen's own automatic TOC injection, driven
+# by this setting, duplicated that list and rendered doubled heading text
+# until the ids stopped clashing (see MARKDOWN_ID_STYLE above) — turned
+# off entirely now that it's pure redundancy.
+TOC_INCLUDE_HEADINGS   = 0
+
+# MESSAGES / WARNINGS ──────────────────────────────────────────────────────────
+
+QUIET                  = YES
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES
+WARN_NO_PARAMDOC       = YES
+WARN_AS_ERROR          = NO
+
+# INPUT ────────────────────────────────────────────────────────────────────────
+
+INPUT                  = @DOXYGEN_INPUT_PATHS@
+RECURSIVE              = YES
+FILE_PATTERNS          = *.hpp *.cpp *.h *.md
+EXCLUDE_PATTERNS       = */build/* */generated/* */tests/*
+STRIP_FROM_PATH        = @PROJECT_ROOT_DIR@
+STRIP_FROM_INC_PATH    = @INCLUDE_DIR@
+
+# SOURCE BROWSING ──────────────────────────────────────────────────────────────
+
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = NO
+STRIP_CODE_COMMENTS    = YES
+REFERENCED_BY_RELATION = YES
+REFERENCES_RELATION    = YES
+REFERENCES_LINK_SOURCE = YES
+
+# ALPHABETICAL INDEX ───────────────────────────────────────────────────────────
+
+ALPHABETICAL_INDEX     = YES
+
+# HTML OUTPUT ──────────────────────────────────────────────────────────────────
+
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+HTML_DYNAMIC_SECTIONS  = YES
+# No left-hand navtree: with markdown pages nested only by their directory
+# grouping (see docs/plan/TODO.md), the tree had nothing meaningful to show
+# and rendered empty. Navigation instead relies on in-page markdown links
+# and Doxygen's own flat "Related Pages" index, which DISABLE_INDEX=NO
+# still provides via the top tab bar regardless of GENERATE_TREEVIEW.
+DISABLE_INDEX          = NO
+GENERATE_TREEVIEW      = NO
+FULL_SIDEBAR           = NO
+# Doxygen Awesome CSS (fetched by CMake, see the DOCS block in the root
+# CMakeLists.txt), "Base Theme" configuration — the theme's sidebar-only
+# variant only applies once GENERATE_TREEVIEW is on, and no companion
+# "-darkmode-toggle" stylesheet is needed for the base theme (that one is
+# documented as "ONLY required for the sidebar-only theme variant").
+# HTML_COLORSTYLE must stay LIGHT: dark mode is handled by the theme's own
+# JS toggle (see header.html), not Doxygen's native TOGGLE mechanism, and
+# the two conflict if both are active.
+HTML_EXTRA_STYLESHEET  = @DOXYGEN_AWESOME_CSS_DIR@/doxygen-awesome.css
+HTML_COLORSTYLE        = LIGHT
+# Adds the theme's dark/light toggle, copy-to-clipboard code buttons,
+# clickable paragraph anchors, scroll-synced TOC, and tab support — see
+# docs/doxygen/header.html for the actual script includes. Each extension's
+# own install docs list its .js file under HTML_EXTRA_FILES: without this,
+# the $relpath^doxygen-awesome-*.js includes in header.html point at files
+# Doxygen never copies into the output directory, and every extension is
+# silently inert (a 404 in the browser console, nothing visibly broken).
+HTML_HEADER            = @PROJECT_ROOT_DIR@/docs/doxygen/header.html
+# jquery.min.js and mermaid.min.js are self-hosted single files (see the
+# root CMakeLists.txt's DOCS block) rather than Doxygen's own bundled
+# resources or a CDN reference, for two different reasons: Doxygen >= 1.17
+# no longer bundles jQuery at all, which doxygen-awesome-css's own JS still
+# depends on, and Doxygen's own $mermaidjs placeholder only offers
+# Mermaid's stock 'default'/'dark' themes with no way to request the
+# GitHub-like 'neutral' theme header.html actually asks for.
+HTML_EXTRA_FILES       = @DOXYGEN_AWESOME_CSS_DIR@/doxygen-awesome-darkmode-toggle.js \
+                         @DOXYGEN_AWESOME_CSS_DIR@/doxygen-awesome-fragment-copy-button.js \
+                         @DOXYGEN_AWESOME_CSS_DIR@/doxygen-awesome-paragraph-link.js \
+                         @DOXYGEN_AWESOME_CSS_DIR@/doxygen-awesome-interactive-toc.js \
+                         @DOXYGEN_AWESOME_CSS_DIR@/doxygen-awesome-tabs.js \
+                         @MERMAID_JS_PATH@ \
+                         @JQUERY_JS_PATH@
+# Both required so the theme's own JS-driven copy button / interactive TOC
+# don't end up duplicated by Doxygen's native equivalents. Older Doxygen
+# versions that predate these options (< 1.10.0 / < 1.14.0) just ignore an
+# unrecognised tag with a warning rather than failing the build.
+HTML_COPY_CLIPBOARD    = NO
+PAGE_OUTLINE_PANEL     = NO
+# Doxygen's own default (YES) since Doxygen >= 1.9.something, stated
+# explicitly here because header.html's <!--BEGIN HTML_CODE_FOLDING-->
+# block (which loads codefolding.js) only makes sense read alongside this
+# setting: Doxygen's generated page bodies call a codefold() function
+# unconditionally whenever this is YES, regardless of what any custom
+# HTML_HEADER does or doesn't include, so the two have to agree.
+HTML_CODE_FOLDING      = YES
+
+# LATEX / MAN / RTF OUTPUT ─────────────────────────────────────────────────────
+
+# NoTeX already means "LaTeX" elsewhere in this repository; Doxygen's own
+# LaTeX/PDF backend would just be redundant noise, so only HTML is produced.
+GENERATE_LATEX         = NO
+GENERATE_MAN           = NO
+GENERATE_RTF           = NO
+
+# PREPROCESSOR ─────────────────────────────────────────────────────────────────
+
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
+PREDEFINED             = DOXYGEN_SHOULD_SKIP_THIS
+
+# DIAGRAMS ─────────────────────────────────────────────────────────────────────
+
+# Built-in (dot-free) class diagrams only, so `docs` works out of the box
+# without a Graphviz dependency. Flip HAVE_DOT to YES (and set DOT_PATH if
+# needed) for richer collaboration/include graphs if Graphviz is available.
+CLASS_DIAGRAMS         = YES
+HAVE_DOT               = NO
